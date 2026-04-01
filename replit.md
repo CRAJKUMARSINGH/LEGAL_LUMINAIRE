@@ -1,3 +1,22 @@
+# Legal Luminaire — अधिवक्ता शोध मंच
+
+## Project Overview
+
+**Legal Luminaire** is an Indian advocate legal research and document platform. It contains a complete, court-ready Hindi Discharge Application (प्रार्थना-पत्र) for Special Session Case No. 1/2025 (Hemraj Vardar, Maharana Pratap Stadium Wall Collapse, Udaipur, Rajasthan) — plus a legal research library, cross-reference matrix, oral arguments, and filing checklist.
+
+## Key Features
+- Full Hindi Discharge Application (25+ pages) under Section 250 BNSS 2023
+- 10 legal grounds with IS codes (IS 1199, IS 4031, IS 3535, ASTM C780, BS EN 1015-2, NBC, CPWD)
+- 8+ Supreme Court / High Court precedents including Kattavellai (2025 INSC 845)
+- Cross-reference matrix (violation → IS clause → judgment)
+- 5 ready-to-use oral argument paragraphs in Hindi
+- Interactive filing checklist with progress tracking
+
+## Artifacts
+- `artifacts/legal-luminaire` — React+Vite frontend (main app, preview path: `/`)
+- `artifacts/api-server` — Express API server
+- `artifacts/mockup-sandbox` — Design sandbox
+
 # Workspace
 
 ## Overview
