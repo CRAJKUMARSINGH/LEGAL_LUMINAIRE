@@ -13,9 +13,10 @@ import StandardsValidity from "@/pages/StandardsValidity";
 import CaseIntakeAssistant from "@/pages/CaseIntakeAssistant";
 import AIResearchEngine from "@/pages/AIResearchEngine";
 import AIDraftEngine from "@/pages/AIDraftEngine";
+import DefenceReply from "@/pages/DefenceReply";
 import {
   Scale, BookOpen, Table2, CheckSquare, Mic,
-  Home as HomeIcon, Menu, FilePlus, Zap, X, Bot,
+  Home as HomeIcon, Menu, FilePlus, Zap, X, Bot, FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { CaseProvider, useCaseContext } from "@/context/CaseContext";
@@ -33,6 +34,7 @@ const navItems = [
   { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments", icon: Mic, caseScoped: true },
   { path: "/standards-validity", label: "मानक वैधता नोट", labelEn: "Standards Note", icon: Scale, caseScoped: true },
   { path: "/filing-checklist", label: "फाइलिंग चेकलिस्ट", labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
+  { path: "/defence-reply", label: "डिफेंस रिप्लाई v3", labelEn: "Defence Reply Final", icon: FileText, caseScoped: true },
 ];
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -190,6 +192,7 @@ function Router() {
         <Route path="/filing-checklist" component={FilingChecklist} />
         <Route path="/ai-research" component={AIResearchEngine} />
         <Route path="/ai-draft" component={AIDraftEngine} />
+        <Route path="/defence-reply" component={DefenceReply} />
 
         {/* Dynamic case-scoped routes */}
         <Route path="/case/:caseId/intake" component={CaseIntakeAssistant} />
@@ -201,6 +204,7 @@ function Router() {
         <Route path="/case/:caseId/oral-arguments" component={OralArguments} />
         <Route path="/case/:caseId/standards-validity" component={StandardsValidity} />
         <Route path="/case/:caseId/filing-checklist" component={FilingChecklist} />
+        <Route path="/case/:caseId/defence-reply" component={DefenceReply} />
 
         <Route component={NotFound} />
       </Switch>
