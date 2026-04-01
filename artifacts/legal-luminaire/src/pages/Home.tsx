@@ -57,8 +57,8 @@ const cards = [
 const keyPoints = [
   {
     icon: AlertTriangle,
-    title: "वर्षा में नमूना संग्रह",
-    desc: "IS 1199 के अनुसार वर्षा/तूफान में नमूना संग्रह प्रतिबंधित — घोर उल्लंघन",
+    title: "गलत मानक + वर्षा में नमूनाकरण",
+    desc: "IS 1199 (fresh concrete) का गलत प्रयोग; सही संदर्भ hardened masonry mortar standards हैं",
     color: "text-red-600 bg-red-50",
   },
   {
@@ -179,7 +179,7 @@ export default function Home() {
             <h4 className="text-sm font-semibold text-green-600 mb-2">बचाव के मुख्य आधार</h4>
             <ul className="text-sm space-y-2">
               {[
-                "वर्षा/तूफान में नमूना — IS 1199 का उल्लंघन",
+                "गलत मानक (IS 1199) का प्रयोग + वर्षा/तूफान में नमूनाकरण",
                 "सतह संदूषण — बाहरी 5-10mm परत परीक्षित",
                 "श्रृंखला-अभिरक्षा पूर्णतः अनुपस्थित",
                 "ठेकेदार प्रतिनिधि अनुपस्थित — नैसर्गिक न्याय हनन",

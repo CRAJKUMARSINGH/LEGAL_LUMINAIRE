@@ -1,105 +1,128 @@
 import { useState } from "react";
-import { Copy, AlertTriangle } from "lucide-react";
+import { Copy, AlertTriangle, ExternalLink } from "lucide-react";
 
+// Source: Cross_Reference_Matrix_Detailed.lex + forensic_defense_report.md
 const matrix = [
   {
-    violation: "मूलतः गलत मानक का प्रयोग — IS 1199 = ताज़ा कंक्रीट, यहाँ चूना-सीमेंट मोर्टार इन स्टोन मेसनरी",
-    isClause: "IS 2250:1981 — Code of Practice for Masonry Mortars (सही मानक); IS 1905:1987, धारा 3.2 — Masonry Structure Standard",
-    intlStandard: "ASTM C1324 — Examination of Hardened Masonry Mortar (सही अंतर्राष्ट्रीय मानक); ASTM C1196/C1197 — In-situ Flatjack Testing",
-    judgment: "Kattavellai SC 2025 — गलत मानक = वैज्ञानिक आधारहीनता; Prafulla Kumar Samal 1979 — संदेह मात्र → उन्मोचन",
+    violation: "IS 1199:2018 (ताज़ा कंक्रीट) को hardened masonry mortar पर लागू किया — मूलभूत तकनीकी त्रुटि",
+    isClause: "IS 2250:1981 (सही मानक — masonry mortars); IS 1905:1987 §3.2; IS 13311 (NDT)",
+    intlStandard: "ASTM C1324 (hardened masonry mortar forensic examination — सही अंतर्राष्ट्रीय मानक)",
+    judgment: "Sushil Sharma SC 2014 — flawed data → expert opinion vitiated; Prafulla Kumar Samal 1979 — suspicion only → discharge",
+    judgmentStatus: "VERIFIED",
     impact: "मूलभूत",
     category: "वैज्ञानिक",
     isNew: true,
+    sourceNote: "forensic_defense_report.md §II",
   },
   {
-    violation: "वर्षा/तूफान में नमूना संग्रह",
-    isClause: "IS 2250:1981, धारा 5.2 — मौसम-सुरक्षा अनिवार्य; IS 3535:1986, धारा 4.1 — नमूनाकरण नियम",
-    intlStandard: "ASTM C780, धारा 6.1 — Weather protection mandatory; BS EN 1015-2, धारा 4.3.1",
-    judgment: "कट्टावेल्लई (SC 2025) — प्रक्रियागत त्रुटि → अग्राह्य",
+    violation: "वर्षा/तूफान में नमूना संग्रह — moisture contamination, water-cement ratio altered",
+    isClause: "IS 4031 Part 6 §5.1: 27±2°C temperature mandatory; IS 1199 §4.1: weather protection",
+    intlStandard: "ASTM C780 §6.1: 'samples must be protected from rain and moisture; otherwise sample is invalid'; BS EN 1015-2 §4.3.1",
+    judgment: "M/s Builders Association v. State of UP 2018 — rain contamination → test results invalid",
+    judgmentStatus: "PENDING",
     impact: "अत्यधिक",
     category: "वैज्ञानिक",
     isNew: false,
+    sourceNote: "forensic_defense_report.md §II; Standards_Matrix_IS_ASTM_NABL.md",
   },
   {
-    violation: "सतह संदूषण — बाहरी 5-10mm परत परीक्षित",
-    isClause: "IS 2250:1981, धारा 4.3 — आंतरिक जोड़ से नमूना; ASTM C1324, धारा 7.1 — Core sampling required",
-    intlStandard: "ASTM C780, धारा 5.2; BS EN 1015-2, धारा 5.1.2 — Core material only",
-    judgment: "Mohanbhai v. State of Gujarat — दूषित आधार → निरर्थक रिपोर्ट",
+    violation: "सतह संदूषण — बाहरी 5-10mm कार्बोनेटेड परत परीक्षित, आंतरिक सार नहीं",
+    isClause: "IS 13311 Part 2: carbonation depth assessment; ASTM C1324 §7-8: core extraction mandatory",
+    intlStandard: "ASTM C780 §5.2: remove weathered surface; BS EN 1015-2 §5.1.2: 'sampling from interior of joint after removal of surface layer'",
+    judgment: "Sushil Sharma SC 2014 — flawed data collection → expert opinion vitiated",
+    judgmentStatus: "VERIFIED",
     impact: "अत्यधिक",
     category: "वैज्ञानिक",
     isNew: false,
+    sourceNote: "Comprehensive_Legal_Defence_Report §I-B; forensic_defense_report.md §II",
   },
   {
-    violation: "ठेकेदार प्रतिनिधि की अनुपस्थिति",
-    isClause: "IS 3535:1986, धारा 4.1 — आपूर्तिकर्ता प्रतिनिधि अनिवार्य",
-    intlStandard: "CPWD मैनुअल 2023, खण्ड 3.7.4",
-    judgment: "मद्रास HC 2025 — फोरेंसिक परीक्षण में भागीदारी का अधिकार",
+    violation: "ठेकेदार प्रतिनिधि की अनुपस्थिति — ex-parte sampling",
+    isClause: "IS 3535:1986 §4.1: 'Sampling in presence of purchaser/contractor representative mandatory'",
+    intlStandard: "CPWD Manual 2023 §3.7.4 & 12.2.1: joint sampling mandatory; joint sealing with both signatures",
+    judgment: "R.B. Constructions v. State of Maharashtra 2014 — ex-parte sampling → natural justice violated → report discarded",
+    judgmentStatus: "PENDING",
     impact: "अत्यधिक",
     category: "प्रक्रियागत",
     isNew: false,
+    sourceNote: "forensic_defense_report.md §II; Full_Case_References.md",
   },
   {
-    violation: "श्रृंखला-अभिरक्षा का सम्पूर्ण अभाव",
-    isClause: "IS 3535:1986, धारा 6.2 — प्रलेखन अनिवार्य; ASTM C1324, धारा 6.3 — Chain of Custody mandatory",
-    intlStandard: "ASTM C780, धारा 7.1 — Chain of Custody mandatory",
-    judgment: "कट्टावेल्लई (SC 2025) — CoC अभाव → साक्ष्य अनुपयोगी; उत्तराखण्ड HC 2026",
+    violation: "श्रृंखला-अभिरक्षा का सम्पूर्ण अभाव — collection to lab, zero documentation",
+    isClause: "IS 3535:1986 §6.2: documentation mandatory; CFSL Guidelines: seizure memo + chain of custody",
+    intlStandard: "ISO/IEC 17025 + NABL: traceability and documented handling required; ASTM C780 §7.1",
+    judgment: "Kattavellai SC 2025 (BINDING): 'Chain of Custody Register shall be maintained... each movement recorded'; Uttarakhand HC 2026: 'forensic evidence loses evidentiary value'",
+    judgmentStatus: "VERIFIED",
     impact: "अत्यधिक",
     category: "विधिक",
     isNew: false,
+    sourceNote: "Kattavellai_Supreme_Court_DNA_Guidelines_2025.md; VERIFIED_DEEP_RESEARCH_DEFENCE_PACK.md",
   },
   {
-    violation: "पंचनामे का अभाव",
-    isClause: "BNSS 2023, धारा 105 / CrPC 1973, धारा 100",
-    intlStandard: "CFSL दिशानिर्देश — नमूना-संग्रह पंचनामा अनिवार्य",
-    judgment: "SC 2026 पंचनामा निर्णय — पंचनामाविहीन संग्रह = अग्राह्य",
+    violation: "पंचनामे का अभाव — नमूना संग्रह स्थल पर कोई पंचनामा नहीं",
+    isClause: "BNSS 2023 §105 / CrPC 1973 §100: panchnama mandatory for seizure",
+    intlStandard: "CFSL Guidelines: seizure memo with panchas + accused signatures mandatory",
+    judgment: "State of Gujarat v. Mohanbhai 2003 — 'failure to prepare proper Panchnama creates incurable defect in prosecution's case'",
+    judgmentStatus: "PENDING",
     impact: "उच्च",
     category: "विधिक",
     isNew: false,
+    sourceNote: "Full_Case_References.md; Argument_Bank_And_Annexure_Builder.md",
   },
   {
-    violation: "तापमान-नियंत्रण का अभाव",
-    isClause: "IS 4031, भाग 6 — 27±2°C एवं नियंत्रित आर्द्रता अनिवार्य (सीमेंट कच्चे माल हेतु)",
-    intlStandard: "ASTM C780, धारा 8.2 — Controlled curing conditions",
-    judgment: "कट्टावेल्लई — संदूषण की संभावना = साक्ष्य अविश्वसनीय",
+    violation: "तापमान-नियंत्रण का अभाव — IS 4031 की अनिवार्य शर्त",
+    isClause: "IS 4031 Part 6 §5.1: 27±2°C and controlled humidity mandatory for compressive strength",
+    intlStandard: "ASTM C780 §8.2: controlled curing conditions; BS EN 1015-2: temperature control",
+    judgment: "Sushil Sharma SC 2014 — flawed data → expert opinion vitiated",
+    judgmentStatus: "VERIFIED",
     impact: "उच्च",
     category: "वैज्ञानिक",
     isNew: false,
+    sourceNote: "forensic_defense_report.md §II",
   },
   {
-    violation: "असंगत एवं अनियमित नमूनाकरण",
-    isClause: "IS 3535:1986, धारा 5.1 — 5 प्रतिनिधि स्थलों से नमूना अनिवार्य",
-    intlStandard: "BS EN 1015-2, धारा 4.1 — Systematic sampling required",
-    judgment: "Union of India v. Prafulla Kumar Samal — संदेह मात्र → उन्मोचन",
+    violation: "असंगत एवं अनियमित नमूनाकरण — IS 3535 §5.1 का उल्लंघन",
+    isClause: "IS 3535:1986 §5.1: systematic sampling; §6.2: minimum 5 representative locations",
+    intlStandard: "BS EN 1015-2 §4.1: systematic sampling required; ASTM C780: representative sampling",
+    judgment: "Union of India v. Prafulla Kumar Samal 1979 — suspicion only → discharge",
+    judgmentStatus: "VERIFIED",
     impact: "उच्च",
     category: "वैज्ञानिक",
     isNew: false,
+    sourceNote: "forensic_defense_report.md §II; Standards_Matrix_IS_ASTM_NABL.md",
   },
   {
-    violation: "कार्बोनेशन का उल्लेख नहीं",
-    isClause: "IS 2250:1981, धारा 4.3 — Carbonation depth assessment; ASTM C1324, धारा 8.2 — Phenolphthalein test mandatory",
-    intlStandard: "BS EN 14630:2006 — Carbonation depth measurement",
-    judgment: "Builders Association v. State — सतही परीक्षण = निर्माण गुणवत्ता का प्रमाण नहीं",
-    impact: "उच्च",
-    category: "वैज्ञानिक",
-    isNew: false,
-  },
-  {
-    violation: "Force Majeure — अत्यधिक वर्षा",
-    isClause: "NBC 2016/2023, खण्ड 3.4 — Extreme weather = Force Majeure",
-    intlStandard: "CPWD मैनुअल, परिशिष्ट C — Natural disaster clause",
-    judgment: "Jacob Mathew (SC 2005) — Force Majeure में घोर उपेक्षा असम्भव",
+    violation: "CPWD + BIS joint sampling protocol का उल्लंघन — PC Act के आरोप असिद्ध",
+    isClause: "CPWD Manual 2023 §3.7.4: joint sampling mandatory; BIS IS 3535 §4.1",
+    intlStandard: "CPWD Works Manual: Engineer-in-Charge + Contractor joint sealing",
+    judgment: "C.B.I. v. K.S. Kalra 2011 — 'failure to follow CPWD/BIS joint sampling → PC Act charge fails'",
+    judgmentStatus: "PENDING",
     impact: "उच्च",
     category: "विधिक",
     isNew: false,
+    sourceNote: "Full_Case_References.md; forensic_defense_report.md §II",
   },
   {
-    violation: "भ्रष्टाचार का कोई ठोस साक्ष्य नहीं",
-    isClause: "भ्रष्टाचार निवारण अधिनियम 1988 (संशोधित 2018) — प्रत्यक्ष साक्ष्य अनिवार्य",
-    intlStandard: "BNSS 2023, धारा 250 — Prima facie case absent",
-    judgment: "Sajjan Kumar v. CBI (SC 2010) — साक्ष्याभाव → उन्मोचन",
+    violation: "Force Majeure — अत्यधिक वर्षा/तूफान, NBC 2016/2023 के अंतर्गत",
+    isClause: "NBC 2016/2023 §3.4: extreme weather = Force Majeure; Appendix C: natural disaster clause",
+    intlStandard: "CPWD Manual Appendix C: natural disaster exemption for contractor",
+    judgment: "Jacob Mathew v. State of Punjab 2005 — 'mere lack of care ≠ rash/negligent act'; Force Majeure → IPC 304A असिद्ध",
+    judgmentStatus: "VERIFIED",
     impact: "उच्च",
     category: "विधिक",
     isNew: false,
+    sourceNote: "VERIFIED_DEEP_RESEARCH_DEFENCE_PACK.md §3-E",
+  },
+  {
+    violation: "भ्रष्टाचार का कोई प्रत्यक्ष साक्ष्य नहीं — PC Act के आरोप निराधार",
+    isClause: "PC Act 1988 (amended 2018) §7, 11, 12, 13: demand + acceptance of bribe mandatory",
+    intlStandard: "BNSS 2023 §250: prima facie case absent",
+    judgment: "Sajjan Kumar v. CBI (2010) 9 SCC 368 — evidence absence → discharge",
+    judgmentStatus: "SECONDARY",
+    impact: "उच्च",
+    category: "विधिक",
+    isNew: false,
+    sourceNote: "VERIFIED_DEEP_RESEARCH_DEFENCE_PACK.md §3",
   },
 ];
 
@@ -107,21 +130,25 @@ const impactColor: Record<string, string> = {
   "मूलभूत": "text-rose-800 bg-rose-100 font-bold",
   "अत्यधिक": "text-red-700 bg-red-50",
   "उच्च": "text-amber-700 bg-amber-50",
-  "माध्यम": "text-blue-700 bg-blue-50",
 };
 const catColor: Record<string, string> = {
   "वैज्ञानिक": "text-purple-700 bg-purple-50",
   "प्रक्रियागत": "text-blue-700 bg-blue-50",
   "विधिक": "text-green-700 bg-green-50",
 };
+const statusDot: Record<string, string> = {
+  VERIFIED: "bg-green-500",
+  SECONDARY: "bg-blue-400",
+  PENDING: "bg-red-500",
+};
 
 export default function CrossReferenceMatrix() {
   const [copied, setCopied] = useState(false);
 
   const csvText = [
-    "उल्लंघन,IS धारा (सही मानक),अंतर्राष्ट्रीय मानक,न्यायिक निर्णय,प्रभाव,श्रेणी",
+    "उल्लंघन,IS धारा,अंतर्राष्ट्रीय मानक,न्यायिक निर्णय,निर्णय स्थिति,प्रभाव,श्रेणी",
     ...matrix.map((r) =>
-      `"${r.violation}","${r.isClause}","${r.intlStandard}","${r.judgment}","${r.impact}","${r.category}"`
+      `"${r.violation}","${r.isClause}","${r.intlStandard}","${r.judgment}","${r.judgmentStatus}","${r.impact}","${r.category}"`
     ),
   ].join("\n");
 
@@ -137,78 +164,87 @@ export default function CrossReferenceMatrix() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-foreground">क्रॉस-रेफरेंस मैट्रिक्स</h1>
-          <p className="text-sm text-muted-foreground">Cross-Reference Matrix — तथ्य → सही IS मानक → निर्णय</p>
+          <p className="text-sm text-muted-foreground">
+            Source: Cross_Reference_Matrix_Detailed.lex + forensic_defense_report.md
+          </p>
         </div>
-        <button
-          onClick={handleCopy}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity w-fit"
-        >
+        <button onClick={handleCopy}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 w-fit">
           <Copy className="w-4 h-4" />
           {copied ? "कॉपी हो गया!" : "CSV कॉपी करें"}
         </button>
       </div>
 
+      {/* Foundational error */}
       <div className="bg-rose-50 border-2 border-rose-300 rounded-xl p-4">
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-rose-600 mt-0.5 flex-shrink-0" />
           <div>
             <p className="font-bold text-rose-800 text-sm">⚠ मूलभूत तकनीकी त्रुटि — Foundational Scientific Error</p>
             <p className="text-xs text-rose-700 mt-1 leading-relaxed">
-              <strong>IS 1199:2018</strong> "Methods of Sampling and Testing of <u>Fresh Concrete</u>" का मानक है — यह <u>ताज़ा कंक्रीट</u> पर लागू होता है।
-              प्रस्तुत प्रकरण में नमूने <strong>पुरानी पत्थर की चिनाई में जमे हुए कठोर सीमेंट मोर्टार</strong> (Hardened Cement Mortar in Existing Stone Masonry) से लिए गए हैं।
-              इस पर सही भारतीय मानक है — <strong>IS 2250:1981</strong> (Code of Practice for Masonry Mortars) एवं अंतर्राष्ट्रीय मानक <strong>ASTM C1324</strong> (Examination of Hardened Masonry Mortar)।
-              गलत मानक के प्रयोग से सम्पूर्ण फोरेंसिक रिपोर्ट का वैज्ञानिक आधार ही शून्य है।
+              <strong>IS 1199:2018</strong> "Methods of Sampling and Testing of <u>Fresh Concrete</u>" — ताज़ा कंक्रीट पर लागू।
+              प्रस्तुत प्रकरण में नमूने <strong>पुरानी पत्थर की चिनाई में जमे हुए कठोर सीमेंट मोर्टार</strong> से लिए गए।
+              सही मानक: <strong>IS 2250:1981</strong> (Masonry Mortars) + <strong>ASTM C1324</strong> (Hardened Masonry Mortar Forensic Examination)।
             </p>
           </div>
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
-        <p className="font-semibold">मैट्रिक्स का उपयोग</p>
-        <p className="text-xs mt-1">प्रत्येक पंक्ति एक उल्लंघन को सही IS मानक, अंतर्राष्ट्रीय मानक एवं न्यायिक निर्णय से जोड़ती है। लाल पृष्ठभूमि वाली पंक्ति = मूलभूत त्रुटि। इसे प्रार्थना-पत्र के साथ अनुलग्नक के रूप में संलग्न करें।</p>
+      {/* Verification legend */}
+      <div className="flex flex-wrap gap-3 text-xs">
+        {[["VERIFIED", "bg-green-500", "Court-safe — cite with para numbers"],
+          ["SECONDARY", "bg-blue-400", "Credible — fetch full judgment before filing"],
+          ["PENDING", "bg-red-500", "⚠ Obtain certified copy — do NOT file without verification"]
+        ].map(([label, dot, note]) => (
+          <div key={label} className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-full ${dot}`} />
+            <span className="font-medium">{label}</span>
+            <span className="text-muted-foreground">— {note}</span>
+          </div>
+        ))}
       </div>
 
+      {/* Matrix table */}
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-xs">
           <thead>
             <tr className="bg-muted border-b border-border">
-              <th className="text-left px-4 py-3 font-semibold text-foreground w-6">#</th>
-              <th className="text-left px-4 py-3 font-semibold text-foreground">उल्लंघन / Violation</th>
-              <th className="text-left px-4 py-3 font-semibold text-foreground">सही IS मानक</th>
-              <th className="text-left px-4 py-3 font-semibold text-foreground hidden md:table-cell">अंतर्राष्ट्रीय मानक</th>
-              <th className="text-left px-4 py-3 font-semibold text-foreground hidden lg:table-cell">न्यायिक निर्णय</th>
-              <th className="text-left px-4 py-3 font-semibold text-foreground">प्रभाव</th>
-              <th className="text-left px-4 py-3 font-semibold text-foreground hidden sm:table-cell">श्रेणी</th>
+              <th className="text-left px-3 py-3 font-semibold w-5">#</th>
+              <th className="text-left px-3 py-3 font-semibold">उल्लंघन</th>
+              <th className="text-left px-3 py-3 font-semibold">IS मानक</th>
+              <th className="text-left px-3 py-3 font-semibold hidden md:table-cell">अंतर्राष्ट्रीय मानक</th>
+              <th className="text-left px-3 py-3 font-semibold hidden lg:table-cell">न्यायिक निर्णय</th>
+              <th className="text-left px-3 py-3 font-semibold">प्रभाव</th>
+              <th className="text-left px-3 py-3 font-semibold hidden sm:table-cell">श्रेणी</th>
             </tr>
           </thead>
           <tbody>
             {matrix.map((row, i) => (
-              <tr
-                key={i}
-                className={`border-b border-border last:border-0 ${
-                  row.isNew
-                    ? "bg-rose-50 border-l-4 border-l-rose-500"
-                    : i % 2 === 0
-                    ? "bg-card"
-                    : "bg-muted/20"
-                }`}
-              >
-                <td className="px-4 py-3 text-muted-foreground font-medium">
+              <tr key={i} className={`border-b border-border last:border-0 ${
+                row.isNew ? "bg-rose-50 border-l-4 border-l-rose-500" : i % 2 === 0 ? "bg-card" : "bg-muted/20"
+              }`}>
+                <td className="px-3 py-3 text-muted-foreground font-medium">
                   {row.isNew ? <span className="text-rose-700 font-bold">0</span> : i}
                 </td>
-                <td className="px-4 py-3 text-foreground font-medium leading-snug">
+                <td className="px-3 py-3 text-foreground font-medium leading-snug">
                   {row.isNew && <span className="inline-block mb-1 text-xs bg-rose-600 text-white px-2 py-0.5 rounded font-bold">मूलभूत त्रुटि</span>}
                   <div>{row.violation}</div>
+                  <div className="text-muted-foreground text-xs mt-0.5 opacity-70">{row.sourceNote}</div>
                 </td>
-                <td className="px-4 py-3 text-foreground leading-snug">{row.isClause}</td>
-                <td className="px-4 py-3 text-foreground leading-snug hidden md:table-cell">{row.intlStandard}</td>
-                <td className="px-4 py-3 text-foreground leading-snug hidden lg:table-cell">{row.judgment}</td>
-                <td className="px-4 py-3">
+                <td className="px-3 py-3 text-foreground leading-snug">{row.isClause}</td>
+                <td className="px-3 py-3 text-foreground leading-snug hidden md:table-cell">{row.intlStandard}</td>
+                <td className="px-3 py-3 leading-snug hidden lg:table-cell">
+                  <div className="flex items-start gap-1.5">
+                    <span className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${statusDot[row.judgmentStatus]}`} />
+                    <span className="text-foreground">{row.judgment}</span>
+                  </div>
+                </td>
+                <td className="px-3 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${impactColor[row.impact] ?? ""}`}>
                     {row.impact}
                   </span>
                 </td>
-                <td className="px-4 py-3 hidden sm:table-cell">
+                <td className="px-3 py-3 hidden sm:table-cell">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${catColor[row.category] ?? ""}`}>
                     {row.category}
                   </span>
@@ -219,12 +255,13 @@ export default function CrossReferenceMatrix() {
         </table>
       </div>
 
+      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: "कुल उल्लंघन", value: matrix.length, color: "text-foreground" },
-          { label: "मूलभूत / अत्यधिक", value: matrix.filter((r) => r.impact === "अत्यधिक" || r.impact === "मूलभूत").length, color: "text-red-600" },
-          { label: "वैज्ञानिक", value: matrix.filter((r) => r.category === "वैज्ञानिक").length, color: "text-purple-600" },
-          { label: "विधिक", value: matrix.filter((r) => r.category === "विधिक").length, color: "text-green-600" },
+          { label: "मूलभूत / अत्यधिक", value: matrix.filter(r => r.impact === "अत्यधिक" || r.impact === "मूलभूत").length, color: "text-red-600" },
+          { label: "VERIFIED निर्णय", value: matrix.filter(r => r.judgmentStatus === "VERIFIED").length, color: "text-green-600" },
+          { label: "⚠ PENDING निर्णय", value: matrix.filter(r => r.judgmentStatus === "PENDING").length, color: "text-red-600" },
         ].map((stat) => (
           <div key={stat.label} className="bg-card border border-border rounded-xl p-4 text-center">
             <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
@@ -233,8 +270,9 @@ export default function CrossReferenceMatrix() {
         ))}
       </div>
 
+      {/* Standard distinction table */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-        <p className="text-xs font-bold text-amber-800 mb-2">मानक-भेद सारणी (Standard Distinction Table)</p>
+        <p className="text-xs font-bold text-amber-800 mb-2">मानक-भेद सारणी — Source: Standards_Matrix_IS_ASTM_NABL.md</p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse">
             <thead>
@@ -242,41 +280,60 @@ export default function CrossReferenceMatrix() {
                 <th className="text-left px-3 py-2 border border-amber-200">मानक</th>
                 <th className="text-left px-3 py-2 border border-amber-200">यह किस पर लागू होता है</th>
                 <th className="text-left px-3 py-2 border border-amber-200">यहाँ लागू?</th>
+                <th className="text-left px-3 py-2 border border-amber-200">Confidence</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-red-50">
-                <td className="px-3 py-2 border border-amber-200 font-bold text-red-700">IS 1199:2018</td>
-                <td className="px-3 py-2 border border-amber-200">ताज़ा कंक्रीट (Fresh Concrete) — Sampling & Testing</td>
-                <td className="px-3 py-2 border border-amber-200 text-red-700 font-bold">❌ नहीं — गलत मानक</td>
-              </tr>
-              <tr className="bg-green-50">
-                <td className="px-3 py-2 border border-amber-200 font-bold text-green-700">IS 2250:1981</td>
-                <td className="px-3 py-2 border border-amber-200">चिनाई मोर्टार — Masonry Mortars (तैयारी एवं उपयोग)</td>
-                <td className="px-3 py-2 border border-amber-200 text-green-700 font-bold">✅ हाँ — सही मानक</td>
-              </tr>
-              <tr className="bg-green-50">
-                <td className="px-3 py-2 border border-amber-200 font-bold text-green-700">IS 1905:1987</td>
-                <td className="px-3 py-2 border border-amber-200">Unreinforced Masonry Structure (पत्थर की चिनाई)</td>
-                <td className="px-3 py-2 border border-amber-200 text-green-700 font-bold">✅ हाँ — सही मानक</td>
-              </tr>
-              <tr className="bg-green-50">
-                <td className="px-3 py-2 border border-amber-200 font-bold text-green-700">ASTM C1324</td>
-                <td className="px-3 py-2 border border-amber-200">कठोर चिनाई मोर्टार का फोरेंसिक परीक्षण — Hardened Masonry Mortar</td>
-                <td className="px-3 py-2 border border-amber-200 text-green-700 font-bold">✅ हाँ — सही अंतर्राष्ट्रीय मानक</td>
-              </tr>
-              <tr className="bg-yellow-50">
-                <td className="px-3 py-2 border border-amber-200 font-bold text-amber-700">IS 13311 (भाग 1-2)</td>
-                <td className="px-3 py-2 border border-amber-200">NDT — मौजूदा संरचना का गैर-विनाशकारी परीक्षण</td>
-                <td className="px-3 py-2 border border-amber-200 text-amber-700 font-bold">✅ हाँ — सही NDT मानक</td>
-              </tr>
-              <tr className="bg-red-50">
-                <td className="px-3 py-2 border border-amber-200 font-bold text-red-700">IS 4031 (भाग 1-15)</td>
-                <td className="px-3 py-2 border border-amber-200">कच्चे हाइड्रोलिक सीमेंट का भौतिक परीक्षण (Raw Cement)</td>
-                <td className="px-3 py-2 border border-amber-200 text-orange-700 font-bold">⚠ आंशिक — सीमेंट पर, मोर्टार पर नहीं</td>
-              </tr>
+              {[
+                ["IS 1199:2018", "ताज़ा कंक्रीट (Fresh Concrete) — Sampling & Testing", "❌ नहीं — गलत मानक", "SECONDARY", "bg-red-50 text-red-700"],
+                ["IS 2250:1981", "चिनाई मोर्टार — Masonry Mortars (तैयारी एवं उपयोग)", "✅ हाँ — सही मानक", "SECONDARY", "bg-green-50 text-green-700"],
+                ["IS 3535:1986", "हाइड्रोलिक सीमेंट नमूनाकरण — Sampling discipline", "✅ हाँ — सही मानक", "SECONDARY", "bg-green-50 text-green-700"],
+                ["ASTM C1324", "कठोर चिनाई मोर्टार का फोरेंसिक परीक्षण", "✅ हाँ — सही अंतर्राष्ट्रीय मानक", "SECONDARY", "bg-green-50 text-green-700"],
+                ["IS 13311 (1-2)", "NDT — मौजूदा संरचना का गैर-विनाशकारी परीक्षण", "✅ हाँ — सही NDT मानक", "SECONDARY", "bg-green-50 text-green-700"],
+                ["IS 4031 (1-15)", "कच्चे हाइड्रोलिक सीमेंट का भौतिक परीक्षण", "⚠ आंशिक — सीमेंट पर, hardened mortar पर नहीं", "SECONDARY", "bg-amber-50 text-amber-700"],
+              ].map(([code, scope, applies, conf, rowColor]) => (
+                <tr key={code} className={rowColor}>
+                  <td className="px-3 py-2 border border-amber-200 font-bold">{code}</td>
+                  <td className="px-3 py-2 border border-amber-200">{scope}</td>
+                  <td className="px-3 py-2 border border-amber-200 font-bold">{applies}</td>
+                  <td className="px-3 py-2 border border-amber-200">
+                    <span className={`px-1.5 py-0.5 rounded text-xs ${statusDot[conf] ? "" : ""}`}>{conf}</span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
+        </div>
+        <p className="text-xs text-amber-700 mt-2">
+          ⚠ Do not claim exact clause numbers in pleadings unless you have the official text + page-paragraph proof in annexure.
+          Source: Standards_Matrix_IS_ASTM_NABL.md — "Use standards first as reliability principles, then narrow to exact clauses after verification."
+        </p>
+      </div>
+
+      {/* Annexure demand list */}
+      <div className="bg-card border border-border rounded-xl p-4">
+        <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-600" />
+          अनुलग्नक माँग सूची — Source: Argument_Bank_And_Annexure_Builder.md
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {[
+            "FIR 496/2011 + सम्पूर्ण आरोप-पत्र",
+            "नमूना संग्रह स्थल का निरीक्षण ज्ञापन + पंचनामा",
+            "सील ज्ञापन और नमूना लेबल के फोटोग्राफ",
+            "प्रेषण रजिस्टर + मालखाना रजिस्टर + हस्तांतरण पावती",
+            "FSL आवक रजिस्टर और सील सत्यापन पत्र",
+            "कच्ची प्रयोगशाला कार्यपत्रक, मशीन लॉग, विश्लेषक नोट्स",
+            "IMD/स्थानीय मौसम रिपोर्ट दिनांक 28-12-2011",
+            "ठेकेदार को नमूना संग्रह हेतु जारी कोई नोटिस",
+            "IS 2250:1981, IS 3535:1986, ASTM C1324 के प्रमाणित अंश",
+            "कट्टावेल्लई निर्णय (2025 INSC 845) की प्रमाणित प्रति",
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-2 text-xs">
+              <span className="text-primary font-bold flex-shrink-0">{i + 1}.</span>
+              <span>{item}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -47,3 +47,12 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Legal Luminaire Backend
+artifacts/legal-luminaire/backend/.env
+artifacts/legal-luminaire/backend/venv/
+artifacts/legal-luminaire/backend/chroma_db/
+artifacts/legal-luminaire/backend/uploaded_cases/
+artifacts/legal-luminaire/backend/__pycache__/
+artifacts/legal-luminaire/backend/**/__pycache__/
+artifacts/legal-luminaire/backend/*.pyc
