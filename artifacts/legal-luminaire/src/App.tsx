@@ -14,9 +14,20 @@ import CaseIntakeAssistant from "@/pages/CaseIntakeAssistant";
 import AIResearchEngine from "@/pages/AIResearchEngine";
 import AIDraftEngine from "@/pages/AIDraftEngine";
 import DefenceReply from "@/pages/DefenceReply";
+import SessionWorkspace from "@/pages/session-workspace";
+import DraftViewer from "@/pages/draft-viewer";
+// New views from update
+import { DashboardView } from "@/components/views/DashboardView";
+import { CaseLawView } from "@/components/views/CaseLawView";
+import { StandardsView } from "@/components/views/StandardsView";
+import { TimelineView } from "@/components/views/TimelineView";
+import { DocumentsView } from "@/components/views/DocumentsView";
+import { UploadView } from "@/components/views/UploadView";
+import { ChatView } from "@/components/views/ChatView";
 import {
   Scale, BookOpen, Table2, CheckSquare, Mic,
   Home as HomeIcon, Menu, FilePlus, Zap, X, Bot, FileText,
+  LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files,
 } from "lucide-react";
 import { useState } from "react";
 import { CaseProvider, useCaseContext } from "@/context/CaseContext";
@@ -26,15 +37,22 @@ const queryClient = new QueryClient();
 const navItems = [
   { path: "/", label: "मुख्य पृष्ठ", labelEn: "Home", icon: HomeIcon, caseScoped: false },
   { path: "/intake", label: "नया केस इंटेक", labelEn: "New Case Intake", icon: FilePlus, caseScoped: false },
+  { path: "/dashboard", label: "डैशबोर्ड", labelEn: "Case Dashboard", icon: LayoutDashboard, caseScoped: true },
   { path: "/ai-draft", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine", icon: Bot, caseScoped: true },
   { path: "/ai-research", label: "AI रिसर्च इंजन", labelEn: "AI Research Engine", icon: Zap, caseScoped: true },
+  { path: "/chat", label: "AI ड्राफ्टर चैट", labelEn: "AI Drafter Chat", icon: MessageSquare, caseScoped: true },
   { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale, caseScoped: true },
+  { path: "/defence-reply", label: "डिफेंस रिप्लाई v3", labelEn: "Defence Reply Final", icon: FileText, caseScoped: true },
   { path: "/case-research", label: "विधिक शोध", labelEn: "Legal Research", icon: BookOpen, caseScoped: true },
+  { path: "/case-law", label: "केस लॉ मैट्रिक्स", labelEn: "Case Law Matrix", icon: BookOpen, caseScoped: true },
+  { path: "/standards", label: "मानक मैट्रिक्स", labelEn: "Standards Matrix", icon: FlaskConical, caseScoped: true },
+  { path: "/timeline", label: "केस टाइमलाइन", labelEn: "Case Timeline", icon: Clock, caseScoped: true },
   { path: "/cross-reference", label: "क्रॉस-रेफरेंस", labelEn: "Cross Reference", icon: Table2, caseScoped: true },
   { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments", icon: Mic, caseScoped: true },
   { path: "/standards-validity", label: "मानक वैधता नोट", labelEn: "Standards Note", icon: Scale, caseScoped: true },
+  { path: "/documents", label: "दस्तावेज़", labelEn: "Documents", icon: Files, caseScoped: true },
+  { path: "/upload", label: "फाइल अपलोड", labelEn: "Upload Files", icon: Upload, caseScoped: true },
   { path: "/filing-checklist", label: "फाइलिंग चेकलिस्ट", labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
-  { path: "/defence-reply", label: "डिफेंस रिप्लाई v3", labelEn: "Defence Reply Final", icon: FileText, caseScoped: true },
 ];
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -194,6 +212,19 @@ function Router() {
         <Route path="/ai-draft" component={AIDraftEngine} />
         <Route path="/defence-reply" component={DefenceReply} />
 
+        {/* New view routes */}
+        <Route path="/dashboard" component={() => <div className="p-6"><DashboardView /></div>} />
+        <Route path="/chat" component={() => <div className="flex flex-col h-full"><ChatView /></div>} />
+        <Route path="/case-law" component={() => <div className="p-0"><CaseLawView /></div>} />
+        <Route path="/standards" component={() => <div className="p-0"><StandardsView /></div>} />
+        <Route path="/timeline" component={() => <div className="p-0"><TimelineView /></div>} />
+        <Route path="/documents" component={() => <div className="p-0"><DocumentsView /></div>} />
+        <Route path="/upload" component={() => <div className="p-0"><UploadView /></div>} />
+
+        {/* Session-based routes from Legal-Luminaire-Update */}
+        <Route path="/sessions/:id" component={SessionWorkspace} />
+        <Route path="/drafts/:id" component={DraftViewer} />
+
         {/* Dynamic case-scoped routes */}
         <Route path="/case/:caseId/intake" component={CaseIntakeAssistant} />
         <Route path="/case/:caseId/ai-draft" component={AIDraftEngine} />
@@ -205,6 +236,13 @@ function Router() {
         <Route path="/case/:caseId/standards-validity" component={StandardsValidity} />
         <Route path="/case/:caseId/filing-checklist" component={FilingChecklist} />
         <Route path="/case/:caseId/defence-reply" component={DefenceReply} />
+        <Route path="/case/:caseId/dashboard" component={() => <div className="p-6"><DashboardView /></div>} />
+        <Route path="/case/:caseId/chat" component={() => <div className="flex flex-col h-full"><ChatView /></div>} />
+        <Route path="/case/:caseId/case-law" component={() => <div className="p-0"><CaseLawView /></div>} />
+        <Route path="/case/:caseId/standards" component={() => <div className="p-0"><StandardsView /></div>} />
+        <Route path="/case/:caseId/timeline" component={() => <div className="p-0"><TimelineView /></div>} />
+        <Route path="/case/:caseId/documents" component={() => <div className="p-0"><DocumentsView /></div>} />
+        <Route path="/case/:caseId/upload" component={() => <div className="p-0"><UploadView /></div>} />
 
         <Route component={NotFound} />
       </Switch>
