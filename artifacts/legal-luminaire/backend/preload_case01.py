@@ -1,98 +1,110 @@
 """
-Pre-load Case 01 (Hemraj Vardar) documents into ChromaDB.
-Run once: python preload_case01.py
-Documents sourced from CASE_01_HemrajG/ folder.
+Pre-load CASE_01_HemrajG documents into ChromaDB on startup.
+Run: python preload_case01.py
+Or called automatically from main.py lifespan.
 """
-import sys
+from __future__ import annotations
+
+import logging
 from pathlib import Path
 
-# Add backend to path
-sys.path.insert(0, str(Path(__file__).parent))
-
-from config import settings
-from rag.document_store import ingest_files, get_case_doc_count
-
-CASE_ID = "case-01"
-
-# All Case 01 documents (relative to workspace root)
-WORKSPACE_ROOT = Path(__file__).parent.parent.parent.parent  # adjust if needed
-CASE_DOCS_ROOT = WORKSPACE_ROOT / "CASE_01_HemrajG"
-
-CASE01_FILES = [
-    CASE_DOCS_ROOT / "Comprehensive_Legal_Defence_Report_Stadium_Collapse.md",
-    CASE_DOCS_ROOT / "VERIFIED_DEEP_RESEARCH_DEFENCE_PACK.md",
-    CASE_DOCS_ROOT / "Case_Facts_Timeline.md",
-    CASE_DOCS_ROOT / "Case_Law_Matrix_Verified_Pending.md",
-    CASE_DOCS_ROOT / "Standards_Matrix_IS_ASTM_NABL.md",
-    CASE_DOCS_ROOT / "Forensic_Protocol_Checklist.md",
-    CASE_DOCS_ROOT / "Argument_Bank_And_Annexure_Builder.md",
-    CASE_DOCS_ROOT / "DEEPsEARCH.md",
-    CASE_DOCS_ROOT / "bibliography" / "forensic_defense_report.md",
-    CASE_DOCS_ROOT / "bibliography" / "Full_Case_References.md",
-    CASE_DOCS_ROOT / "bibliography" / "Bibliography_Index.md",
-    CASE_DOCS_ROOT / "bibliography" / "Kattavellai_Supreme_Court_DNA_Guidelines_2025.md",
-    CASE_DOCS_ROOT / "Attached_Assets" / "grok_01042026.md",
-    CASE_DOCS_ROOT / "INPUT_DATA" / "discharge.pdf",
-    CASE_DOCS_ROOT / "INPUT_DATA" / "DOC-20260222-WA0003..pdf",
-]
-
-# Also include .lex files (treated as text)
-LEX_FILES = [
-    CASE_DOCS_ROOT / "Stadium_Collapse_Defence_Hindi.lex",
-    CASE_DOCS_ROOT / "SUPERIOR_HINDI_DISCHARGE_APPLICATION_FULL.lex",
-    CASE_DOCS_ROOT / "Cross_Reference_Matrix_Detailed.lex",
-    CASE_DOCS_ROOT / "bibliography" / "forensic_defense_hindi.lex",
-]
+logger = logging.getLogger(__name__)
 
 
-def main():
-    print(f"=== Pre-loading Case 01 into ChromaDB ===")
-    print(f"Case ID: {CASE_ID}")
-    print(f"ChromaDB path: {settings.chroma_path.resolve()}")
+def preload_hemraj_case(workspace_root: Path | None = None) -> dict:
+    """Index all CASE_01_HemrajG documents into ChromaDB for case01."""
+    from config import settings
+    from rag.document_store import ingest_files, case_has_documents, get_case_doc_count
 
-    if not settings.openai_api_key:
-        print("ERROR: OPENAI_API_KEY not set in .env")
-        print("Copy .env.example to .env and add your key.")
-        sys.exit(1)
+    case_id = "case01"
 
-    # Ensure case docs dir exists
-    case_dir = settings.case_docs_path / CASE_ID
-    case_dir.mkdir(parents=True, exist_ok=True)
+    # Find the case directory
+    if workspace_root is None:
+        # Try relative paths from backend/
+        candidates = [
+            Path("../../CASE_01_HemrajG"),
+            Path("../../../CASE_01_HemrajG"),
+            Path("CASE_01_HemrajG"),
+        ]
+        for c in candidates:
+            if c.exists():
+                workspace_root = c.parent
+                break
 
-    # Copy files to case dir and collect paths
-    import shutil
-    paths_to_index: list[Path] = []
+    if workspace_root is None:
+        logger.warning("Could not find CASE_01_HemrajG directory. Skipping preload.")
+        return {"success": False, "error": "Directory not found"}
 
-    all_files = CASE01_FILES + LEX_FILES
-    for src in all_files:
-        if not src.exists():
-            print(f"  SKIP (not found): {src.name}")
-            continue
-        dest = case_dir / src.name
-        shutil.copy2(src, dest)
-        paths_to_index.append(dest)
-        print(f"  Copied: {src.name}")
+    case_dir = workspace_root / "CASE_01_HemrajG"
+    if not case_dir.exists():
+        logger.warning(f"CASE_01_HemrajG not found at {case_dir}")
+        return {"success": False, "error": str(case_dir)}
 
-    if not paths_to_index:
-        print("No files found to index.")
-        sys.exit(1)
+    # Priority files to index (most important first)
+    priority_files = [
+        "DEFENCE_REPLY_FINAL_v3.lex",
+        "WRITTEN_SUBMISSION_RHC_FINAL_v3.lex",
+        "Comprehensive_Legal_Defence_Report_Stadium_Collapse.md",
+        "VERIFIED_DEEP_RESEARCH_DEFENCE_PACK.md",
+        "Case_Law_Matrix_Verified_Pending.md",
+        "Standards_Matrix_IS_ASTM_NABL.md",
+        "Argument_Bank_And_Annexure_Builder.md",
+        "Cross_Reference_Matrix_Detailed.lex",
+        "Forensic_Protocol_Checklist.md",
+        "Case_Facts_Timeline.md",
+        "Legal_Case_References_Brief_Notes.md",
+        "DEEPsEARCH.md",
+        "SUPERIOR_HINDI_DISCHARGE_APPLICATION_FULL.lex",
+        "Stadium_Collapse_Defence_Hindi.lex",
+        "DISCHARGE_APPLICATION_UPDATED_v2.lex",
+        "DEFENCE_REPLY_UPDATED_v2.lex",
+    ]
 
-    print(f"\nIndexing {len(paths_to_index)} files...")
-    summary = ingest_files(CASE_ID, paths_to_index)
+    files_to_index: list[Path] = []
 
-    print(f"\n=== Indexing Complete ===")
-    print(f"Indexed: {len(summary['indexed'])} files")
-    for item in summary["indexed"]:
-        print(f"  ✓ {item['file']} → {item['chunks']} chunks")
-    if summary["skipped"]:
-        print(f"Skipped: {summary['skipped']}")
-    if summary["errors"]:
-        print(f"Errors: {summary['errors']}")
+    # Add priority files first
+    for fname in priority_files:
+        p = case_dir / fname
+        if p.exists():
+            files_to_index.append(p)
 
-    total = get_case_doc_count(CASE_ID)
-    print(f"\nTotal chunks in ChromaDB for {CASE_ID}: {total}")
-    print("Case 01 is ready for AI research queries.")
+    # Add any remaining .md, .lex, .txt files
+    extensions = {".md", ".lex", ".txt"}
+    for f in case_dir.rglob("*"):
+        if f.suffix.lower() in extensions and f.is_file() and f not in files_to_index:
+            files_to_index.append(f)
+
+    # Add PDFs from INPUT_DATA
+    input_dir = case_dir / "INPUT_DATA"
+    if input_dir.exists():
+        for f in input_dir.glob("*.pdf"):
+            files_to_index.append(f)
+
+    if not files_to_index:
+        return {"success": False, "error": "No files to index"}
+
+    logger.info(f"Pre-loading {len(files_to_index)} files for case01...")
+    summary = ingest_files(case_id, files_to_index)
+    total_chunks = sum(item.get("chunks", 0) for item in summary["indexed"])
+
+    logger.info(
+        f"Case01 preload complete: {len(summary['indexed'])} files, "
+        f"{total_chunks} chunks, {len(summary['skipped'])} skipped"
+    )
+
+    return {
+        "success": True,
+        "case_id": case_id,
+        "files_indexed": len(summary["indexed"]),
+        "total_chunks": total_chunks,
+        "skipped": summary["skipped"],
+        "errors": summary["errors"],
+    }
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    logging.basicConfig(level=logging.INFO)
+    root = Path(sys.argv[1]) if len(sys.argv) > 1 else None
+    result = preload_hemraj_case(root)
+    print(result)

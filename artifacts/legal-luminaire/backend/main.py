@@ -52,6 +52,24 @@ async def lifespan(app: FastAPI):
     logger.info(f"Case docs path: {settings.case_docs_path.resolve()}")
     logger.info(f"OpenAI configured: {bool(settings.openai_api_key)}")
     logger.info(f"Tavily configured: {bool(settings.tavily_api_key)}")
+
+    # Auto-preload Case 01 documents if OpenAI is configured
+    if settings.openai_api_key:
+        try:
+            from preload_case01 import preload_hemraj_case
+            result = preload_hemraj_case()
+            if result.get("success"):
+                logger.info(
+                    f"Case01 preloaded: {result['files_indexed']} files, "
+                    f"{result['total_chunks']} chunks"
+                )
+            else:
+                logger.warning(f"Case01 preload skipped: {result.get('error')}")
+        except Exception as e:
+            logger.warning(f"Case01 preload failed (non-fatal): {e}")
+    else:
+        logger.info("OpenAI not configured — skipping Case01 preload")
+
     yield
     logger.info("Shutting down Legal Luminaire backend.")
 

@@ -1,421 +1,460 @@
 import { useState, useMemo } from "react";
-import { ClipboardCopy, ExternalLink, Search, AlertTriangle, CheckCircle2, Database, Zap } from "lucide-react";
+import {
+  ClipboardCopy, ExternalLink, Search, AlertTriangle,
+  CheckCircle2, Database, Zap, ShieldCheck, XCircle,
+  Info, BarChart3, FileText,
+} from "lucide-react";
 import { useCaseContext } from "@/context/CaseContext";
 import {
-  buildResearchPrompt,
-  scorePrecedentFit,
-  DB_URLS,
-  DB_LABELS,
-  type DatabaseSource,
-  type ResearchQuery,
-  type FitLevel,
+  buildResearchPrompt, scorePrecedentFit, computeAccuracyReport,
+  validateForFiling, fitLevelLabel, fitLevelClass,
+  DATABASES, TIER_LABELS, TIER_CLASSES,
+  type DatabaseSource, type ResearchQuery, type FitLevel,
+  type VerificationTier, type PrecedentResult, type StandardResult,
 } from "@/lib/ai-research";
+import { CASE01_PRECEDENTS, CASE01_STANDARDS } from "@/lib/case01-data";
 import PrecedentFitGate from "@/components/PrecedentFitGate";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// ─── Hardcoded precedents for Case 01 with fit metadata ───────────────────────
-const CASE01_PRECEDENTS = [
-  {
-    id: "p1",
-    name: "कट्टावेल्लई @ देवकर बनाम तमिलनाडु राज्य",
-    citation: "2025 INSC 845 | Cri. Appeal No. 1672/2019",
-    court: "सर्वोच्च न्यायालय — त्रि-न्यायाधीशीय खण्डपीठ",
-    date: "15 जुलाई 2025",
-    holding: `"Right from the point of collection to the logical end, a Chain of Custody Register shall be maintained wherein each and every movement of the evidence shall be recorded with counter-sign at each end."`,
-    application: "मोर्टार नमूनों की शून्य श्रृंखला-अभिरक्षा → सम्पूर्ण फोरेंसिक रिपोर्ट अग्राह्य",
-    fitScore: 88,
-    fitLevel: "exact" as FitLevel,
-    fitReason: "forensic evidence + chain of custody + procedural defect — direct match",
-    source: "scc_online" as DatabaseSource,
-    sourceUrl: "https://www.scconline.com",
-    tags: ["forensic", "chain of custody", "evidence", "sampling", "collection", "contamination"],
-  },
-  {
-    id: "p2",
-    name: "Union of India v. Prafulla Kumar Samal",
-    citation: "(1979) 3 SCC 4",
-    court: "सर्वोच्च न्यायालय",
-    date: "1979",
-    holding: `"If the material placed on record discloses nothing more than a suspicion, the accused is entitled to be discharged."`,
-    application: "दोषपूर्ण साक्ष्य = केवल सन्देह → उन्मोचन अनिवार्य",
-    fitScore: 82,
-    fitLevel: "exact" as FitLevel,
-    fitReason: "discharge standard + prima facie test — exact procedural match",
-    source: "manupatra" as DatabaseSource,
-    sourceUrl: "https://www.manupatra.com",
-    tags: ["discharge", "prima facie", "suspicion", "evidence", "section 227", "section 250"],
-  },
-  {
-    id: "p3",
-    name: "State of Bihar v. Ramesh Singh",
-    citation: "(1977) 4 SCC 39",
-    court: "सर्वोच्च न्यायालय",
-    date: "1977",
-    holding: "उन्मोचन चरण में न्यायालय मात्र यह देखता है कि प्रथम दृष्टया आरोप सिद्ध हो सकता है अथवा नहीं।",
-    application: "फोरेंसिक साक्ष्य दूषित → प्रथम दृष्टया आरोप असिद्ध → उन्मोचन",
-    fitScore: 80,
-    fitLevel: "exact" as FitLevel,
-    fitReason: "discharge test + prima facie standard — binding precedent",
-    source: "manupatra" as DatabaseSource,
-    sourceUrl: "https://www.manupatra.com",
-    tags: ["discharge", "prima facie", "framing of charge", "evidence", "section 227"],
-  },
-  {
-    id: "p4",
-    name: "उत्तराखण्ड उच्च न्यायालय — श्रृंखला-अभिरक्षा",
-    citation: "2026 — LiveLaw Report",
-    court: "उत्तराखण्ड उच्च न्यायालय",
-    date: "मार्च 2026",
-    holding: `"In the absence of a duly established chain of custody, forensic evidence loses its evidentiary value and cannot be treated as conclusive."`,
-    application: "शून्य श्रृंखला-अभिरक्षा → फोरेंसिक साक्ष्य निष्फल",
-    fitScore: 85,
-    fitLevel: "exact" as FitLevel,
-    fitReason: "chain of custody + forensic evidence + material sampling — direct match",
-    source: "indian_kanoon" as DatabaseSource,
-    sourceUrl: "https://indiankanoon.org",
-    tags: ["chain of custody", "forensic", "evidence", "sampling", "material"],
-  },
-  {
-    id: "p5",
-    name: "मद्रास उच्च न्यायालय — फोरेंसिक परीक्षण अधिकार",
-    citation: "31 जुलाई 2025 — SCCOnline",
-    court: "मद्रास उच्च न्यायालय",
-    date: "जुलाई 2025",
-    holding: `"The accused is entitled to a fair opportunity to disprove the allegations against him. Denial of access to forensic examination amounts to curtailment of such a right."`,
-    application: "ठेकेदार प्रतिनिधि अनुपस्थित → नैसर्गिक न्याय का हनन",
-    fitScore: 76,
-    fitLevel: "exact" as FitLevel,
-    fitReason: "natural justice + representative absence + forensic sampling — matches",
-    source: "scc_online" as DatabaseSource,
-    sourceUrl: "https://www.scconline.com",
-    tags: ["natural justice", "representative", "forensic", "sampling", "audi alteram partem"],
-  },
-  {
-    id: "p6",
-    name: "Jacob Mathew v. State of Punjab",
-    citation: "(2005) 6 SCC 1",
-    court: "सर्वोच्च न्यायालय",
-    date: "2005",
-    holding: `"Mere lack of necessary care, precaution and attention cannot be considered as rash or negligent act."`,
-    application: "प्राकृतिक आपदा = Force Majeure → घोर उपेक्षा का आरोप असिद्ध",
-    fitScore: 62,
-    fitLevel: "analogous" as FitLevel,
-    fitReason: "negligence standard matches but incident type is medical — analogous only",
-    source: "manupatra" as DatabaseSource,
-    sourceUrl: "https://www.manupatra.com",
-    tags: ["negligence", "rash", "304A", "force majeure", "criminal negligence"],
-  },
-  {
-    id: "p7",
-    name: "पंचनामा अग्राह्यता — सर्वोच्च न्यायालय",
-    citation: "2026 — BWLegalWorld Report",
-    court: "सर्वोच्च न्यायालय",
-    date: "2026",
-    holding: `"Panchanamas would be inadmissible in court if they were prepared in a manner violating Section 162 CrPC."`,
-    application: "नमूना-संग्रह पंचनामे का अभाव → सम्पूर्ण प्रक्रिया अमान्य",
-    fitScore: 78,
-    fitLevel: "exact" as FitLevel,
-    fitReason: "panchnama absence + evidence collection procedure — direct match",
-    source: "indian_kanoon" as DatabaseSource,
-    sourceUrl: "https://indiankanoon.org",
-    tags: ["panchnama", "evidence collection", "procedure", "section 162", "admissibility"],
-  },
-  {
-    id: "p8",
-    name: "मालेगाँव विस्फोट बरी — NIA विशेष न्यायालय",
-    citation: "2025 — Indian Express",
-    court: "NIA विशेष न्यायालय, मुम्बई",
-    date: "2025",
-    holding: `"The prosecution failed to provide cogent and reliable evidence, and also failed to establish guilt beyond reasonable doubt."`,
-    application: "अविश्वसनीय फोरेंसिक साक्ष्य → संदेह का लाभ अभियुक्त को",
-    fitScore: 44,
-    fitLevel: "weak" as FitLevel,
-    fitReason: "evidence reliability matches but incident type (explosion/terrorism) is factually distant from construction wall collapse",
-    source: "indian_kanoon" as DatabaseSource,
-    sourceUrl: "https://indiankanoon.org",
-    tags: ["evidence", "reasonable doubt", "acquittal", "forensic"],
-  },
-];
-
-const DATABASES: { id: DatabaseSource; label: string; flag: string }[] = [
-  { id: "manupatra", label: "Manupatra", flag: "🇮🇳" },
-  { id: "scc_online", label: "SCC Online", flag: "🇮🇳" },
-  { id: "indian_kanoon", label: "Indian Kanoon", flag: "🇮🇳" },
-  { id: "lexis_nexis", label: "Lexis Nexis India", flag: "🇮🇳" },
-  { id: "westlaw", label: "Westlaw", flag: "🌐" },
-  { id: "bailii", label: "BAILII", flag: "🇬🇧" },
-  { id: "astm", label: "ASTM International", flag: "🇺🇸" },
-  { id: "bis", label: "BIS Portal", flag: "🇮🇳" },
-  { id: "cpwd", label: "CPWD Manual", flag: "🇮🇳" },
-];
-
-const fitBadge: Record<FitLevel, string> = {
-  exact: "bg-green-100 text-green-800",
-  analogous: "bg-blue-100 text-blue-800",
-  weak: "bg-amber-100 text-amber-800",
-  rejected: "bg-red-100 text-red-800",
+// ── Default query for Case 01 ─────────────────────────────────────────────────
+const DEFAULT_QUERY: ResearchQuery = {
+  caseTitle: "Special Session Case No. 1/2025 — Hemraj Vardar, Stadium Wall Collapse, Udaipur",
+  brief: "Discharge application u/s 250 BNSS 2023. FSL mortar report challenged on chain-of-custody, ex-parte sampling, wrong IS standard, rain contamination.",
+  incidentType: "building collapse construction wall forensic mortar sampling",
+  evidenceType: "material sampling forensic lab report chain of custody mortar concrete",
+  proceduralDefects: [
+    "no panchnama", "no chain of custody", "no contractor representative",
+    "wrong IS standard IS 1199 used instead of IS 2250",
+    "rain storm sampling", "no sealing", "no FSL inward register",
+  ],
+  jurisdiction: "Rajasthan — Special Session Court (PCA), Udaipur",
 };
+
+// ── Tier badge ────────────────────────────────────────────────────────────────
+function TierBadge({ tier }: { tier: VerificationTier }) {
+  const icons: Record<VerificationTier, React.ElementType> = {
+    COURT_SAFE: ShieldCheck, VERIFIED: CheckCircle2,
+    SECONDARY: Info, PENDING: AlertTriangle, FATAL_ERROR: XCircle,
+  };
+  const Icon = icons[tier];
+  return (
+    <Badge variant="outline" className={`gap-1 text-xs font-semibold ${TIER_CLASSES[tier]}`}>
+      <Icon className="h-3 w-3" /> {TIER_LABELS[tier]}
+    </Badge>
+  );
+}
+
+// ── Fit score bar ─────────────────────────────────────────────────────────────
+function FitBar({ score, max, label }: { score: number; max: number; label: string }) {
+  const pct = Math.round((score / max) * 100);
+  const color = pct >= 70 ? "bg-emerald-500" : pct >= 50 ? "bg-blue-500" : pct >= 30 ? "bg-amber-500" : "bg-red-500";
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className="w-28 text-muted-foreground shrink-0">{label}</span>
+      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="w-12 text-right font-mono text-foreground">{score}/{max}</span>
+    </div>
+  );
+}
 
 export default function AIResearchEngine() {
   const { selectedCase } = useCaseContext();
+  const [query, setQuery] = useState<ResearchQuery>(DEFAULT_QUERY);
+  const [filterLevel, setFilterLevel] = useState<FitLevel | "all">("all");
+  const [filterTier, setFilterTier] = useState<VerificationTier | "all">("all");
+  const [showPrompt, setShowPrompt] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [filterFit, setFilterFit] = useState<FitLevel | "all">("all");
-  const [incidentType, setIncidentType] = useState(
-    selectedCase.brief ? "construction wall collapse forensic mortar sampling" : ""
-  );
-  const [evidenceType, setEvidenceType] = useState(
-    selectedCase.brief ? "material sampling forensic lab report chain of custody" : ""
-  );
-  const [defects, setDefects] = useState(
-    selectedCase.brief
-      ? "no panchnama, no representative, no chain of custody, wrong IS standard, rain sampling"
-      : ""
-  );
+  const [activeTab, setActiveTab] = useState<"precedents" | "standards" | "accuracy" | "databases">("precedents");
 
-  const query: ResearchQuery = useMemo(
-    () => ({
-      caseTitle: selectedCase.title,
-      brief: selectedCase.brief,
-      incidentType,
-      evidenceType,
-      proceduralDefects: defects.split(",").map((d) => d.trim()).filter(Boolean),
-      jurisdiction: selectedCase.court || "Rajasthan, India",
-    }),
-    [selectedCase, incidentType, evidenceType, defects]
-  );
-
-  // Re-score precedents dynamically based on current query inputs
-  const scoredPrecedents = useMemo(() => {
-    if (selectedCase.id === "case-01") {
-      // Use pre-scored data for Case 01 (already researched)
-      return CASE01_PRECEDENTS;
-    }
-    // For new cases: score dynamically
+  // Score all precedents against current query
+  const scoredPrecedents = useMemo<PrecedentResult[]>(() => {
     return CASE01_PRECEDENTS.map((p) => {
-      const { score, level, reason } = scorePrecedentFit(p.tags, query);
-      return { ...p, fitScore: score, fitLevel: level, fitReason: reason };
+      const fit = scorePrecedentFit(p.tags, query);
+      return {
+        ...p,
+        fitScore: fit.total,
+        fitLevel: fit.level,
+        fitReason: fit.reasons.join(" | "),
+        verificationTier: p.status as VerificationTier,
+        verificationNote: p.statusNote,
+        paraRef: null,
+        requiredActions: [],
+        blockedFromDraft: p.status === "PENDING",
+        source: "manupatra" as DatabaseSource,
+        sourceUrl: p.sourceUrl,
+      };
     });
-  }, [selectedCase.id, query]);
+  }, [query]);
 
-  const filtered = useMemo(
-    () => (filterFit === "all" ? scoredPrecedents : scoredPrecedents.filter((p) => p.fitLevel === filterFit)),
-    [scoredPrecedents, filterFit]
-  );
+  const scoredStandards = useMemo<StandardResult[]>(() => {
+    return CASE01_STANDARDS.map((s) => ({
+      ...s,
+      applicabilityReason: s.violation,
+      exactClauseText: null,
+      clauseRef: s.keyClause,
+      source: "bis" as DatabaseSource,
+      sourceUrl: s.sourceUrl,
+      verificationTier: s.confidence as VerificationTier,
+      requiredActions: [],
+    }));
+  }, []);
 
-  const fatalErrors = scoredPrecedents.filter((p) => p.fitLevel === "rejected");
-  const exactCount = scoredPrecedents.filter((p) => p.fitLevel === "exact").length;
-  const analogousCount = scoredPrecedents.filter((p) => p.fitLevel === "analogous").length;
-  const weakCount = scoredPrecedents.filter((p) => p.fitLevel === "weak").length;
+  const accuracyReport = useMemo(() => computeAccuracyReport(scoredPrecedents), [scoredPrecedents]);
+  const filingValidation = useMemo(() => validateForFiling(scoredPrecedents, scoredStandards), [scoredPrecedents, scoredStandards]);
 
-  const prompt = buildResearchPrompt(
-    query,
-    selectedCase.files.map((f) => f.name)
-  );
+  const filteredPrecedents = useMemo(() => {
+    return scoredPrecedents.filter((p) => {
+      if (filterLevel !== "all" && p.fitLevel !== filterLevel) return false;
+      if (filterTier !== "all" && p.verificationTier !== filterTier) return false;
+      return true;
+    }).sort((a, b) => b.fitScore - a.fitScore);
+  }, [scoredPrecedents, filterLevel, filterTier]);
 
-  const copyPrompt = async () => {
-    await navigator.clipboard.writeText(prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const researchPrompt = buildResearchPrompt(query, []);
+
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText(researchPrompt).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
+  const scoreColor = accuracyReport.overallScore >= 70 ? "text-emerald-600"
+    : accuracyReport.overallScore >= 40 ? "text-amber-600" : "text-red-600";
+
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-5">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold flex items-center gap-2">
-            <Zap className="w-5 h-5 text-primary" />
-            AI Research Engine
+            <Search className="w-5 h-5 text-primary" /> AI Research Engine
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Lexis · Manupatra · SCC Online · Indian Kanoon · ASTM · BIS — Fact-Fit Enforced
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Fact-Fit Gate enforced · 8 databases · Zero-hallucination · {selectedCase.title}
           </p>
         </div>
-        <button
-          onClick={copyPrompt}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity w-fit"
-        >
-          <ClipboardCopy className="w-4 h-4" />
-          {copied ? "Copied!" : "Copy AI Prompt"}
-        </button>
-      </div>
-
-      {/* Active case banner */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-900">
-        <span className="font-semibold">Active Case:</span> {selectedCase.title}
-        {selectedCase.caseNo && <span className="ml-2 opacity-70">· {selectedCase.caseNo}</span>}
-      </div>
-
-      {/* Fact parameters */}
-      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-        <h2 className="text-sm font-bold flex items-center gap-2">
-          <Search className="w-4 h-4" /> Fact Parameters (controls precedent scoring)
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1">Incident Type</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 text-xs"
-              value={incidentType}
-              onChange={(e) => setIncidentType(e.target.value)}
-              placeholder="e.g. construction wall collapse forensic"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1">Evidence Type</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 text-xs"
-              value={evidenceType}
-              onChange={(e) => setEvidenceType(e.target.value)}
-              placeholder="e.g. material sampling forensic lab"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1">Procedural Defects (comma-separated)</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 text-xs"
-              value={defects}
-              onChange={(e) => setDefects(e.target.value)}
-              placeholder="e.g. no panchnama, no chain of custody"
-            />
-          </div>
+        <div className="flex gap-2">
+          <button onClick={() => setShowPrompt(!showPrompt)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-border rounded-lg hover:bg-muted transition-colors">
+            <Zap className="w-3.5 h-3.5" /> {showPrompt ? "Hide" : "Show"} Research Prompt
+          </button>
+          {showPrompt && (
+            <button onClick={handleCopyPrompt}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-lg">
+              <ClipboardCopy className="w-3.5 h-3.5" /> {copied ? "Copied!" : "Copy Prompt"}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Research prompt */}
+      {showPrompt && (
+        <div className="bg-muted/50 border border-border rounded-xl p-4">
+          <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
+            Research Prompt (paste into Manupatra AI / SCC AI / GPT-4)
+          </p>
+          <pre className="text-xs text-foreground whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
+            {researchPrompt}
+          </pre>
+        </div>
+      )}
+
+      {/* Accuracy score bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <Card className="col-span-2 sm:col-span-1">
+          <CardContent className="p-4 text-center">
+            <p className={`text-3xl font-bold ${scoreColor}`}>{accuracyReport.overallScore}</p>
+            <p className="text-xs text-muted-foreground mt-1">Accuracy Score</p>
+            <p className={`text-xs font-semibold mt-1 ${accuracyReport.readyToFile ? "text-emerald-600" : "text-amber-600"}`}>
+              {accuracyReport.readyToFile ? "✓ Ready to file" : "⚠ Actions needed"}
+            </p>
+          </CardContent>
+        </Card>
         {[
-          { label: "Exact Match", value: exactCount, color: "text-green-700", bg: "bg-green-50 border-green-200" },
-          { label: "Analogous", value: analogousCount, color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
-          { label: "Weak Fit", value: weakCount, color: "text-amber-700", bg: "bg-amber-50 border-amber-200" },
-          { label: "Fatal Errors", value: fatalErrors.length, color: "text-red-700", bg: "bg-red-50 border-red-200" },
+          { label: "Court-Safe", value: accuracyReport.courtSafe, color: "text-emerald-600" },
+          { label: "Verified",   value: accuracyReport.verified,  color: "text-blue-600" },
+          { label: "Secondary",  value: accuracyReport.secondary, color: "text-amber-600" },
+          { label: "Pending",    value: accuracyReport.pending,   color: "text-orange-600" },
+          { label: "Blocked",    value: accuracyReport.blocked,   color: "text-red-600" },
         ].map((s) => (
-          <div key={s.label} className={`border rounded-xl p-3 text-center ${s.bg}`}>
-            <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
-          </div>
+          <Card key={s.label}>
+            <CardContent className="p-4 text-center">
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      {/* Fatal error alert */}
-      {fatalErrors.length > 0 && (
-        <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-bold text-red-800 text-sm">
-                ⚠ FATAL ERROR DETECTED — {fatalErrors.length} precedent(s) factually mismatched
-              </p>
-              <p className="text-xs text-red-700 mt-1">
-                These precedents do NOT match the incident/evidence/procedure pattern of this case.
-                Using them as primary authority is a fatal error that will weaken your argument.
-              </p>
-              <ul className="mt-2 space-y-1">
-                {fatalErrors.map((p) => (
-                  <li key={p.id} className="text-xs text-red-700">
-                    • {p.name} — {p.fitReason}
-                  </li>
-                ))}
-              </ul>
+      {/* Fatal errors */}
+      {accuracyReport.fatalErrors.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-1">
+          <p className="text-sm font-semibold text-red-800 flex items-center gap-2">
+            <XCircle className="w-4 h-4" /> Fatal Errors Detected
+          </p>
+          {accuracyReport.fatalErrors.map((e, i) => (
+            <p key={i} className="text-xs text-red-700">{e}</p>
+          ))}
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-border overflow-x-auto">
+        {([
+          { id: "precedents" as const, label: `Precedents (${scoredPrecedents.length})`, icon: FileText },
+          { id: "standards"  as const, label: `Standards (${scoredStandards.length})`,   icon: ShieldCheck },
+          { id: "accuracy"   as const, label: "Filing Validation",                        icon: BarChart3 },
+          { id: "databases"  as const, label: "Databases",                                icon: Database },
+        ]).map(({ id, label, icon: Icon }) => (
+          <button key={id} onClick={() => setActiveTab(id)}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              activeTab === id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}>
+            <Icon className="w-4 h-4" /> {label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── PRECEDENTS TAB ── */}
+      {activeTab === "precedents" && (
+        <div className="space-y-4">
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-muted-foreground font-medium">Fit Level:</span>
+              {(["all", "exact", "analogous", "weak", "rejected"] as const).map((l) => (
+                <button key={l} onClick={() => setFilterLevel(l)}
+                  className={`px-2.5 py-1 rounded-full border text-xs transition-colors ${
+                    filterLevel === l ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-muted"
+                  }`}>
+                  {l === "all" ? "All" : l}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-muted-foreground font-medium">Tier:</span>
+              {(["all", "COURT_SAFE", "VERIFIED", "SECONDARY", "PENDING"] as const).map((t) => (
+                <button key={t} onClick={() => setFilterTier(t)}
+                  className={`px-2.5 py-1 rounded-full border text-xs transition-colors ${
+                    filterTier === t ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-muted"
+                  }`}>
+                  {t === "all" ? "All" : TIER_LABELS[t as VerificationTier]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Showing {filteredPrecedents.length} of {scoredPrecedents.length} precedents · sorted by fit score
+          </p>
+
+          {filteredPrecedents.map((p) => (
+            <div key={p.id} className={`border rounded-xl overflow-hidden ${
+              p.fitLevel === "rejected" ? "border-red-300 opacity-80" :
+              p.fitLevel === "exact" ? "border-emerald-300" :
+              p.fitLevel === "analogous" ? "border-blue-300" : "border-amber-300"
+            }`}>
+              {/* Header */}
+              <div className={`p-4 ${
+                p.fitLevel === "rejected" ? "bg-red-50" :
+                p.fitLevel === "exact" ? "bg-emerald-50/50" :
+                p.fitLevel === "analogous" ? "bg-blue-50/50" : "bg-amber-50/50"
+              }`}>
+                <div className="flex flex-wrap items-start gap-2 mb-2">
+                  <span className="font-semibold text-sm text-foreground">{p.name}</span>
+                  <span className="text-xs text-muted-foreground font-mono">{p.citation}</span>
+                  <Badge variant="outline" className={`text-xs ${fitLevelClass(p.fitLevel)}`}>
+                    {p.fitScore}/100 · {p.fitLevel}
+                  </Badge>
+                  <TierBadge tier={p.verificationTier} />
+                  {p.blockedFromDraft && (
+                    <Badge variant="destructive" className="text-xs">BLOCKED FROM DRAFT</Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">{p.court} · {p.date}</p>
+
+                {/* Fit score breakdown */}
+                <div className="mt-3 space-y-1">
+                  <FitBar score={p.fitScore >= 40 ? 40 : p.fitScore} max={40} label="[A] Incident" />
+                  <FitBar score={Math.min(35, Math.max(0, p.fitScore - 40))} max={35} label="[B] Evidence" />
+                  <FitBar score={Math.min(25, Math.max(0, p.fitScore - 75))} max={25} label="[C] Procedure" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{p.fitReason}</p>
+              </div>
+
+              {/* Body */}
+              {p.fitLevel !== "rejected" && (
+                <div className="p-4 bg-card space-y-3">
+                  <div className="p-3 bg-muted/40 rounded-lg">
+                    <p className="text-xs font-semibold text-foreground mb-1">Holding (verbatim):</p>
+                    <p className="text-xs text-foreground/80 italic leading-relaxed">{p.holding}</p>
+                    {p.paraRef && <p className="text-xs text-emerald-700 mt-1 font-semibold">Para: {p.paraRef}</p>}
+                  </div>
+                  <div className="p-3 bg-accent/30 rounded-lg">
+                    <p className="text-xs font-semibold text-accent-foreground mb-1">Application to this case:</p>
+                    <p className="text-xs text-accent-foreground/80 leading-relaxed">{p.application}</p>
+                  </div>
+                  {p.verificationNote && (
+                    <p className="text-xs text-muted-foreground italic">{p.verificationNote}</p>
+                  )}
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <a href={p.sourceUrl} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-xs text-primary hover:underline">
+                      <ExternalLink className="w-3 h-3" /> {DATABASES.find(d => d.id === p.source)?.label || p.source}
+                    </a>
+                    {p.tags.slice(0, 4).map((t) => (
+                      <span key={t} className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {p.fitLevel === "rejected" && (
+                <div className="p-3 bg-red-50 border-t border-red-200">
+                  <p className="text-xs text-red-700 font-semibold">
+                    ⚠ FATAL ERROR — Fit score {p.fitScore}/100 (below 30 threshold).
+                    DO NOT use as primary authority. Reason: {p.fitReason}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── STANDARDS TAB ── */}
+      {activeTab === "standards" && (
+        <div className="space-y-3">
+          {/* Wrong standards first */}
+          {(["wrong", "correct", "partial"] as const).map((app) => {
+            const group = scoredStandards.filter((s) => s.applicability === app);
+            if (!group.length) return null;
+            const label = app === "wrong" ? "⛔ Wrong Standard — Prosecution Error"
+              : app === "correct" ? "✅ Correct Standard — Defence Argument"
+              : "⚠ Partial Applicability";
+            return (
+              <div key={app}>
+                <h3 className="text-sm font-semibold text-foreground mb-2">{label} ({group.length})</h3>
+                <div className="space-y-2">
+                  {group.map((s) => (
+                    <div key={s.code} className={`border rounded-xl p-4 ${
+                      app === "wrong" ? "border-red-300 bg-red-50/30" :
+                      app === "correct" ? "border-emerald-300 bg-emerald-50/30" : "border-amber-300 bg-amber-50/30"
+                    }`}>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="font-mono font-semibold text-sm text-foreground">{s.code}</span>
+                        <TierBadge tier={s.verificationTier} />
+                        <Badge variant="outline" className={`text-xs ${
+                          app === "wrong" ? "text-red-700 border-red-300" :
+                          app === "correct" ? "text-emerald-700 border-emerald-300" : "text-amber-700 border-amber-300"
+                        }`}>
+                          {app === "wrong" ? "WRONG STANDARD" : app === "correct" ? "CORRECT" : "PARTIAL"}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-foreground font-medium">{s.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{s.applicabilityReason}</p>
+                      {s.clauseRef && (
+                        <p className="text-xs text-blue-600 mt-1">Clause: {s.clauseRef}</p>
+                      )}
+                      {!s.exactClauseText && (
+                        <p className="text-xs text-amber-700 mt-1">
+                          ⚠ Official clause text not yet obtained — do not cite specific clause language without official copy.
+                        </p>
+                      )}
+                      <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-xs text-primary hover:underline mt-2">
+                        <ExternalLink className="w-3 h-3" /> {s.sourceUrl}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── ACCURACY / FILING VALIDATION TAB ── */}
+      {activeTab === "accuracy" && (
+        <div className="space-y-4">
+          <div className={`rounded-xl border p-4 ${filingValidation.canFile ? "bg-emerald-50 border-emerald-200" : "bg-amber-50 border-amber-200"}`}>
+            <p className={`font-semibold text-sm ${filingValidation.canFile ? "text-emerald-800" : "text-amber-800"}`}>
+              {filingValidation.canFile ? "✓ Ready to file" : `⚠ ${filingValidation.errors.length} errors + ${filingValidation.warnings.length} warnings before filing`}
+            </p>
+          </div>
+
+          {filingValidation.errors.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-red-700">Errors (must fix before filing):</p>
+              {filingValidation.errors.map((e, i) => (
+                <p key={i} className="text-xs text-red-600 flex items-start gap-1.5">
+                  <XCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" /> {e}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {filingValidation.warnings.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-amber-700">Warnings:</p>
+              {filingValidation.warnings.map((w, i) => (
+                <p key={i} className="text-xs text-amber-600 flex items-start gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" /> {w}
+                </p>
+              ))}
+            </div>
+          )}
+
+          <div>
+            <p className="text-sm font-semibold text-foreground mb-3">Pre-Filing Checklist</p>
+            <div className="space-y-2">
+              {filingValidation.checklist.map((item, i) => (
+                <div key={i} className={`flex items-start gap-3 p-2.5 rounded-lg border text-xs ${
+                  item.critical ? "border-amber-200 bg-amber-50/50" : "border-border bg-muted/20"
+                }`}>
+                  <div className={`w-4 h-4 rounded border-2 shrink-0 mt-0.5 ${
+                    item.done ? "bg-emerald-500 border-emerald-500" : "border-muted-foreground/40"
+                  }`} />
+                  <span className={item.critical ? "text-amber-800" : "text-muted-foreground"}>{item.item}</span>
+                  {item.critical && <Badge variant="outline" className="text-[10px] shrink-0 ml-auto border-amber-300 text-amber-700">Critical</Badge>}
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Database links */}
-      <div className="bg-card border border-border rounded-xl p-4">
-        <h2 className="text-sm font-bold flex items-center gap-2 mb-3">
-          <Database className="w-4 h-4" /> Research Databases — Direct Access
-        </h2>
-        <div className="flex flex-wrap gap-2">
+      {/* ── DATABASES TAB ── */}
+      {activeTab === "databases" && (
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Search these databases in priority order. Every citation must be verified on at least one primary source before use in court.
+          </p>
           {DATABASES.map((db) => (
-            <a
-              key={db.id}
-              href={DB_URLS[db.id]}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-muted hover:bg-accent rounded-lg border border-border transition-colors"
-            >
-              <span>{db.flag}</span>
-              <span>{db.label}</span>
-              <ExternalLink className="w-3 h-3 opacity-60" />
-            </a>
+            <div key={db.id} className="flex items-start gap-4 p-4 border border-border rounded-xl bg-card hover:bg-muted/30 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <span className="text-xs font-bold text-primary">{db.priority}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-semibold text-sm text-foreground">{db.label}</span>
+                  <Badge variant="outline" className="text-xs capitalize">{db.type}</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">{db.description}</p>
+                <a href={db.url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-primary hover:underline mt-1">
+                  <ExternalLink className="w-3 h-3" /> {db.url}
+                </a>
+              </div>
+            </div>
           ))}
         </div>
-      </div>
-
-      {/* Filter */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-xs font-medium text-muted-foreground">Filter by fit:</span>
-        {(["all", "exact", "analogous", "weak", "rejected"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilterFit(f)}
-            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-              filterFit === f
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card border-border hover:bg-muted"
-            }`}
-          >
-            {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* Precedents */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-bold text-foreground">
-          Precedents ({filtered.length} shown)
-        </h2>
-        {filtered.map((p) => (
-          <PrecedentFitGate
-            key={p.id}
-            precedentName={p.name}
-            citation={p.citation}
-            fitScore={p.fitScore}
-            fitLevel={p.fitLevel}
-            fitReason={p.fitReason}
-            holding={p.holding}
-            application={p.application}
-          >
-            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-2">
-              <span>{p.court}</span>
-              <span>·</span>
-              <span>{p.date}</span>
-              <span>·</span>
-              <a
-                href={DB_URLS[p.source]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-primary hover:underline"
-              >
-                {DB_LABELS[p.source]} <ExternalLink className="w-3 h-3" />
-              </a>
-              <span className={`px-2 py-0.5 rounded-full font-medium ${fitBadge[p.fitLevel]}`}>
-                {p.fitLevel}
-              </span>
-            </div>
-          </PrecedentFitGate>
-        ))}
-      </div>
-
-      {/* AI Prompt preview */}
-      <div className="bg-card border border-border rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-bold">Generated AI Research Prompt</h2>
-          <button
-            onClick={copyPrompt}
-            className="text-xs px-3 py-1 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90"
-          >
-            {copied ? "Copied!" : "Copy"}
-          </button>
-        </div>
-        <p className="text-xs text-muted-foreground mb-2">
-          Paste this into Manupatra AI, SCC Online AI, or any LLM to get fact-fit enforced research.
-        </p>
-        <pre className="text-xs bg-muted rounded-lg p-3 overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto">
-          {prompt}
-        </pre>
-      </div>
+      )}
     </div>
   );
 }

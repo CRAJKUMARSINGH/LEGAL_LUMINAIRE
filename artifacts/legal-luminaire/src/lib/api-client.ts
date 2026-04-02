@@ -95,3 +95,50 @@ export const apiClient = {
     });
   },
 };
+
+// ── Extended client methods ────────────────────────────────────────────────────
+
+export interface CitationVerifyResponse {
+  case_name: string;
+  citation: string;
+  found_on_indian_kanoon: boolean;
+  indian_kanoon_result: string;
+  web_result: string;
+  confidence: "HIGH" | "LOW";
+  recommendation: string;
+  error?: string;
+}
+
+export interface StandardVerifyResponse {
+  code: string;
+  result: string;
+  error?: string;
+}
+
+export interface ChatResponse {
+  reply: string;
+  sources: string[];
+  verification_notes: string[];
+}
+
+export const extendedApiClient = {
+  verifyCitation(caseName: string, citation = ""): Promise<CitationVerifyResponse> {
+    const params = new URLSearchParams({ case_name: caseName, citation });
+    return apiFetch(`/verify-citation?${params}`);
+  },
+
+  verifyStandard(code: string): Promise<StandardVerifyResponse> {
+    return apiFetch(`/verify-standard?code=${encodeURIComponent(code)}`);
+  },
+
+  chat(caseId: string, message: string, history: Array<{ role: string; content: string }> = []): Promise<ChatResponse> {
+    return apiFetch("/chat", {
+      method: "POST",
+      body: JSON.stringify({ case_id: caseId, message, history }),
+    });
+  },
+
+  preloadCase01(): Promise<{ success: boolean; files_indexed: number; total_chunks: number; error?: string }> {
+    return apiFetch("/cases/case01/preload", { method: "POST" });
+  },
+};

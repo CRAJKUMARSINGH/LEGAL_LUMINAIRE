@@ -1,8 +1,18 @@
 /**
- * AI Research Engine — Legal Luminaire
- * Orchestrates precedent retrieval from Lexis, Manupatra, SCC Online,
- * Indian Kanoon, and international databases with fact-fit scoring.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * LEGAL LUMINAIRE — ACCURACY ENGINE v3
+ * Single source of truth for all research, scoring, and verification logic.
+ *
+ * Rules (NEVER VIOLATE):
+ *  1. Every precedent scored on 3-axis Fact-Fit Gate before use.
+ *  2. Score < 30 → REJECTED. Fatal error if used as primary authority.
+ *  3. Holdings quoted verbatim — never paraphrased.
+ *  4. IS/ASTM standards verified for scope before citing clause numbers.
+ *  5. Databases searched in priority order: Manupatra → SCC → IK → LN → BAILII.
+ * ═══════════════════════════════════════════════════════════════════════════
  */
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 export type DatabaseSource =
   | "manupatra"
@@ -15,7 +25,26 @@ export type DatabaseSource =
   | "bis"
   | "cpwd";
 
+/** Fact-fit level derived from 3-axis score */
 export type FitLevel = "exact" | "analogous" | "weak" | "rejected";
+
+/** Verification tier for a citation */
+export type VerificationTier =
+  | "COURT_SAFE"   // certified copy + para number confirmed
+  | "VERIFIED"     // existence confirmed on official source
+  | "SECONDARY"    // credible secondary source, needs primary verification
+  | "PENDING"      // unverified — must not appear in filed documents
+  | "FATAL_ERROR"; // factually mismatched or fabricated — blocked
+
+export type FitScoreBreakdown = {
+  incidentScore: number;   // 0-40
+  evidenceScore: number;   // 0-35
+  defectScore: number;     // 0-25
+  total: number;           // 0-100
+  level: FitLevel;
+  reasons: string[];
+  fatalError: boolean;
+};
 
 export type PrecedentResult = {
   id: string;
@@ -23,14 +52,37 @@ export type PrecedentResult = {
   citation: string;
   court: string;
   date: string;
+  /** Verbatim holding from certified source — never paraphrased */
   holding: string;
+  /** Para/page reference from the actual judgment */
+  paraRef: string | null;
   application: string;
+  fitScore: number;
   fitLevel: FitLevel;
-  fitScore: number; // 0-100
   fitReason: string;
+  verificationTier: VerificationTier;
+  verificationNote: string;
   source: DatabaseSource;
-  sourceUrl?: string;
+  sourceUrl: string;
+  /** Actions required before this can be used in court */
+  requiredActions: string[];
+  /** Blocked from draft output until verified */
+  blockedFromDraft: boolean;
   tags: string[];
+};
+
+export type StandardResult = {
+  code: string;
+  title: string;
+  applicability: "correct" | "wrong" | "partial";
+  applicabilityReason: string;
+  /** Exact clause text from official standard — null if not yet obtained */
+  exactClauseText: string | null;
+  clauseRef: string | null;
+  source: DatabaseSource;
+  sourceUrl: string;
+  verificationTier: VerificationTier;
+  requiredActions: string[];
 };
 
 export type ResearchQuery = {
@@ -47,167 +99,426 @@ export type ResearchResult = {
   precedents: PrecedentResult[];
   standards: StandardResult[];
   fatalErrors: string[];
+  blockedCitations: string[];
+  overallAccuracyScore: number;
   generatedAt: string;
 };
 
-export type StandardResult = {
-  code: string;
-  title: string;
-  applicability: "correct" | "wrong" | "partial";
-  reason: string;
-  source: DatabaseSource;
-};
+// ── Database Registry (priority order per spec) ───────────────────────────────
+
+export const DATABASES: Array<{
+  id: DatabaseSource;
+  label: string;
+  url: string;
+  priority: number;
+  type: "legal" | "standard" | "manual";
+  description: string;
+}> = [
+  {
+    id: "manupatra",
+    label: "Manupatra",
+    url: "https://www.manupatra.com",
+    priority: 1,
+    type: "legal",
+    description: "Indian SC/HC judgments — primary database",
+  },
+  {
+    id: "scc_online",
+    label: "SCC Online",
+    url: "https://www.scconline.com",
+    priority: 2,
+    type: "legal",
+    description: "Supreme Court cases — authoritative reporter",
+  },
+  {
+    id: "indian_kanoon",
+    label: "Indian Kanoon",
+    url: "https://indiankanoon.org",
+    priority: 3,
+    type: "legal",
+    description: "Full-text search — free access",
+  },
+  {
+    id: "lexis_nexis",
+    label: "Lexis Nexis India",
+    url: "https://www.lexisnexis.in",
+    priority: 4,
+    type: "legal",
+    description: "Annotated cases — secondary verification",
+  },
+  {
+    id: "bailii",
+    label: "BAILII / Westlaw",
+    url: "https://www.bailii.org",
+    priority: 5,
+    type: "legal",
+    description: "International precedents",
+  },
+  {
+    id: "bis",
+    label: "BIS Portal",
+    url: "https://www.bis.gov.in",
+    priority: 6,
+    type: "standard",
+    description: "IS codes — official Bureau of Indian Standards",
+  },
+  {
+    id: "astm",
+    label: "ASTM International",
+    url: "https://www.astm.org",
+    priority: 7,
+    type: "standard",
+    description: "ASTM technical standards",
+  },
+  {
+    id: "cpwd",
+    label: "CPWD Manual 2023",
+    url: "https://cpwd.gov.in",
+    priority: 8,
+    type: "manual",
+    description: "Construction norms — Central Public Works Department",
+  },
+];
+
+export const DB_URLS: Record<DatabaseSource, string> = Object.fromEntries(
+  DATABASES.map((d) => [d.id, d.url])
+) as Record<DatabaseSource, string>;
+
+export const DB_LABELS: Record<DatabaseSource, string> = Object.fromEntries(
+  DATABASES.map((d) => [d.id, d.label])
+) as Record<DatabaseSource, string>;
+
+// ── Fact-Fit Gate ─────────────────────────────────────────────────────────────
 
 /**
- * Fact-fit scoring rubric:
- * - Incident type match: 40 pts
- * - Evidence type match: 35 pts
- * - Procedural defect match: 25 pts
- * Score >= 70 → exact/analogous; < 40 → rejected
+ * 3-axis Fact-Fit scoring (mandatory for every precedent):
+ *   [A] Incident type match  0-40 pts
+ *   [B] Evidence type match  0-35 pts
+ *   [C] Procedural defect    0-25 pts
+ *
+ * >= 70 → exact   (primary authority)
+ * 50-69 → analogous (use with qualification)
+ * 30-49 → weak    (supporting only)
+ * < 30  → rejected (FATAL ERROR if used as primary)
  */
 export function scorePrecedentFit(
   precedentTags: string[],
   query: ResearchQuery
-): { score: number; level: FitLevel; reason: string } {
-  let score = 0;
+): FitScoreBreakdown {
+  const tagStr = precedentTags.join(" ").toLowerCase();
   const reasons: string[] = [];
 
-  const incidentKeywords = query.incidentType.toLowerCase().split(/\s+/);
-  const evidenceKeywords = query.evidenceType.toLowerCase().split(/\s+/);
-  const defectKeywords = query.proceduralDefects.map((d) => d.toLowerCase()).join(" ");
+  // [A] Incident type match (0-40)
+  const incidentKw = query.incidentType.toLowerCase().split(/[\s,;]+/).filter((k) => k.length > 3);
+  const incidentHits = incidentKw.filter((k) => tagStr.includes(k)).length;
+  const incidentScore = Math.min(40, incidentKw.length > 0
+    ? Math.round((incidentHits / incidentKw.length) * 40)
+    : 0);
+  reasons.push(incidentScore >= 20
+    ? `[A] Incident match: ${incidentScore}/40 (${incidentHits}/${incidentKw.length} keywords)`
+    : `[A] Incident mismatch: ${incidentScore}/40`);
 
-  const tagStr = precedentTags.join(" ").toLowerCase();
+  // [B] Evidence type match (0-35)
+  const evidenceKw = query.evidenceType.toLowerCase().split(/[\s,;]+/).filter((k) => k.length > 3);
+  const evidenceHits = evidenceKw.filter((k) => tagStr.includes(k)).length;
+  const evidenceScore = Math.min(35, evidenceKw.length > 0
+    ? Math.round((evidenceHits / evidenceKw.length) * 35)
+    : 0);
+  reasons.push(evidenceScore >= 17
+    ? `[B] Evidence match: ${evidenceScore}/35`
+    : `[B] Evidence mismatch: ${evidenceScore}/35`);
 
-  // Incident match (40 pts)
-  const incidentHits = incidentKeywords.filter((k) => k.length > 3 && tagStr.includes(k)).length;
-  const incidentScore = Math.min(40, (incidentHits / Math.max(incidentKeywords.length, 1)) * 40);
-  score += incidentScore;
-  if (incidentScore >= 20) reasons.push("incident type matches");
-  else reasons.push("incident type mismatch");
+  // [C] Procedural defect match (0-25)
+  const defectKw = query.proceduralDefects
+    .join(" ").toLowerCase().split(/[\s,;]+/).filter((k) => k.length > 3);
+  const defectHits = defectKw.filter((k) => tagStr.includes(k)).length;
+  const defectScore = Math.min(25, Math.round((defectHits / Math.max(defectKw.length, 1)) * 25));
+  if (defectScore >= 10) reasons.push(`[C] Procedural match: ${defectScore}/25`);
 
-  // Evidence match (35 pts)
-  const evidenceHits = evidenceKeywords.filter((k) => k.length > 3 && tagStr.includes(k)).length;
-  const evidenceScore = Math.min(35, (evidenceHits / Math.max(evidenceKeywords.length, 1)) * 35);
-  score += evidenceScore;
-  if (evidenceScore >= 17) reasons.push("evidence type matches");
-  else reasons.push("evidence type mismatch");
+  const total = incidentScore + evidenceScore + defectScore;
 
-  // Procedural defect match (25 pts)
-  const defectHits = defectKeywords.split(/\s+/).filter((k) => k.length > 3 && tagStr.includes(k)).length;
-  const defectScore = Math.min(25, defectHits * 5);
-  score += defectScore;
-  if (defectScore >= 10) reasons.push("procedural defect pattern matches");
-
-  const finalScore = Math.round(score);
   let level: FitLevel;
-  if (finalScore >= 75) level = "exact";
-  else if (finalScore >= 50) level = "analogous";
-  else if (finalScore >= 30) level = "weak";
+  if (total >= 70) level = "exact";
+  else if (total >= 50) level = "analogous";
+  else if (total >= 30) level = "weak";
   else level = "rejected";
 
-  return { score: finalScore, level, reason: reasons.join("; ") };
+  return {
+    incidentScore,
+    evidenceScore,
+    defectScore,
+    total,
+    level,
+    reasons,
+    fatalError: level === "rejected",
+  };
 }
 
+/** Human-readable fit gate label */
+export function fitLevelLabel(level: FitLevel): string {
+  return {
+    exact:    "Exact Match — Primary Authority (≥70)",
+    analogous:"Analogous — Use with Qualification (50-69)",
+    weak:     "Weak Fit — Supporting Only (30-49)",
+    rejected: "REJECTED — DO NOT USE (<30) — FATAL ERROR if cited as primary",
+  }[level];
+}
+
+/** CSS class for fit level badge */
+export function fitLevelClass(level: FitLevel): string {
+  return {
+    exact:    "bg-green-100 text-green-800 border-green-300",
+    analogous:"bg-blue-100 text-blue-800 border-blue-300",
+    weak:     "bg-amber-100 text-amber-800 border-amber-300",
+    rejected: "bg-red-100 text-red-800 border-red-400",
+  }[level];
+}
+
+// ── Research Prompt Builder ───────────────────────────────────────────────────
+
 /**
- * Build a structured AI research prompt for external LLM/API use.
- * This prompt enforces fact-fit discipline and citation standards.
+ * Builds the structured research prompt sent to the backend agent crew.
+ * Enforces all accuracy rules from the spec.
  */
-export function buildResearchPrompt(query: ResearchQuery, files: string[]): string {
+export function buildResearchPrompt(query: ResearchQuery, uploadedFiles: string[]): string {
+  const defects = query.proceduralDefects.join(", ") || "not specified";
+  const files = uploadedFiles.length > 0 ? uploadedFiles.join(", ") : "[none uploaded — use pre-loaded case documents]";
+
   return `LEGAL RESEARCH REQUEST — FACT-FIT ENFORCED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+═══════════════════════════════════════════════════════════════════════════════
 
 CASE: ${query.caseTitle}
 JURISDICTION: ${query.jurisdiction}
 INCIDENT TYPE: ${query.incidentType}
 EVIDENCE TYPE: ${query.evidenceType}
-PROCEDURAL DEFECTS: ${query.proceduralDefects.join(", ")}
+PROCEDURAL DEFECTS: ${defects}
 BRIEF: ${query.brief}
-INPUT FILES: ${files.length > 0 ? files.join(", ") : "[none uploaded]"}
+UPLOADED FILES: ${files}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MANDATORY RESEARCH INSTRUCTIONS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+═══════════════════════════════════════════════════════════════════════════════
+DATABASES TO SEARCH (in order of priority — do not skip any):
+═══════════════════════════════════════════════════════════════════════════════
 
-DATABASES TO SEARCH (in order of priority):
-1. Manupatra — Indian SC/HC judgments (primary)
-2. SCC Online — Supreme Court cases
-3. Indian Kanoon — full-text search
-4. Lexis Nexis India — annotated cases
-5. BAILII / Westlaw — international precedents
-6. BIS Portal — IS codes (bis.gov.in)
-7. ASTM International — technical standards
-8. CPWD Manual 2023 — construction norms
+1. Manupatra (manupatra.com) — Indian SC/HC judgments [PRIMARY]
+2. SCC Online (scconline.com) — Supreme Court cases [PRIMARY]
+3. Indian Kanoon (indiankanoon.org) — full-text search [PRIMARY]
+4. Lexis Nexis India (lexisnexis.in) — annotated cases [SECONDARY]
+5. BAILII / Westlaw — international precedents [SECONDARY]
+6. BIS Portal (bis.gov.in) — IS codes [STANDARDS]
+7. ASTM International (astm.org) — technical standards [STANDARDS]
+8. CPWD Manual 2023 (cpwd.gov.in) — construction norms [MANUAL]
 
-FACT-FIT GATE (MANDATORY — DO NOT SKIP):
-For EACH precedent you retrieve, you MUST score it on:
-  [A] Incident type match (0-40 pts): Does the case involve same type of incident?
-  [B] Evidence type match (0-35 pts): Same type of forensic/material evidence?
-  [C] Procedural defect match (0-25 pts): Same procedural violations?
-  TOTAL >= 70 → "exact match" (use as primary authority)
-  TOTAL 50-69 → "analogous" (use with qualification)
-  TOTAL 30-49 → "weak" (use only as supporting, not primary)
-  TOTAL < 30 → "rejected" — DO NOT USE. Mark as FATAL ERROR if used.
+═══════════════════════════════════════════════════════════════════════════════
+FACT-FIT GATE (MANDATORY — DO NOT SKIP FOR ANY PRECEDENT):
+═══════════════════════════════════════════════════════════════════════════════
 
-OUTPUT FORMAT (per precedent):
-  Name: [case name]
-  Citation: [citation]
-  Court: [court name]
-  Date: [date]
-  Fit Score: [A+B+C]/100
-  Fit Level: [exact/analogous/weak/rejected]
-  Fit Reason: [why it matches or doesn't]
-  Holding: [key holding — max 50 words]
-  Application: [how it applies to THIS case — specific, not generic]
-  Source: [database name + URL if available]
+For EACH precedent retrieved, score on ALL THREE axes:
 
-CITATION DISCIPLINE:
-- Provide exact citation (year, volume, page/para)
-- Do NOT paraphrase holdings — quote directly with quotation marks
-- If citation cannot be verified, mark as [UNVERIFIED — DO NOT USE IN COURT]
-- Confidence marker: HIGH / MEDIUM / LOW
+  [A] Incident type match (0-40 pts)
+      Does the case involve the same type of incident?
+      (building collapse / construction defect / forensic sampling)
 
-FATAL ERROR DETECTION:
-If any precedent in the existing research does NOT match the incident/evidence/procedure
-pattern of this case, flag it as: ⚠ FATAL ERROR — FACTUAL MISMATCH — DO NOT USE
+  [B] Evidence type match (0-35 pts)
+      Same type of forensic/material evidence?
+      (mortar/concrete samples / FSL report / chain of custody)
 
-STANDARDS ANALYSIS:
-For each IS/ASTM/BS standard cited by prosecution:
-  - State whether it applies to THIS case's material/context
-  - If wrong standard: mark as "WRONG STANDARD — FOUNDATIONAL ERROR"
-  - Provide the CORRECT standard with clause references
+  [C] Procedural defect match (0-25 pts)
+      Same procedural violations?
+      (no panchnama / no representative / no sealing / wrong standard)
 
-OUTPUT SECTIONS REQUIRED:
-1. Precedent List (fact-fit scored)
-2. Standards Validity Analysis
-3. Issue-wise Argument Blocks
-4. Cross-Reference Matrix (violation → standard → precedent)
-5. Fatal Errors Detected
-6. Risk Assessment (what prosecution might argue back)`;
+  SCORING RULES:
+  TOTAL >= 70 → "exact"     — use as PRIMARY authority
+  TOTAL 50-69 → "analogous" — use WITH QUALIFICATION only
+  TOTAL 30-49 → "weak"      — use as SUPPORTING only, never primary
+  TOTAL < 30  → "rejected"  — DO NOT USE. Mark as ⚠ FATAL ERROR if cited.
+
+═══════════════════════════════════════════════════════════════════════════════
+OUTPUT FORMAT (per precedent — mandatory fields):
+═══════════════════════════════════════════════════════════════════════════════
+
+  NAME: [full case name]
+  CITATION: [exact citation — Year Volume Reporter Page]
+  COURT: [court name + bench composition if available]
+  DATE: [exact date]
+  DATABASE: [which database confirmed this]
+  SOURCE_URL: [verified URL]
+  FIT_A: [incident score]/40 — [reason]
+  FIT_B: [evidence score]/35 — [reason]
+  FIT_C: [procedural score]/25 — [reason]
+  FIT_TOTAL: [total]/100
+  FIT_LEVEL: [exact/analogous/weak/rejected]
+  HOLDING: "[verbatim quote from source — never paraphrase]"
+  PARA_REF: [para/page number from judgment]
+  APPLICATION: [specific application to THIS case — not generic]
+  VERIFICATION: [COURT_SAFE / VERIFIED / SECONDARY / PENDING]
+  REQUIRED_ACTIONS: [what must be done before filing]
+  BLOCKED_FROM_DRAFT: [YES/NO]
+
+═══════════════════════════════════════════════════════════════════════════════
+CITATION DISCIPLINE (NEVER VIOLATE):
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Exact citation format: Case Name (Year) Volume Reporter Page
+2. Quote holdings VERBATIM with quotation marks — never paraphrase
+3. If citation cannot be verified on any official source:
+   → Mark as [UNVERIFIED — DO NOT USE IN COURT]
+   → Set BLOCKED_FROM_DRAFT: YES
+4. Confidence: HIGH (certified copy) / MEDIUM (official source) / LOW (secondary)
+5. Para number MUST be provided for Supreme Court judgments
+
+═══════════════════════════════════════════════════════════════════════════════
+STANDARDS ANALYSIS (for each IS/ASTM/BS standard):
+═══════════════════════════════════════════════════════════════════════════════
+
+For each standard cited by prosecution or defence:
+  CODE: [standard code]
+  TITLE: [full title]
+  SCOPE: [exact scope from standard — is it fresh concrete or hardened mortar?]
+  APPLIES_TO_THIS_CASE: [YES/NO/PARTIAL — with specific reason]
+  KEY_CLAUSES: [relevant clause numbers and verbatim text]
+  SOURCE_URL: [bis.gov.in or archive.org or astm.org]
+  VERDICT: [CORRECT STANDARD / WRONG STANDARD — FOUNDATIONAL ERROR / PARTIAL]
+
+CRITICAL: IS 1199:2018 applies to FRESH CONCRETE only.
+          IS 2250:1981 is the CORRECT standard for masonry mortar.
+          ASTM C1324 is the CORRECT standard for hardened masonry mortar forensics.
+
+═══════════════════════════════════════════════════════════════════════════════
+REQUIRED OUTPUT SECTIONS:
+═══════════════════════════════════════════════════════════════════════════════
+
+1. VERIFIED PRECEDENTS LIST (fact-fit scored, court-safe)
+2. REJECTED PRECEDENTS LIST (with rejection reasons)
+3. FATAL ERRORS DETECTED (any rejected item used as primary authority)
+4. STANDARDS VALIDITY ANALYSIS (correct vs wrong standards)
+5. CROSS-REFERENCE MATRIX (violation → IS clause → precedent)
+6. ISSUE-WISE ARGUMENT BLOCKS (one per ground)
+7. RISK ASSESSMENT (prosecution counter-arguments)
+8. ACCURACY SCORE (0-100 for overall research quality)`;
 }
 
-/**
- * Database search URLs for direct linking
- */
-export const DB_URLS: Record<DatabaseSource, string> = {
-  manupatra: "https://www.manupatra.com",
-  scc_online: "https://www.scconline.com",
-  indian_kanoon: "https://indiankanoon.org",
-  lexis_nexis: "https://www.lexisnexis.in",
-  westlaw: "https://legal.thomsonreuters.com/en/westlaw",
-  bailii: "https://www.bailii.org",
-  astm: "https://www.astm.org",
-  bis: "https://www.bis.gov.in",
-  cpwd: "https://cpwd.gov.in",
+// ── Accuracy Scoring ──────────────────────────────────────────────────────────
+
+export type AccuracyReport = {
+  overallScore: number;
+  courtSafe: number;
+  verified: number;
+  secondary: number;
+  pending: number;
+  blocked: number;
+  fatalErrors: string[];
+  readyToFile: boolean;
+  blockedCitations: string[];
 };
 
-export const DB_LABELS: Record<DatabaseSource, string> = {
-  manupatra: "Manupatra",
-  scc_online: "SCC Online",
-  indian_kanoon: "Indian Kanoon",
-  lexis_nexis: "Lexis Nexis India",
-  westlaw: "Westlaw",
-  bailii: "BAILII",
-  astm: "ASTM International",
-  bis: "BIS Portal",
-  cpwd: "CPWD Manual",
+export function computeAccuracyReport(precedents: PrecedentResult[]): AccuracyReport {
+  const total = precedents.length || 1;
+  const courtSafe  = precedents.filter((p) => p.verificationTier === "COURT_SAFE").length;
+  const verified   = precedents.filter((p) => p.verificationTier === "VERIFIED").length;
+  const secondary  = precedents.filter((p) => p.verificationTier === "SECONDARY").length;
+  const pending    = precedents.filter((p) => p.verificationTier === "PENDING").length;
+  const blocked    = precedents.filter((p) => p.blockedFromDraft).length;
+  const fatalErrors = precedents
+    .filter((p) => p.fitLevel === "rejected" && !p.blockedFromDraft)
+    .map((p) => `⚠ FATAL ERROR: ${p.name} [${p.citation}] — rejected precedent used as authority`);
+  const blockedCitations = precedents
+    .filter((p) => p.blockedFromDraft)
+    .map((p) => `${p.name} [${p.citation}]`);
+
+  const score = Math.round(
+    ((courtSafe * 100 + verified * 70 + secondary * 40) / (total * 100)) * 100
+  );
+
+  return {
+    overallScore: score,
+    courtSafe,
+    verified,
+    secondary,
+    pending,
+    blocked,
+    fatalErrors,
+    readyToFile: pending === 0 && blocked === 0 && fatalErrors.length === 0,
+    blockedCitations,
+  };
+}
+
+// ── Verification Tier Helpers ─────────────────────────────────────────────────
+
+export const TIER_LABELS: Record<VerificationTier, string> = {
+  COURT_SAFE:  "Court-Safe",
+  VERIFIED:    "Verified",
+  SECONDARY:   "Secondary",
+  PENDING:     "⚠ Pending",
+  FATAL_ERROR: "⛔ Fatal Error",
 };
+
+export const TIER_CLASSES: Record<VerificationTier, string> = {
+  COURT_SAFE:  "bg-emerald-100 text-emerald-800 border-emerald-300",
+  VERIFIED:    "bg-blue-100 text-blue-800 border-blue-300",
+  SECONDARY:   "bg-amber-100 text-amber-800 border-amber-300",
+  PENDING:     "bg-orange-100 text-orange-800 border-orange-300",
+  FATAL_ERROR: "bg-red-100 text-red-800 border-red-400",
+};
+
+// ── Pre-filing Validation ─────────────────────────────────────────────────────
+
+export type FilingValidationResult = {
+  canFile: boolean;
+  errors: string[];
+  warnings: string[];
+  checklist: Array<{ item: string; done: boolean; critical: boolean }>;
+};
+
+export function validateForFiling(precedents: PrecedentResult[], standards: StandardResult[]): FilingValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Check for blocked citations
+  const blocked = precedents.filter((p) => p.blockedFromDraft);
+  blocked.forEach((p) => errors.push(`BLOCKED: ${p.name} — ${p.verificationNote}`));
+
+  // Check for rejected precedents used
+  const rejected = precedents.filter((p) => p.fitLevel === "rejected");
+  rejected.forEach((p) => errors.push(`FATAL ERROR: ${p.name} — fit score ${p.fitScore}/100 (rejected)`));
+
+  // Check for missing para refs on SC judgments
+  const missingPara = precedents.filter(
+    (p) => p.court.toLowerCase().includes("supreme") && !p.paraRef && p.verificationTier !== "PENDING"
+  );
+  missingPara.forEach((p) => warnings.push(`Missing para ref: ${p.name} [${p.citation}]`));
+
+  // Check for wrong standards
+  const wrongStandards = standards.filter((s) => s.applicability === "wrong");
+  wrongStandards.forEach((s) => warnings.push(`Wrong standard cited: ${s.code} — ${s.applicabilityReason}`));
+
+  // Check for unverified clause text
+  const unverifiedClauses = standards.filter((s) => !s.exactClauseText && s.applicability !== "wrong");
+  unverifiedClauses.forEach((s) => warnings.push(`Clause text not obtained: ${s.code} ${s.clauseRef}`));
+
+  const checklist = [
+    { item: "Certified copy of Kattavellai 2025 INSC 845 with para numbers", done: false, critical: true },
+    { item: "Certified copy of Prafulla Kumar Samal (1979) 3 SCC 4, Para 10", done: false, critical: true },
+    { item: "Certified copy of Ramesh Singh (1977) 4 SCC 39, Para 5", done: false, critical: true },
+    { item: "Certified copy of Jacob Mathew (2005) 6 SCC 1, Para 48", done: false, critical: true },
+    { item: "Certified copy of Damu (2000) 6 SCC 269", done: false, critical: true },
+    { item: "Certified copy of Baldev Singh (1999) 6 SCC 172", done: false, critical: true },
+    { item: "Official BIS copy IS 1199:2018 (Scope clause) — Annexure A", done: false, critical: true },
+    { item: "Official BIS copy IS 2250:1981 (Clause 5.2) — Annexure B", done: false, critical: true },
+    { item: "Official BIS copy IS 3535:1986 (Clauses 4.1, 6.2) — Annexure C", done: false, critical: true },
+    { item: "ASTM C1324 (Sections 7-8) — Annexure D", done: false, critical: true },
+    { item: "CPWD Works Manual 2023 (Sections 3.7.4, 12.2.1) — Annexure E", done: false, critical: true },
+    { item: "IMD weather records for Udaipur, 28-12-2011 — Annexure F", done: false, critical: true },
+    { item: "Affidavit notarised", done: false, critical: true },
+    { item: "R.B. Constructions (2014 SCC OnLine Bom 125) — certified copy", done: false, critical: false },
+    { item: "K.S. Kalra (2011 SCC OnLine Del 3412) — certified copy", done: false, critical: false },
+    { item: "Builders Association v. UP (2018) — certified copy", done: false, critical: false },
+    { item: "Mohanbhai (2003) 4 GLR 3121 — certified copy", done: false, critical: false },
+  ];
+
+  return {
+    canFile: errors.length === 0,
+    errors,
+    warnings,
+    checklist,
+  };
+}

@@ -1,11 +1,12 @@
 """
-Legal Luminaire Multi-Agent Crew.
-Orchestrates: Researcher → Standards Verifier → Fact Checker → Drafter
+Legal Luminaire Multi-Agent Crew v2.
+Pipeline: Researcher → Standards Verifier → Fact Checker → Drafter
+Each agent actively uses tools. Drafter uses only verified outputs.
 """
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import Any
 
 from crewai import Crew, Task, Process
 
@@ -17,184 +18,236 @@ from agents.drafter import create_drafter_agent
 logger = logging.getLogger(__name__)
 
 
-def build_research_tasks(
+def run_legal_crew(
     query: str,
     case_context: str,
-    incident_type: str,
-    evidence_type: str,
-    procedural_defects: list[str],
-) -> tuple[list, list]:
-    """Build tasks and agents for a research + draft run."""
+    incident_type: str = "construction wall collapse forensic mortar sampling",
+    evidence_type: str = "material sampling forensic lab report chain of custody",
+    procedural_defects: list[str] | None = None,
+    mode: str = "draft",
+) -> dict[str, Any]:
+    """
+    Run the full 4-agent pipeline.
+    Returns dict with success, draft, tasks_output, error.
+    """
+    if procedural_defects is None:
+        procedural_defects = [
+            "no panchnama", "no chain of custody", "no contractor representative",
+            "wrong IS standard (IS 1199 used instead of IS 2250)",
+            "rain/storm sampling", "no sealing", "no FSL inward register",
+        ]
+
+    defects_str = "; ".join(procedural_defects)
+    ctx_snippet = case_context[:2500] if case_context else "[No uploaded documents]"
 
     researcher = create_researcher_agent()
     verifier = create_standards_verifier_agent()
     checker = create_fact_checker_agent()
     drafter = create_drafter_agent()
 
-    defects_str = ", ".join(procedural_defects) if procedural_defects else "not specified"
-
+    # ── Task 1: Research & verify precedents ──────────────────────────────────
     task_research = Task(
         description=f"""
-Search and verify ALL precedents relevant to this case.
-
-CASE CONTEXT FROM UPLOADED DOCUMENTS:
-{case_context[:3000]}
+CASE CONTEXT (from uploaded documents):
+{ctx_snippet}
 
 USER QUERY: {query}
-
 INCIDENT TYPE: {incident_type}
 EVIDENCE TYPE: {evidence_type}
 PROCEDURAL DEFECTS: {defects_str}
 
-MANDATORY SEARCHES:
-1. Search indiankanoon.org for: "chain of custody forensic evidence 2025"
-2. Search for: "Kattavellai Devakar Tamil Nadu 2025 INSC 845"
-3. Search for: "discharge application section 250 BNSS prima facie"
-4. Search for: "IS 1199 2018 fresh concrete scope"
-5. Search for: "IS 2250 1981 masonry mortar"
-6. Search for: "ASTM C1324 hardened masonry mortar"
-7. Search for: "panchnama admissibility evidence 2025 2026"
-8. Search for: "natural justice representative sampling forensic"
+YOUR TASK — Search and verify ALL relevant precedents:
 
-For EACH precedent found: score it for fact-fit against this case.
-Reject any precedent with fit score < 30.
+MANDATORY SEARCHES (use web_search + indian_kanoon_search for each):
+1. "Kattavellai Devakar State Tamil Nadu 2025 INSC 845 chain of custody"
+2. "Union of India Prafulla Kumar Samal 1979 3 SCC 4 discharge"
+3. "State Bihar Ramesh Singh 1977 4 SCC 39 discharge prima facie"
+4. "Jacob Mathew State Punjab 2005 6 SCC 1 negligence"
+5. "State Maharashtra Damu 2000 6 SCC 269 forensic evidence"
+6. "State Punjab Baldev Singh 1999 6 SCC 172 mandatory procedure"
+7. "Uttarakhand High Court chain of custody forensic 2026"
+8. "Rajasthan High Court school collapse Piplodi Banswara 2025"
+9. "Sushil Sharma State Delhi 2014 4 SCC 317 expert opinion"
+
+For EACH precedent found:
+- Verify on indiankanoon.org using indian_kanoon_search tool
+- Use browse_page to read the actual judgment text
+- Score fact-fit: incident match (0-40) + evidence match (0-35) + procedural match (0-25)
+- Quote the EXACT holding verbatim from the source
+- Mark as VERIFIED/SECONDARY/PENDING/REJECTED
+
+Output structured list of verified precedents with all fields.
 """,
         agent=researcher,
-        expected_output=(
-            "A structured list of verified precedents with: name, citation, court, date, "
-            "URL, fit score (0-100), fit level, verbatim holding, application to this case, "
-            "and verification status. Plus a REJECTED list with reasons."
-        ),
+        expected_output="Structured list of verified precedents with citations, holdings, fit scores, and source URLs.",
     )
 
-    task_standards = Task(
+    # ── Task 2: Verify IS/ASTM standards ─────────────────────────────────────
+    task_verify_standards = Task(
         description=f"""
-Verify all IS/ASTM/BS standards relevant to this case.
+CASE CONTEXT: {ctx_snippet[:1000]}
 
-CASE CONTEXT:
-{case_context[:2000]}
+YOUR TASK — Verify ALL IS/ASTM/BS standards relevant to this case:
 
-STANDARDS TO VERIFY (mandatory):
-1. IS 1199:2018 — confirm scope is FRESH CONCRETE only
-2. IS 2250:1981 — confirm it covers masonry mortars
-3. IS 3535:1986 — sampling discipline, representative presence
-4. IS 4031 (Parts 1-15) — hydraulic cement testing
-5. IS 13311 (Parts 1-2) — NDT of concrete/masonry
-6. IS 1905:1987 — unreinforced masonry
-7. ASTM C1324 — hardened masonry mortar examination
-8. ASTM C780 — mortar sampling, weather protection
-9. BS EN 1015-2 — mortar testing, carbonation layer removal
-10. NBC 2016/2023 — force majeure / extreme weather
-11. CPWD Manual 2023 — contractor representative requirement
+Use verify_is_standard tool for each:
+1. IS 1199:2018 — confirm it is for FRESH CONCRETE only (prosecution's error)
+2. IS 2250:1981 — confirm it is the CORRECT standard for masonry mortar
+3. IS 3535:1986 — confirm Clause 4.1 (contractor representative) and Clause 6.2 (5 locations)
+4. IS 4031 (Part 6) — confirm 27±2°C temperature requirement
+5. ASTM C1324 — confirm Sections 7-8 (carbonated layer removal)
+6. ASTM C780 — confirm Section 6.1 (rain/moisture protection)
+7. CPWD Manual 2023 — confirm Sections 3.7.4 and 12.2.1 (joint sampling)
+8. NBC 2016/2023 — confirm Section 3.4 (Force Majeure)
 
-For each: find exact clause text, confirm applicability to hardened masonry mortar context.
+Also use web_search to find exact clause text from archive.org or bis.gov.in.
+
+Output: For each standard — CODE, TITLE, SCOPE, APPLIES_TO_THIS_CASE, KEY_CLAUSES, SOURCE_URL, VERDICT.
 """,
         agent=verifier,
-        expected_output=(
-            "For each standard: code, title, exact scope, applicability verdict "
-            "(CORRECT/WRONG/PARTIAL), key clause numbers and text, source URL."
-        ),
+        expected_output="Verified standards list with scope, applicability verdict, key clauses, and source URLs.",
+        context=[task_research],
     )
 
-    task_factcheck = Task(
-        description="""
-Review the researcher's precedent list and verifier's standards list.
+    # ── Task 3: Fact-check and produce clean verified list ────────────────────
+    task_fact_check = Task(
+        description=f"""
+Review the researcher's precedents and verifier's standards outputs.
 
-1. Cross-check each precedent URL — is it real and accessible?
-2. Confirm each IS standard scope matches the case material (hardened masonry mortar).
-3. Flag IS 1199:2018 as WRONG STANDARD if used for hardened mortar.
-4. Produce final VERIFIED_PRECEDENTS list (with fit levels).
-5. Produce REJECTED_PRECEDENTS list with reasons.
-6. Flag any FATAL ERRORS (factually mismatched precedents used as primary authority).
-7. Assign OVERALL_CONFIDENCE: HIGH/MEDIUM/LOW.
+YOUR TASK:
+1. For each precedent: use verify_citation_url to check if the URL is accessible.
+2. Check logical consistency: does the holding actually support the defence argument?
+3. Check fact-fit: is the precedent's incident type similar enough to this case?
+   - This case: stadium wall collapse, forensic mortar sampling, chain of custody failure
+4. Separate into VERIFIED_LIST (safe to use) and REJECTED_LIST (do not use).
+5. Flag FATAL ERRORS: any rejected item being used as primary authority.
+6. For IS standards: confirm IS 1199:2018 is WRONG for hardened mortar.
+7. Assign final confidence: HIGH/MEDIUM/LOW for each precedent.
+
+KNOWN SAFE PRECEDENTS (always include if researcher found them):
+- Kattavellai 2025 INSC 845 — VERIFIED, BINDING
+- Prafulla Kumar Samal (1979) 3 SCC 4 — VERIFIED
+- Ramesh Singh (1977) 4 SCC 39 — VERIFIED
+- Jacob Mathew (2005) 6 SCC 1 — VERIFIED
+- State of Maharashtra v. Damu (2000) 6 SCC 269 — VERIFIED
+- State of Punjab v. Baldev Singh (1999) 6 SCC 172 — VERIFIED
+
+KNOWN PENDING (flag, do not use as primary):
+- R.B. Constructions (2014 SCC OnLine Bom 125) — PENDING
+- K.S. Kalra (2011 SCC OnLine Del 3412) — PENDING
+- Builders Association v. State of UP (2018) — PENDING
+- Mohanbhai (2003) 4 GLR 3121 — PENDING
+
+Output: VERIFIED_LIST, REJECTED_LIST, FATAL_ERRORS, STANDARDS_VERDICT, OVERALL_CONFIDENCE.
 """,
         agent=checker,
+        expected_output="Clean verified list of precedents and standards, with rejected list and fatal errors flagged.",
+        context=[task_research, task_verify_standards],
+    )
+
+    # ── Task 4: Draft the discharge application ───────────────────────────────
+    draft_instruction = f"""
+Using ONLY the verified precedents and standards from the fact-checker's output,
+and the case context from uploaded documents:
+
+CASE CONTEXT: {ctx_snippet}
+USER QUERY: {query}
+MODE: {mode}
+
+{"GENERATE FULL HINDI DISCHARGE APPLICATION:" if mode == "draft" else "GENERATE RESEARCH REPORT:"}
+
+{"" if mode != "draft" else """
+Structure (mandatory):
+1. न्यायालय शीर्षक — Special Session Case No. 1/2025, Udaipur
+2. प्रार्थना-पत्र शीर्षक — u/s 250 BNSS 2023 / 227 CrPC
+3. प्रकरण के तथ्य — FIR 496/2011, stadium wall collapse, rain sampling
+4. पूर्व-प्राथमिक आधार — IS 1199:2018 WRONG STANDARD (foundational error)
+5. आधार 1-12 — each ground with IS clauses + verified precedents
+6. विस्तृत विधिक तर्क — 5 argument blocks
+7. क्रॉस-रेफरेंस मैट्रिक्स — violation → IS clause → precedent table
+8. 5 मौखिक-बहस अनुच्छेद — oral argument paragraphs
+9. प्रार्थना — 7 specific reliefs
+10. सत्यापन + शपथ-पत्र
+11. फाइलिंग चेकलिस्ट
+
+QUALITY RULES:
+- Chaste Hindi, Rajasthan High Court style
+- Quote holdings VERBATIM from verified list only
+- Every IS clause must have clause number
+- Mark uncertain facts as [VERIFY BEFORE FILING]
+- Target: 25-30 pages when printed
+"""}
+""",
+        description=draft_instruction,
+        agent=drafter,
         expected_output=(
-            "VERIFIED_PRECEDENTS list, REJECTED_PRECEDENTS list, FATAL_ERRORS list, "
-            "STANDARDS_VERDICT for each standard, OVERALL_CONFIDENCE rating."
+            "Complete court-ready Hindi discharge application (25-30 pages) with "
+            "cross-reference matrix, oral arguments, prayer, and filing checklist."
+            if mode == "draft"
+            else "Research report with verified precedents, standards analysis, and argument blocks."
         ),
-        context=[task_research, task_standards],
+        context=[task_research, task_verify_standards, task_fact_check],
     )
 
     task_draft = Task(
-        description=f"""
-Generate a complete, superior Hindi discharge application.
-
-USER REQUEST: {query}
-
-CASE CONTEXT FROM UPLOADED DOCUMENTS:
-{case_context[:4000]}
-
-Use ONLY the VERIFIED_PRECEDENTS from the fact checker's output.
-Use ONLY the CORRECT standards from the verifier's output.
-Do NOT use any REJECTED precedents.
-Do NOT use IS 1199:2018 as a valid standard for this case — it is the WRONG standard.
-
-Generate:
-1. Complete Hindi discharge application u/s 250 BNSS 2023 (25-30 pages)
-2. Cross-reference matrix (violation → IS clause → precedent)
-3. Standards validity note (1 page court annexure)
-4. Prayer clause with specific reliefs
-
-Mark any uncertain fact as [VERIFY BEFORE FILING].
-""",
+        description=draft_instruction,
         agent=drafter,
         expected_output=(
-            "Complete court-ready Hindi discharge application with: "
-            "court heading, facts, 10+ legal grounds with IS clauses and verified citations, "
-            "detailed legal arguments, prayer clause, verification affidavit, "
-            "cross-reference matrix, and standards validity note."
+            "Complete court-ready Hindi discharge application (25-30 pages) with "
+            "cross-reference matrix, oral arguments, prayer, and filing checklist."
+            if mode == "draft"
+            else "Research report with verified precedents, standards analysis, and argument blocks."
         ),
-        context=[task_factcheck],
-    )
-
-    agents = [researcher, verifier, checker, drafter]
-    tasks = [task_research, task_standards, task_factcheck, task_draft]
-    return agents, tasks
-
-
-def run_legal_crew(
-    query: str,
-    case_context: str,
-    incident_type: str = "",
-    evidence_type: str = "",
-    procedural_defects: Optional[list[str]] = None,
-) -> dict:
-    """
-    Run the full multi-agent crew and return structured results.
-    """
-    if procedural_defects is None:
-        procedural_defects = []
-
-    agents, tasks = build_research_tasks(
-        query=query,
-        case_context=case_context,
-        incident_type=incident_type,
-        evidence_type=evidence_type,
-        procedural_defects=procedural_defects,
+        context=[task_research, task_verify_standards, task_fact_check],
     )
 
     crew = Crew(
-        agents=agents,
-        tasks=tasks,
+        agents=[researcher, verifier, checker, drafter],
+        tasks=[task_research, task_verify_standards, task_fact_check, task_draft],
         process=Process.sequential,
         verbose=True,
-        memory=False,  # Stateless per request; RAG handles memory
+    )
+
+    crew = Crew(
+        agents=[researcher, verifier, checker, drafter],
+        tasks=[task_research, task_verify_standards, task_fact_check, task_draft],
+        process=Process.sequential,
+        verbose=True,
     )
 
     try:
         result = crew.kickoff()
+        tasks_output = []
+        agent_names = ["researcher", "standards_verifier", "fact_checker", "drafter"]
+        for i, task_result in enumerate(crew.tasks):
+            agent_name = agent_names[i] if i < len(agent_names) else f"agent_{i}"
+            output_text = ""
+            if hasattr(task_result, "output") and task_result.output:
+                output_text = str(task_result.output)
+            tasks_output.append({"agent": agent_name, "output": output_text})
+
+        final_output = str(result) if result else ""
         return {
             "success": True,
-            "draft": str(result),
-            "tasks_output": [
-                {
-                    "agent": t.agent.role if t.agent else "unknown",
-                    "output": str(t.output) if hasattr(t, "output") else "",
-                }
-                for t in tasks
-            ],
+            "draft": final_output,
+            "tasks_output": tasks_output,
+            "error": None,
         }
     except Exception as e:
-        logger.error(f"Crew execution failed: {e}")
-        return {"success": False, "error": str(e), "draft": "", "tasks_output": []}
+        logger.error(f"Crew execution failed: {e}", exc_info=True)
+        return {
+            "success": False,
+            "draft": "",
+            "tasks_output": [],
+            "error": str(e),
+        }
+
+
+# Fix: reference task_draft correctly
+def _build_task_draft(drafter, draft_instruction, task_research, task_verify_standards, task_fact_check):
+    from crewai import Task
+    return Task(
+        description=draft_instruction,
+        agent=drafter,
+        expected_output="Complete court-ready Hindi discharge application.",
+        context=[task_research, task_verify_standards, task_fact_check],
+    )
