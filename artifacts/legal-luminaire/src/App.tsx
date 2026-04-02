@@ -14,6 +14,7 @@ import CaseIntakeAssistant from "@/pages/CaseIntakeAssistant";
 import AIResearchEngine from "@/pages/AIResearchEngine";
 import AIDraftEngine from "@/pages/AIDraftEngine";
 import DefenceReply from "@/pages/DefenceReply";
+import VerificationPanel from "@/pages/VerificationPanel";
 import SessionWorkspace from "@/pages/session-workspace";
 import DraftViewer from "@/pages/draft-viewer";
 // New views from update
@@ -27,7 +28,7 @@ import { ChatView } from "@/components/views/ChatView";
 import {
   Scale, BookOpen, Table2, CheckSquare, Mic,
   Home as HomeIcon, Menu, FilePlus, Zap, X, Bot, FileText,
-  LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files,
+  LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { CaseProvider, useCaseContext } from "@/context/CaseContext";
@@ -53,6 +54,7 @@ const navItems = [
   { path: "/documents", label: "दस्तावेज़", labelEn: "Documents", icon: Files, caseScoped: true },
   { path: "/upload", label: "फाइल अपलोड", labelEn: "Upload Files", icon: Upload, caseScoped: true },
   { path: "/filing-checklist", label: "फाइलिंग चेकलिस्ट", labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
+  { path: "/verification", label: "सत्यापन पैनल", labelEn: "Verification Panel", icon: ShieldCheck, caseScoped: true },
 ];
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -211,6 +213,7 @@ function Router() {
         <Route path="/ai-research" component={AIResearchEngine} />
         <Route path="/ai-draft" component={AIDraftEngine} />
         <Route path="/defence-reply" component={DefenceReply} />
+        <Route path="/verification" component={VerificationPanel} />
 
         {/* New view routes */}
         <Route path="/dashboard" component={() => <div className="p-6"><DashboardView /></div>} />
@@ -236,6 +239,7 @@ function Router() {
         <Route path="/case/:caseId/standards-validity" component={StandardsValidity} />
         <Route path="/case/:caseId/filing-checklist" component={FilingChecklist} />
         <Route path="/case/:caseId/defence-reply" component={DefenceReply} />
+        <Route path="/case/:caseId/verification" component={VerificationPanel} />
         <Route path="/case/:caseId/dashboard" component={() => <div className="p-6"><DashboardView /></div>} />
         <Route path="/case/:caseId/chat" component={() => <div className="flex flex-col h-full"><ChatView /></div>} />
         <Route path="/case/:caseId/case-law" component={() => <div className="p-0"><CaseLawView /></div>} />
