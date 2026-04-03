@@ -1,0 +1,26 @@
+EXPECTED OUTPUT — CASE_02_BailNDPS
+
+Document Type: Bail Application u/s 439 CrPC / §483 BNSS 2023
+Court: Rajasthan High Court, Jaipur Bench
+Language: English + Hindi (bilingual)
+
+MANDATORY SECTIONS:
+1. Court heading + case number
+2. Facts (FIR 234/2024, arrest, sampling)
+3. Grounds for bail:
+   - §52A NDPS non-compliance (no Magistrate, no certificate)
+   - No independent witness
+   - FSL delay (45 days vs 30 days prescribed)
+   - No nexus — vehicle not owned by accused
+4. Precedents (VERIFIED only):
+   - State of Punjab v. Baldev Singh (1999) 6 SCC 172 [VERIFIED] — §50 compliance
+   - Tofan Singh v. State of Tamil Nadu (2021) 4 SCC 1 [VERIFIED] — §52A mandatory
+5. Prayer: Release on bail with conditions
+6. Verification report
+7. Pre-filing checklist
+
+FACT-FIT SCORES:
+- Baldev Singh: [A]35 + [B]30 + [C]25 = 90/100 → EXACT
+- Tofan Singh: [A]38 + [B]32 + [C]25 = 95/100 → EXACT
+
+ACCURACY SCORE: 9/10

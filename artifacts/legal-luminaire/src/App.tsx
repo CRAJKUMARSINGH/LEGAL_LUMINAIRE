@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { CaseProvider, useCaseContext } from "@/context/CaseContext";
+import { AccuracyProvider } from "@/context/AccuracyContext";
 
 const queryClient = new QueryClient();
 

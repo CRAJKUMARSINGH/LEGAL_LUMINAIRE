@@ -56,3 +56,19 @@ artifacts/legal-luminaire/backend/uploaded_cases/
 artifacts/legal-luminaire/backend/__pycache__/
 artifacts/legal-luminaire/backend/**/__pycache__/
 artifacts/legal-luminaire/backend/*.pyc
+
+# Python cache (all locations)
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+.pytest_cache/
+
+# TypeScript build cache
+**/*.tsbuildinfo
+
+# Vite / Node cache
+node_modules/.vite/
+node_modules/.cache/
+
+# Test artifacts (generated outputs — not source)
+artifacts/demo-outputs/*.pdf
