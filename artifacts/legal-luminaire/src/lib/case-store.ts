@@ -12,6 +12,19 @@ export type CaseRecord = {
   brief: string;
   createdAt: string;
   files: CaseFile[];
+  status?: string;
+  charges?: string;
+  documents?: Array<{ id: string; name: string; type: string; status: string; size: number; uploadedAt: string; description?: string }>;
+  caseLaw?: Array<{ case: string; court: string; useForDefence: string; status: string; action: string; citation?: string; holding?: string; fitScore?: number }>;
+  timeline?: Array<{ id: number; title: string; description: string; status: string; note?: string; date?: string }>;
+  strategy?: Array<{ id: string; title: string; description: string; status: string; priority: string }>;
+  standards?: Array<{ code: string; title: string; applicability: string; keyClause: string; violation: string; sourceUrl?: string; confidence: string }>;
+  metadata?: {
+    category: string;
+    complexity: string;
+    estimatedDuration: string;
+    requiredResources: string[];
+  };
 };
 
 const CASES_KEY = "legal_luminaire_cases_v1";
