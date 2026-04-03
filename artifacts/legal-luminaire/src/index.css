@@ -320,4 +320,30 @@
       0 0 0 1px hsl(var(--primary) / 0.55),
       0 0 34px hsl(var(--primary) / 0.22);
   }
+
+  /* --- WEEK 13: COURT-SPECIFIC PREMIUM FORMATTING --- */
+  
+  /* Rajasthan High Court: Gutter margin and strict bolding */
+  .style-rajasthan-hc {
+    border-left: 12px solid #e2e8f0;
+    padding-left: 3rem !important;
+    font-weight: 500;
+  }
+  .style-rajasthan-hc h1, 
+  .style-rajasthan-hc .header-bold {
+    @apply uppercase font-black tracking-tight text-center mb-8;
+    text-decoration: underline;
+  }
+
+  /* Supreme Court: Wide margins & Double-spacing simulation */
+  .style-supreme-court {
+    padding-left: 4rem !important;
+    padding-right: 4rem !important;
+    line-height: 2.2 !important;
+    font-size: 16px !important;
+  }
+  .style-supreme-court::before {
+    content: "IN THE SUPREME COURT OF INDIA";
+    @apply block text-center font-black mb-10 text-xl border-b-2 pb-2 border-slate-900;
+  }
 }

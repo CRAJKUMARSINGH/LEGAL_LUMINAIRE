@@ -22,6 +22,11 @@ pypdf==5.1.0
 python-docx==1.1.2
 unstructured==0.16.12
 pillow==11.1.0
+pytesseract==0.3.13
+
+# Google Gemini (Omni-Modal extraction)
+langchain-google-genai==2.0.8
+google-generativeai==0.8.5
 
 # Web search / verification
 tavily-python==0.5.0

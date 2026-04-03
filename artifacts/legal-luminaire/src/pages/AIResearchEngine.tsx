@@ -73,11 +73,16 @@ export default function AIResearchEngine() {
   const scoredPrecedents = useMemo<PrecedentResult[]>(() => {
     return CASE01_PRECEDENTS.map((p) => {
       const fit = scorePrecedentFit(p.tags, query);
+      
+      // Refined logic: Respect curated scores for foundational precedents
+      // that may not contain exact incident keywords but are legally binding.
+      const useCurated = (p.fitScore || 0) >= fit.total;
+
       return {
         ...p,
-        fitScore: fit.total,
-        fitLevel: fit.level,
-        fitReason: fit.reasons.join(" | "),
+        fitScore: useCurated ? p.fitScore : fit.total,
+        fitLevel: useCurated ? p.fitLevel : fit.level,
+        fitReason: useCurated ? `[Curated] ${p.fitReason}` : fit.reasons.join(" | "),
         verificationTier: p.status as VerificationTier,
         verificationNote: p.statusNote,
         paraRef: null,

@@ -16,6 +16,15 @@ from fastapi.responses import JSONResponse
 
 from config import settings
 from api.routes import router
+from api.routes_omni import router as omni_router
+from api.routes_cases import router as cases_router
+from api.routes_drafting import router as drafting_router
+from api.routes_search import router as search_router
+from api.routes_oral import router as oral_router
+from api.routes_lab import router as lab_router
+from api.routes_collision import router as collision_router
+from api.routes_auto_research import router as auto_research_router
+from api.routes_verify import router as verify_router
 
 # ── Logging ────────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -105,6 +114,15 @@ async def rate_limit_middleware(request: Request, call_next):
 
 
 app.include_router(router, prefix="/api/v1")
+app.include_router(omni_router, prefix="/api/v1")
+app.include_router(cases_router, prefix="/api/v1")
+app.include_router(drafting_router, prefix="/api/v1")
+app.include_router(search_router, prefix="/api/v1")
+app.include_router(oral_router, prefix="/api/v1")
+app.include_router(lab_router, prefix="/api/v1")
+app.include_router(collision_router, prefix="/api/v1")
+app.include_router(auto_research_router, prefix="/api/v1")
+app.include_router(verify_router, prefix="/api/v1")
 
 
 @app.get("/")

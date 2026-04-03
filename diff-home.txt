@@ -1,0 +1,162 @@
+diff --git "a/.\\artifacts\\legal-luminaire\\src\\pages\\Home.tsx" "b/.\\REFERENCE-APP00\\artifacts\\legal-luminaire\\src\\pages\\Home.tsx"
+index a320f95..367674b 100644
+--- "a/.\\artifacts\\legal-luminaire\\src\\pages\\Home.tsx"
++++ "b/.\\REFERENCE-APP00\\artifacts\\legal-luminaire\\src\\pages\\Home.tsx"
+@@ -6,11 +6,15 @@ import {
+   Scale, FileText, BookOpen, FlaskConical, Clock,
+   AlertTriangle, CheckCircle2, Info, ArrowRight,
+   MessageSquare, LayoutDashboard, Files, Upload, PlayCircle,
++  Zap, Target,
+ } from "lucide-react";
+ import {
+   caseInfo, caseLawMatrix, standardsMatrix,
+   timelineEvents, caseDocuments,
+ } from "@/data/caseData";
++import {
++  RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip,
++} from "recharts";
+ 
+ // ── Status badge (mirrors DashboardView from update) ──────────────────────
+ type VS = "VERIFIED" | "SECONDARY" | "PENDING";
+@@ -50,6 +54,31 @@ const STRATEGY_PILLARS = [
+   "BIS/IS procedural non-compliance",
+ ];
+ 
++// ── Defence Strength Radar data (derived from case evidence) ──────────────
++const RADAR_DATA = [
++  { pillar: "Chain of Custody",   score: 72, fullMark: 100 },
++  { pillar: "Sampling Method",    score: 80, fullMark: 100 },
++  { pillar: "Weather Evidence",   score: 58, fullMark: 100 },
++  { pillar: "Standards (BIS/IS)", score: 65, fullMark: 100 },
++  { pillar: "Natural Justice",    score: 85, fullMark: 100 },
++  { pillar: "FSL Challenge",      score: 70, fullMark: 100 },
++];
++
++const overallStrength = Math.round(
++  RADAR_DATA.reduce((sum, d) => sum + d.score, 0) / RADAR_DATA.length
++);
++
++// ── Priority Action Items (auto-derived from pending case law) ─────────────
++const PRIORITY_ACTIONS = caseLawMatrix
++  .filter((c) => c.status === "PENDING")
++  .map((c) => ({ task: c.action, citation: c.case.split(",")[0], court: c.court }))
++  .concat(
++    timelineEvents
++      .filter((e) => e.note)
++      .map((e) => ({ task: e.note, citation: e.title, court: "Evidence" }))
++  )
++  .slice(0, 5);
++
+ export default function Home() {
+   const verifiedCount  = caseLawMatrix.filter((c) => c.status === "VERIFIED").length;
+   const pendingCount   = caseLawMatrix.filter((c) => c.status === "PENDING").length;
+@@ -150,6 +179,109 @@ export default function Home() {
+         ))}
+       </div>
+ 
++      {/* ── Gift: Defence Strength Radar + Priority Actions ─────────────── */}
++      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
++
++        {/* Radar Chart */}
++        <Card className="glass-surface hover-elevate">
++          <CardHeader className="pb-2">
++            <CardTitle className="text-base flex items-center gap-2">
++              <Target className="h-4 w-4 text-primary" />
++              Defence Strength Analysis
++              <Badge className="ml-auto bg-primary/10 text-primary border-primary/20 text-xs">
++                {overallStrength}% Overall
++              </Badge>
++            </CardTitle>
++            <p className="text-xs text-muted-foreground">
++              Pillar-by-pillar strength based on verified evidence &amp; precedents
++            </p>
++          </CardHeader>
++          <CardContent className="pt-0">
++            <ResponsiveContainer width="100%" height={240}>
++              <RadarChart data={RADAR_DATA} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
++                <PolarGrid stroke="hsl(var(--border))" />
++                <PolarAngleAxis
++                  dataKey="pillar"
++                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
++                />
++                <Tooltip
++                  contentStyle={{
++                    background: "hsl(var(--card))",
++                    border: "1px solid hsl(var(--border))",
++                    borderRadius: "8px",
++                    fontSize: "12px",
++                  }}
++                  formatter={(v: number) => [`${v}%`, "Strength"]}
++                />
++                <Radar
++                  name="Defence"
++                  dataKey="score"
++                  stroke="hsl(var(--primary))"
++                  fill="hsl(var(--primary))"
++                  fillOpacity={0.18}
++                  strokeWidth={2}
++                  dot={{ r: 3, fill: "hsl(var(--primary))" }}
++                />
++              </RadarChart>
++            </ResponsiveContainer>
++            <div className="mt-2 grid grid-cols-3 gap-2">
++              {RADAR_DATA.map((d) => (
++                <div key={d.pillar} className="flex flex-col items-center gap-0.5">
++                  <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
++                    <div
++                      className="h-full rounded-full bg-primary transition-all duration-700"
++                      style={{ width: `${d.score}%` }}
++                    />
++                  </div>
++                  <span className="text-[9px] text-muted-foreground text-center leading-tight">{d.pillar}</span>
++                </div>
++              ))}
++            </div>
++          </CardContent>
++        </Card>
++
++        {/* Priority Action Items */}
++        <Card className="glass-surface hover-elevate">
++          <CardHeader className="pb-2">
++            <CardTitle className="text-base flex items-center gap-2">
++              <Zap className="h-4 w-4 text-amber-500" />
++              Priority Actions
++              <Badge className="ml-auto bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">
++                {PRIORITY_ACTIONS.length} pending
++              </Badge>
++            </CardTitle>
++            <p className="text-xs text-muted-foreground">
++              Auto-generated from pending citations &amp; evidence gaps
++            </p>
++          </CardHeader>
++          <CardContent className="pt-0 space-y-2.5">
++            {PRIORITY_ACTIONS.map((item, i) => (
++              <div
++                key={i}
++                className="flex items-start gap-3 p-3 rounded-lg border border-border/60 bg-muted/30 hover:bg-muted/60 transition-colors"
++              >
++                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 font-bold text-[10px] shrink-0 mt-0.5">
++                  {i + 1}
++                </span>
++                <div className="flex-1 min-w-0">
++                  <p className="text-xs font-medium text-foreground leading-snug">{item.task}</p>
++                  <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
++                    {item.citation} · {item.court}
++                  </p>
++                </div>
++              </div>
++            ))}
++            <div className="pt-1">
++              <Link href="/case/case01/case-law">
++                <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
++                  <BookOpen className="h-3 w-3" /> View Full Case Law Matrix
++                </Button>
++              </Link>
++            </div>
++          </CardContent>
++        </Card>
++      </div>
++
+       {/* ── Verification + Strategy ──────────────────────────────────────── */}
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+ 

@@ -7,7 +7,15 @@ import { useCaseContext } from '@/context/CaseContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AccuracyBadge } from '@/components/ui/accuracy-badge';
-import { Scale, FileText, BookOpen, FlaskConical, Clock, AlertTriangle, CheckCircle2, Info, Users, Calendar, Target } from 'lucide-react';
+import { 
+  Scale, FileText, BookOpen, FlaskConical, Clock, AlertTriangle, 
+  CheckCircle2, Info, Users, Calendar, Target, Activity, ShieldAlert, Zap, Gavel, FileSignature
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
+import { useState, useEffect } from 'react';
+import { ForensicRadar } from '@/components/charts/ForensicRadar';
+import { TimelineHeatmap } from '@/components/charts/TimelineHeatmap';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const variant = status === "VERIFIED" ? "default" : status === "SECONDARY" ? "secondary" : "outline";
@@ -21,8 +29,26 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 export function DynamicDashboardView() {
   const { selectedCase } = useCaseContext();
+  const [, navigate] = useLocation();
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Calculate statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/v1/cases/${selectedCase.id}/stats`);
+        const data = await res.json();
+        setStats(data);
+      } catch (err) {
+        console.error("Failed to fetch dashboard stats", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, [selectedCase.id]);
+
+  // Calculate statistics from context for fallback/sync
   const verifiedCount = selectedCase.caseLaw?.filter((c) => c.status === "VERIFIED").length || 0;
   const pendingCount = selectedCase.caseLaw?.filter((c) => c.status === "PENDING").length || 0;
   const secondaryCount = selectedCase.caseLaw?.filter((c) => c.status === "SECONDARY").length || 0;
@@ -144,7 +170,81 @@ export function DynamicDashboardView() {
             )}
           </CardContent>
         </Card>
-      )}
+      )}      {/* Quick Actions (Week 11 Hardening) */}
+      <Card className="border-primary/20 bg-primary/5 my-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-bold flex items-center gap-2">
+            <Zap className="h-4 w-4 text-primary" />
+            Nascent Advocate: Drafting Quick Actions (1-Click)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-3">
+          <Button 
+            className="gap-2 bg-primary text-[11px] font-bold h-9" 
+            onClick={() => navigate(`/case/${selectedCase.id}/drafting?type=BAIL_439`)}
+          >
+            <Gavel className="w-3.5 h-3.5" />
+            GENERATE §439 BAIL APPLICATION
+          </Button>
+          <Button 
+            variant="outline"
+            className="gap-2 border-primary/20 text-[11px] font-bold h-9 bg-white/50" 
+            onClick={() => navigate(`/case/${selectedCase.id}/drafting?type=DISCHARGE`)}
+          >
+            <FileSignature className="w-3.5 h-3.5" />
+            GENERATE §250 DISCHARGE APP
+          </Button>
+          <div className="flex-1" />
+          <p className="text-[10px] text-primary/60 italic flex items-center gap-1">
+             <Info className="w-3 h-3" /> Auto-populated using extracted OMNI-facts
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* --- WEEK 5: FORENSIC ANALYTICS SECTION --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b pb-4">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 text-primary" />
+              Forensic Risk Radar
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px] p-0">
+             {loading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                </div>
+             ) : (
+                <ForensicRadar data={stats?.radar || []} />
+             )}
+          </CardContent>
+          <div className="px-5 py-3 bg-slate-50/30 border-t text-[10px] text-muted-foreground italic">
+            * Visualization of prosecution gaps by Indian Standards (BIS/IS) categories.
+          </div>
+        </Card>
+
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b pb-4">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" />
+              Timeline Heatmap (Activity Density)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px] p-0">
+             {loading ? (
+                <div className="flex items-center justify-center h-full text-muted-foreground italic">
+                  Calculating clusters...
+                </div>
+             ) : (
+                <TimelineHeatmap data={stats?.heatmap || []} />
+             )}
+          </CardContent>
+          <div className="px-5 py-3 bg-slate-50/30 border-t text-[10px] text-muted-foreground italic">
+            * Clustering of case incidents by Year-Month.
+          </div>
+        </Card>
+      </div>
 
       {/* Verification Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -77,8 +77,6 @@ export const caseLawMatrix = [
     useForDefence: "Chain-of-custody rigor and forensic-procedure scrutiny",
     status: "VERIFIED" as const,
     action: "Add certified/order copy and exact para numbers",
-    reporter: "unknown",
-    verifiedBy: "case-file",
   },
   {
     case: "Uttarakhand HC (March 2026 — chain-of-custody defects)",
@@ -87,8 +85,6 @@ export const caseLawMatrix = [
       "Forensic evidence loses force when custody chain is not proved",
     status: "SECONDARY" as const,
     action: "Fetch full judgment text/citation and para extract",
-    reporter: "unknown",
-    verifiedBy: "manual",
   },
   {
     case: "Surendra Koli v. CBI (2023 refs on evidentiary scrutiny)",
@@ -97,8 +93,6 @@ export const caseLawMatrix = [
       "Reinforces strict proof requirements in forensic-heavy cases",
     status: "SECONDARY" as const,
     action: "Confirm exact proposition from judgment text",
-    reporter: "unknown",
-    verifiedBy: "manual",
   },
   {
     case: "Sushil Sharma v. State (NCT of Delhi), (2014) 4 SCC 317",
@@ -107,12 +101,6 @@ export const caseLawMatrix = [
       "General caution that expert opinion depends on factual foundation",
     status: "SECONDARY" as const,
     action: "Verify exact para language; avoid invented quote blocks",
-    year: "2014",
-    volume: "4",
-    reporter: "SCC",
-    page: "317",
-    para: "",
-    verifiedBy: "manual",
   },
   {
     case: "State of Gujarat v. Mohanbhai (2003) 4 GLR 3121",
@@ -121,12 +109,6 @@ export const caseLawMatrix = [
       "Potential support on sample integrity and proof chain",
     status: "PENDING" as const,
     action: "Obtain authentic judgment copy before reliance",
-    year: "2003",
-    volume: "4",
-    reporter: "GLR",
-    page: "3121",
-    para: "",
-    verifiedBy: "unknown",
   },
   {
     case: "R.B. Constructions v. State of Maharashtra (2014 SCC OnLine Bom 125)",
@@ -134,11 +116,6 @@ export const caseLawMatrix = [
     useForDefence: "Cited for ex-parte sampling / natural justice",
     status: "PENDING" as const,
     action: "Citation authenticity check required",
-    year: "2014",
-    reporter: "SCC OnLine Bom",
-    page: "125",
-    para: "",
-    verifiedBy: "unknown",
   },
   {
     case: "CBI v. K.S. Kalra (2011 SCC OnLine Del 3412)",
@@ -146,11 +123,6 @@ export const caseLawMatrix = [
     useForDefence: "Cited for CPWD/BIS procedural compliance",
     status: "PENDING" as const,
     action: "Citation authenticity check required",
-    year: "2011",
-    reporter: "SCC OnLine Del",
-    page: "3412",
-    para: "",
-    verifiedBy: "unknown",
   },
   {
     case: "C.J. Christopher Signi v. State of Tamil Nadu, 2025 SCC OnLine Mad 3214",
@@ -160,11 +132,6 @@ export const caseLawMatrix = [
     status: "SECONDARY" as const,
     action:
       "Upload/verify full SCC judgment; use only as persuasive authority after confirming authentic text.",
-    year: "2025",
-    reporter: "SCC OnLine Mad",
-    page: "3214",
-    para: "",
-    verifiedBy: "manual",
   },
 ];
 

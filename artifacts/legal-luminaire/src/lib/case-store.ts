@@ -14,17 +14,30 @@ export type CaseRecord = {
   files: CaseFile[];
   status?: string;
   charges?: string;
+  forensic_grounding?: Array<{ code: string; title: string; keywords: string[]; violations: string[] }>;
   documents?: Array<{ id: string; name: string; type: string; status: string; size: number; uploadedAt: string; description?: string }>;
   caseLaw?: Array<{ case: string; court: string; useForDefence: string; status: string; action: string; citation?: string; holding?: string; fitScore?: number }>;
-  timeline?: Array<{ id: number; title: string; description: string; status: string; note?: string; date?: string }>;
+  timeline?: Array<{ id: number; title: string; description: string; status: string; note?: string; date?: string; grounding?: string }>;
   strategy?: Array<{ id: string; title: string; description: string; status: string; priority: string }>;
   standards?: Array<{ code: string; title: string; applicability: string; keyClause: string; violation: string; sourceUrl?: string; confidence: string }>;
+  review_status?: "DRAFT" | "SUBMITTED" | "APPROVED";
+  assigned_to?: string;
+  accused_names?: string[];
   metadata?: {
     category: string;
     complexity: string;
     estimatedDuration: string;
     requiredResources: string[];
   };
+  collisions?: Array<{ 
+    id: string; 
+    type: string; 
+    description: string; 
+    evidence_a: string; 
+    evidence_b: string; 
+    target_event_id?: number; 
+    severity: string;
+  }>;
 };
 
 const CASES_KEY = "legal_luminaire_cases_v1";
