@@ -67,7 +67,7 @@ export default function Home() {
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
 
       {/* ── Demo CTA Banner ──────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 flex items-center gap-4">
+      <div className="rounded-xl border border-amber-300 bg-amber-50/80 backdrop-blur-md p-4 flex items-center gap-4 hover-elevate transition-colors">
         <PlayCircle className="h-8 w-8 text-amber-500 shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-amber-900 text-sm">Try the Demo — No API key needed</p>
@@ -82,33 +82,61 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* ── Case Header ─────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <div className="flex items-start gap-4">
-          <div className="rounded-lg bg-primary/10 p-3 shrink-0">
-            <Scale className="h-8 w-8 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold text-foreground">{caseInfo.title}</h2>
-            <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{caseInfo.summary}</p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              <Badge variant="destructive">{caseInfo.charges}</Badge>
-              <Badge variant="outline">{caseInfo.court}</Badge>
-              <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">{caseInfo.status}</Badge>
+      {/* ── Bento grid (2025 layout) ─────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Case Header (hero tile) */}
+        <div className="lg:col-span-8 rounded-xl glass-surface-strong neon-ring p-6 hover-elevate">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-primary/10 p-3 shrink-0">
+              <Scale className="h-8 w-8 text-primary" />
             </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl font-bold text-foreground">{caseInfo.title}</h2>
+              <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{caseInfo.summary}</p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <Badge variant="destructive">{caseInfo.charges}</Badge>
+                <Badge variant="outline">{caseInfo.court}</Badge>
+                <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">{caseInfo.status}</Badge>
+              </div>
+            </div>
+            <Link href="/case/case01/dashboard">
+              <Button size="sm" className="gap-1.5 shrink-0 hidden sm:flex">
+                Open Case <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
           </div>
-          <Link href="/case/case01/dashboard">
-            <Button size="sm" className="gap-1.5 shrink-0 hidden sm:flex">
-              Open Case <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </Link>
+        </div>
+
+        {/* Quick Access tile */}
+        <div className="lg:col-span-4 rounded-xl glass-surface p-5 hover-elevate">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-foreground">Quick Access</p>
+            <Badge variant="outline" className="text-[10px]">Bento</Badge>
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {QUICK_LINKS.slice(0, 6).map(({ href, label, icon: Icon }) => (
+              <Link key={href} href={href}>
+                <div className="group flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border/70 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer text-center">
+                  <Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground leading-tight">{label}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-3 pt-3 border-t border-border/60">
+            <Link href="/case/case01/upload">
+              <Button variant="outline" size="sm" className="w-full gap-1.5">
+                <Upload className="h-3.5 w-3.5" /> Upload documents
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* ── Stat Cards ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
-          <Card key={s.label}>
+          <Card key={s.label} className="glass-surface hover-elevate">
             <CardContent className="flex items-center gap-4 p-5">
               <div className={`rounded-lg bg-muted p-2.5 ${s.color}`}>
                 <s.icon className="h-5 w-5" />

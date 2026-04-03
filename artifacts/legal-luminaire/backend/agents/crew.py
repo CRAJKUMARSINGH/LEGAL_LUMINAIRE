@@ -58,6 +58,26 @@ PROCEDURAL DEFECTS: {defects_str}
 
 YOUR TASK — Search and verify ALL relevant precedents:
 
+DATABASES TO SEARCH (in order of priority; use best accessible source):
+1. Manupatra — Indian SC/HC judgments (primary)
+2. SCC Online — Supreme Court cases
+3. Indian Kanoon — full-text search
+4. Lexis Nexis India — annotated cases
+5. BAILII / Westlaw — international precedents
+6. BIS Portal — IS codes (bis.gov.in)
+7. ASTM International — technical standards
+8. CPWD Manual 2023 — construction norms
+
+FACT-FIT GATE (MANDATORY — DO NOT SKIP):
+For EACH precedent you retrieve, you MUST score it on:
+  [A] Incident type match (0-40 pts)
+  [B] Evidence type match (0-35 pts)
+  [C] Procedural defect match (0-25 pts)
+  TOTAL >= 70 → "exact match" (use as primary authority)
+  TOTAL 50-69 → "analogous" (use with qualification)
+  TOTAL 30-49 → "weak" (supporting only)
+  TOTAL < 30 → "rejected" — DO NOT USE. Mark as FATAL ERROR if used.
+
 MANDATORY SEARCHES (use web_search + indian_kanoon_search for each):
 1. "Kattavellai Devakar State Tamil Nadu 2025 INSC 845 chain of custody"
 2. "Union of India Prafulla Kumar Samal 1979 3 SCC 4 discharge"
@@ -145,48 +165,38 @@ Output: VERIFIED_LIST, REJECTED_LIST, FATAL_ERRORS, STANDARDS_VERDICT, OVERALL_C
     )
 
     # ── Task 4: Draft the discharge application ───────────────────────────────
-    draft_instruction = f"""
-Using ONLY the verified precedents and standards from the fact-checker's output,
-and the case context from uploaded documents:
-
-CASE CONTEXT: {ctx_snippet}
-USER QUERY: {query}
-MODE: {mode}
-
-{"GENERATE FULL HINDI DISCHARGE APPLICATION:" if mode == "draft" else "GENERATE RESEARCH REPORT:"}
-
-{"" if mode != "draft" else """
-Structure (mandatory):
-1. न्यायालय शीर्षक — Special Session Case No. 1/2025, Udaipur
-2. प्रार्थना-पत्र शीर्षक — u/s 250 BNSS 2023 / 227 CrPC
-3. प्रकरण के तथ्य — FIR 496/2011, stadium wall collapse, rain sampling
-4. पूर्व-प्राथमिक आधार — IS 1199:2018 WRONG STANDARD (foundational error)
-5. आधार 1-12 — each ground with IS clauses + verified precedents
-6. विस्तृत विधिक तर्क — 5 argument blocks
-7. क्रॉस-रेफरेंस मैट्रिक्स — violation → IS clause → precedent table
-8. 5 मौखिक-बहस अनुच्छेद — oral argument paragraphs
-9. प्रार्थना — 7 specific reliefs
-10. सत्यापन + शपथ-पत्र
-11. फाइलिंग चेकलिस्ट
-
-QUALITY RULES:
-- Chaste Hindi, Rajasthan High Court style
-- Quote holdings VERBATIM from verified list only
-- Every IS clause must have clause number
-- Mark uncertain facts as [VERIFY BEFORE FILING]
-- Target: 25-30 pages when printed
-"""}
-""",
-        description=draft_instruction,
-        agent=drafter,
-        expected_output=(
-            "Complete court-ready Hindi discharge application (25-30 pages) with "
-            "cross-reference matrix, oral arguments, prayer, and filing checklist."
-            if mode == "draft"
-            else "Research report with verified precedents, standards analysis, and argument blocks."
-        ),
-        context=[task_research, task_verify_standards, task_fact_check],
+    draft_instruction = (
+        "Using ONLY the verified precedents and standards from the fact-checker's output,\n"
+        "and the case context from uploaded documents:\n\n"
+        f"CASE CONTEXT: {ctx_snippet}\n"
+        f"USER QUERY: {query}\n"
+        f"MODE: {mode}\n\n"
     )
+
+    if mode == "draft":
+        draft_instruction += (
+            "GENERATE FULL HINDI DISCHARGE APPLICATION:\n\n"
+            "Structure (mandatory):\n"
+            "1. न्यायालय शीर्षक - Special Session Case No. 1/2025, Udaipur\n"
+            "2. प्रार्थना-पत्र शीर्षक - u/s 250 BNSS 2023 / 227 CrPC\n"
+            "3. प्रकरण के तथ्य - FIR 496/2011, stadium wall collapse, rain sampling\n"
+            "4. पूर्व-प्राथमिक आधार - IS 1199:2018 WRONG STANDARD (foundational error)\n"
+            "5. आधार 1-12 - each ground with IS clauses + verified precedents\n"
+            "6. विस्तृत विधिक तर्क - 5 argument blocks\n"
+            "7. क्रॉस-रेफरेंस मैट्रिक्स - violation -> IS clause -> precedent table\n"
+            "8. 5 मौखिक-बहस अनुच्छेद - oral argument paragraphs\n"
+            "9. प्रार्थना - 7 specific reliefs\n"
+            "10. सत्यापन + शपथ-पत्र\n"
+            "11. फाइलिंग चेकलिस्ट\n\n"
+            "QUALITY RULES:\n"
+            "- Chaste Hindi, Rajasthan High Court style\n"
+            "- Quote holdings VERBATIM from verified list only\n"
+            "- Every IS clause must have clause number\n"
+            "- Mark uncertain facts as [VERIFY BEFORE FILING]\n"
+            "- Target: 25-30 pages when printed\n"
+        )
+    else:
+        draft_instruction += "GENERATE RESEARCH REPORT:\n"
 
     task_draft = Task(
         description=draft_instruction,

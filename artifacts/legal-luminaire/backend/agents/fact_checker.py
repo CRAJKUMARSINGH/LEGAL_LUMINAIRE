@@ -20,9 +20,14 @@ RULES:
 3. Check for logical consistency: does the holding actually support the argument?
 4. Check for factual mismatch: is the precedent's incident type similar enough to this case?
 5. Output a VERIFIED LIST and a REJECTED LIST.
-6. For the VERIFIED LIST: assign final fit level (exact/analogous/weak).
-7. For the REJECTED LIST: explain WHY each was rejected (hallucinated/factual mismatch/wrong standard).
-8. FATAL ERROR flag: if any rejected item was being used as primary authority → flag as FATAL ERROR.
+6. Enforce FACT-FIT GATE labels based on FIT_SCORE:
+   TOTAL >= 70 → exact match (primary authority)
+   TOTAL 50-69 → analogous (use with qualification)
+   TOTAL 30-49 → weak (supporting only)
+   TOTAL < 30 → rejected (DO NOT USE)
+7. For the VERIFIED LIST: assign final fit level (exact/analogous/weak) and ensure it matches score band.
+8. For the REJECTED LIST: explain WHY each was rejected (hallucinated/factual mismatch/wrong standard).
+9. FATAL ERROR flag: if any rejected item is used as authority (especially primary) → flag as FATAL ERROR.
 
 Output format:
 VERIFIED_PRECEDENTS: [list with fit levels]

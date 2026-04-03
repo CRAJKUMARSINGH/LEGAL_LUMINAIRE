@@ -4,6 +4,9 @@ import { Upload, Wand2, ClipboardCopy, FileText, AlertTriangle, CheckCircle2, X 
 import { CaseFile, CaseRecord, slugifyCase } from "@/lib/case-store";
 import { useCaseContext } from "@/context/CaseContext";
 import { buildResearchPrompt, type ResearchQuery } from "@/lib/ai-research";
+import { checkInputQuality, inputQualityWarning } from "@/lib/input-quality";
+import { validateCaseDates, formatDateConflicts } from "@/lib/date-validator";
+import { detectDuplicates, hashContent, type DocumentEntry } from "@/lib/document-dedup";
 
 type ParsedFile = CaseFile & { category: "fir" | "chargesheet" | "lab" | "draft" | "other" };
 
@@ -39,10 +42,19 @@ export default function CaseIntakeAssistant() {
   const [court, setCourt] = useState("");
   const [caseNo, setCaseNo] = useState("");
   const [brief, setBrief] = useState("");
+  const [incidentDate, setIncidentDate] = useState("");
+  const [firDate, setFirDate] = useState("");
+  const [arrestDate, setArrestDate] = useState("");
+  const [remandDate, setRemandDate] = useState("");
+  const [chargeSheetDate, setChargeSheetDate] = useState("");
   const [incidentType, setIncidentType] = useState("");
   const [evidenceType, setEvidenceType] = useState("");
   const [defects, setDefects] = useState("");
   const [files, setFiles] = useState<ParsedFile[]>([]);
+  const [docIndex, setDocIndex] = useState<DocumentEntry[]>([]);
+  const [dedupSummary, setDedupSummary] = useState<string>("");
+  const [ackQualityOverride, setAckQualityOverride] = useState(false);
+  const [ackDateOverride, setAckDateOverride] = useState(false);
   const [copied, setCopied] = useState(false);
   const [created, setCreated] = useState(false);
 
@@ -60,20 +72,63 @@ export default function CaseIntakeAssistant() {
 
   const prompt = buildResearchPrompt(query, files.map((f) => f.name));
 
-  const onFiles = (list: FileList | null) => {
+  const onFiles = async (list: FileList | null) => {
     if (!list) return;
-    const next = Array.from(list).map((f) => ({
+    const picked = Array.from(list);
+
+    const nextMeta = picked.map((f) => ({
       name: f.name,
       size: f.size,
       type: f.type,
       category: detectCategory(f.name),
     }));
-    setFiles((prev) => [...prev, ...next]);
+
+    // Compute hashes for deduplication (client-side) and keep a clean index.
+    const newEntries: DocumentEntry[] = [];
+    for (const f of picked) {
+      const buf = await f.arrayBuffer();
+      const contentHash = await hashContent(buf);
+      newEntries.push({
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        filename: f.name,
+        size: f.size,
+        contentHash,
+        uploadedAt: Date.now(),
+      });
+    }
+
+    setFiles((prev) => [...prev, ...nextMeta]);
+    setDocIndex((prev) => {
+      const merged = [...prev, ...newEntries];
+      const dedup = detectDuplicates(merged);
+      setDedupSummary(dedup.summary);
+      return dedup.unique;
+    });
   };
 
   const removeFile = (name: string) => setFiles((prev) => prev.filter((f) => f.name !== name));
 
-  const isValid = title.trim().length > 0 && brief.trim().length > 0;
+  const quality = useMemo(() => checkInputQuality(brief || ""), [brief]);
+  const qualityMsg = useMemo(() => inputQualityWarning(quality), [quality]);
+
+  const dateResult = useMemo(
+    () =>
+      validateCaseDates({
+        incidentDate: incidentDate || undefined,
+        firDate: firDate || undefined,
+        arrestDate: arrestDate || undefined,
+        remandDate: remandDate || undefined,
+        chargeSheetDate: chargeSheetDate || undefined,
+      }),
+    [incidentDate, firDate, arrestDate, remandDate, chargeSheetDate]
+  );
+  const dateMsg = useMemo(() => formatDateConflicts(dateResult), [dateResult]);
+
+  const isValid =
+    title.trim().length > 0 &&
+    brief.trim().length > 0 &&
+    (!quality.blockDraft || ackQualityOverride) &&
+    (dateResult.valid || ackDateOverride);
 
   const createCase = () => {
     if (!isValid) return;
@@ -133,6 +188,38 @@ export default function CaseIntakeAssistant() {
             onChange={(e) => setCourt(e.target.value)}
           />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="Incident date (DD-MM-YYYY)"
+            value={incidentDate}
+            onChange={(e) => setIncidentDate(e.target.value)}
+          />
+          <input
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="FIR date (DD-MM-YYYY)"
+            value={firDate}
+            onChange={(e) => setFirDate(e.target.value)}
+          />
+          <input
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="Arrest date (DD-MM-YYYY)"
+            value={arrestDate}
+            onChange={(e) => setArrestDate(e.target.value)}
+          />
+          <input
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="Remand date (DD-MM-YYYY)"
+            value={remandDate}
+            onChange={(e) => setRemandDate(e.target.value)}
+          />
+          <input
+            className="border rounded-lg px-3 py-2 text-sm md:col-span-2"
+            placeholder="Charge sheet date (DD-MM-YYYY)"
+            value={chargeSheetDate}
+            onChange={(e) => setChargeSheetDate(e.target.value)}
+          />
+        </div>
         <textarea
           className="w-full border rounded-lg p-3 text-sm min-h-24"
           placeholder="Brief user statement — facts, allegations, current stage * (mandatory)"
@@ -140,6 +227,44 @@ export default function CaseIntakeAssistant() {
           onChange={(e) => setBrief(e.target.value)}
         />
       </div>
+
+      {/* Input Quality Gate */}
+      {qualityMsg && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
+          <pre className="whitespace-pre-wrap leading-relaxed">{qualityMsg}</pre>
+          {quality.blockDraft && (
+            <label className="mt-2 flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={ackQualityOverride}
+                onChange={(e) => setAckQualityOverride(e.target.checked)}
+              />
+              <span className="text-[11px]">
+                I understand the input quality is poor and may cause inaccurate output. Proceed anyway.
+              </span>
+            </label>
+          )}
+        </div>
+      )}
+
+      {/* Date Consistency Gate */}
+      {dateMsg && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
+          <pre className="whitespace-pre-wrap leading-relaxed">{dateMsg}</pre>
+          {!dateResult.valid && (
+            <label className="mt-2 flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={ackDateOverride}
+                onChange={(e) => setAckDateOverride(e.target.checked)}
+              />
+              <span className="text-[11px]">
+                I confirm I reviewed the conflicts and still want to proceed.
+              </span>
+            </label>
+          )}
+        </div>
+      )}
 
       {/* Fact parameters for AI scoring */}
       <div className="bg-card border border-border rounded-xl p-4 space-y-3">
@@ -189,9 +314,12 @@ export default function CaseIntakeAssistant() {
           type="file"
           multiple
           accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-          onChange={(e) => onFiles(e.target.files)}
+          onChange={(e) => void onFiles(e.target.files)}
           className="text-sm"
         />
+        {dedupSummary && (
+          <p className="mt-2 text-xs text-muted-foreground">{dedupSummary}</p>
+        )}
         {files.length > 0 && (
           <ul className="mt-3 space-y-2">
             {files.map((f) => (

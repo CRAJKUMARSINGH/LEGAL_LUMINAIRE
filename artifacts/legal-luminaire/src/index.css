@@ -299,4 +299,25 @@
   .active-elevate:active:not(.no-default-active-elevate)::after {
     background-color: var(--elevate-1);
   }
+
+  /* 2025 UI trends: glassmorphism + neon accents (opt-in utilities) */
+  .glass-surface {
+    @apply bg-card/70 border border-white/15 backdrop-blur-md shadow-lg;
+  }
+
+  .glass-surface-strong {
+    @apply bg-card/55 border border-white/20 backdrop-blur-lg shadow-xl;
+  }
+
+  .neon-ring {
+    box-shadow:
+      0 0 0 1px hsl(var(--primary) / 0.35),
+      0 0 24px hsl(var(--primary) / 0.18);
+  }
+
+  .neon-ring:hover {
+    box-shadow:
+      0 0 0 1px hsl(var(--primary) / 0.55),
+      0 0 34px hsl(var(--primary) / 0.22);
+  }
 }
