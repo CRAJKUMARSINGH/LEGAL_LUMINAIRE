@@ -47,6 +47,18 @@ uvicorn main:app --reload
 Backend health:
 - `http://127.0.0.1:8000/api/v1/health`
 
+## Run with Docker (optional)
+
+If you prefer a one-command full stack run:
+
+```powershell
+docker compose up --build
+```
+
+Then open:
+- Frontend: `http://localhost:5173/`
+- Backend health: `http://127.0.0.1:8000/api/v1/health`
+
 ## Uploading documents (RAG)
 1. In the UI, open **Upload**.
 2. Upload PDFs/MD/DOCX/images.

@@ -1,0 +1,45 @@
+version: "3.9"
+
+# Legal Luminaire — Full Stack Local Setup
+# Usage: docker compose up
+# Requires: OPENAI_API_KEY and TAVILY_API_KEY in .env
+
+services:
+
+  frontend:
+    build:
+      context: artifacts/legal-luminaire
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:8000/api/v1
+    depends_on:
+      - backend
+    volumes:
+      - ./artifacts/legal-luminaire/src:/app/src:ro
+
+  backend:
+    build:
+      context: artifacts/legal-luminaire/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+      - CHROMA_PATH=/data/chroma_db
+      - CASE_DOCS_PATH=/data/case_docs
+    volumes:
+      - chroma_data:/data/chroma_db
+      - case_docs:/data/case_docs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  chroma_data:
+  case_docs:
