@@ -5,9 +5,35 @@ import { ArrowLeft, Download, Printer, FileText } from "lucide-react";
 
 // Placeholder draft viewer — shows the DEFENCE_REPLY_FINAL_v4 document
 export default function DraftViewer() {
+  const draftId = (() => {
+    try {
+      const m = window.location.pathname.match(/\/drafts\/(\d+)/);
+      return m ? Number(m[1]) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const storedDraft = (() => {
+    if (!draftId) return null;
+    try {
+      const raw = localStorage.getItem(`draft:${draftId}`);
+      return raw ? (JSON.parse(raw) as { query: string; content: string; createdAt: number }) : null;
+    } catch {
+      return null;
+    }
+  })();
+
   const handleDownload = () => {
+    if (storedDraft?.content) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([storedDraft.content], { type: "text/plain;charset=utf-8" }));
+      a.download = `draft_${draftId}.txt`;
+      a.click();
+      return;
+    }
+
     const a = document.createElement("a");
-    // v4 ships as PDF+LEX; keep frontend download simple by serving the PDF.
     a.href = "/CASE_01_HemrajG/DEFENCE_REPLY_FINAL_v4.pdf";
     a.download = "DEFENCE_REPLY_FINAL_v4.pdf";
     a.click();
@@ -39,24 +65,37 @@ export default function DraftViewer() {
         <div className="bg-[#FDFBF7] dark:bg-[#1C1D21] border border-border shadow-lg rounded-sm overflow-hidden">
           <div className="p-8 sm:p-12 devanagari">
             <h1 className="text-2xl font-bold font-serif text-center mb-8 text-foreground underline decoration-1 underline-offset-4">
-              उन्मोचन प्रार्थना-पत्र — DEFENCE REPLY FINAL v4
+              {storedDraft?.content ? "Generated Draft" : "उन्मोचन प्रार्थना-पत्र — DEFENCE REPLY FINAL v4"}
             </h1>
-            <div className="text-center text-muted-foreground text-sm mb-8">
-              <p>विशेष सत्र वाद संख्या 1/2025 | FIR 496/2011 | उदयपुर, राजस्थान</p>
-              <p className="mt-1">हेमराज वर्दार बनाम राज्य (राजस्थान)</p>
-            </div>
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Button asChild variant="outline">
-                <Link href="/case/case01/defence-reply">
-                  <FileText className="mr-2 h-4 w-4" /> View Interactive Defence Reply
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/case/case01/discharge-application">
-                  <FileText className="mr-2 h-4 w-4" /> View Discharge Application
-                </Link>
-              </Button>
-            </div>
+            {storedDraft?.content ? (
+              <div className="space-y-4">
+                <div className="text-xs text-muted-foreground">
+                  Draft ID: {draftId} · Created: {new Date(storedDraft.createdAt).toLocaleString()}
+                </div>
+                <div className="whitespace-pre-wrap font-serif text-sm leading-relaxed">
+                  {storedDraft.content}
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="text-center text-muted-foreground text-sm mb-8">
+                  <p>विशेष सत्र वाद संख्या 1/2025 | FIR 496/2011 | उदयपुर, राजस्थान</p>
+                  <p className="mt-1">हेमराज वर्दार बनाम राज्य (राजस्थान)</p>
+                </div>
+                <div className="flex justify-center gap-4 flex-wrap">
+                  <Button asChild variant="outline">
+                    <Link href="/case/case01/defence-reply">
+                      <FileText className="mr-2 h-4 w-4" /> View Interactive Defence Reply
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link href="/case/case01/discharge-application">
+                      <FileText className="mr-2 h-4 w-4" /> View Discharge Application
+                    </Link>
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

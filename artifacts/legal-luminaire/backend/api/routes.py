@@ -9,6 +9,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
 from config import settings
 from rag.document_store import (
@@ -31,6 +32,15 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 ALLOWED_EXTENSIONS = {".pdf", ".md", ".txt", ".lex", ".doc", ".docx", ".jpg", ".jpeg", ".png"}
+
+def _safe_filename(name: str) -> str:
+    """
+    Best-effort filename sanitization to avoid path traversal and invalid names.
+    Keeps extensions, strips directories, and removes control characters.
+    """
+    base = Path(name).name
+    base = "".join(ch for ch in base if ch.isprintable() and ch not in {"\x00", "\n", "\r", "\t"})
+    return base.strip() or "upload.bin"
 
 
 # ── Health ─────────────────────────────────────────────────────────────────────
@@ -66,17 +76,22 @@ async def upload_documents(
     errors: list[str] = []
 
     for upload in files:
-        suffix = Path(upload.filename or "").suffix.lower()
+        raw_name = upload.filename or ""
+        safe_name = _safe_filename(raw_name)
+        suffix = Path(safe_name).suffix.lower()
         if suffix not in ALLOWED_EXTENSIONS:
-            errors.append(f"{upload.filename}: unsupported type {suffix}")
+            errors.append(f"{raw_name}: unsupported type {suffix}")
             continue
-        dest = case_dir / (upload.filename or f"file{suffix}")
+        dest = case_dir / (safe_name or f"file{suffix}")
+        if dest.exists():
+            stem = dest.stem
+            dest = dest.with_name(f"{stem}-{upload.size}{suffix}")
         try:
             with dest.open("wb") as f:
                 shutil.copyfileobj(upload.file, f)
             saved_paths.append(dest)
         except Exception as e:
-            errors.append(f"{upload.filename}: save failed — {e}")
+            errors.append(f"{raw_name}: save failed — {e}")
 
     if not saved_paths:
         return UploadResponse(
@@ -211,26 +226,17 @@ async def verify_standard(code: str):
 class ChatRequest(BaseModel):
     case_id: str
     message: str
-    history: list[dict] = []
+    history: list[dict] = Field(default_factory=list)
 
 
 class ChatResponse(BaseModel):
     reply: str
-    sources: list[str] = []
-    verification_notes: list[str] = []
+    sources: list[str] = Field(default_factory=list)
+    verification_notes: list[str] = Field(default_factory=list)
 
 
-from pydantic import BaseModel as _BaseModel
-
-
-class _ChatRequest(_BaseModel):
-    case_id: str
-    message: str
-    history: list[dict] = []
-
-
-@router.post("/chat")
-async def chat(req: _ChatRequest):
+@router.post("/chat", response_model=ChatResponse)
+async def chat(req: ChatRequest):
     """
     Chat interface for iterative refinement.
     Supports follow-up questions on the current case.
@@ -244,6 +250,7 @@ async def chat(req: _ChatRequest):
 
     # Build context from RAG
     case_context = ""
+    docs = []
     if case_has_documents(req.case_id):
         try:
             retriever = get_retriever(req.case_id, k=5)
@@ -284,11 +291,11 @@ RULES:
 
     try:
         response = llm.invoke(messages)
-        return {
-            "reply": response.content,
-            "sources": [d.metadata.get("source_file", "") for d in (docs if case_context else [])],
-            "verification_notes": [],
-        }
+        return ChatResponse(
+            reply=str(response.content),
+            sources=[d.metadata.get("source_file", "") for d in (docs or [])],
+            verification_notes=[],
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

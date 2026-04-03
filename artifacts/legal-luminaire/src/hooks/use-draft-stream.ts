@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { apiClient } from "@/lib/api-client";
 
 export type StreamStage = "researcher" | "verifier" | "drafter" | "streaming" | "complete" | "error";
 
@@ -18,6 +19,14 @@ interface DraftGenerationOptions {
   language: string;
 }
 
+function saveDraft(draftId: number, payload: { query: string; content: string; createdAt: number }) {
+  try {
+    localStorage.setItem(`draft:${draftId}`, JSON.stringify(payload));
+  } catch {
+    // ignore storage failures
+  }
+}
+
 export function useDraftStream() {
   const [state, setState] = useState<StreamState>({
     stage: "researcher",
@@ -29,72 +38,33 @@ export function useDraftStream() {
     setState({ stage: "researcher", content: "", isStreaming: true, message: "Initiating research..." });
 
     try {
-      const response = await fetch("/api/legal/draft", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(options),
+      // Map session-based UI to case-based API. For now, sessionId is treated as case ID.
+      const caseId = String(options.sessionId);
+
+      setState((p) => ({ ...p, stage: "verifier", message: "Verifying citations and standards..." }));
+      const res = await apiClient.runResearch(caseId, {
+        query: options.query,
+        incident_type: "unknown",
+        evidence_type: "unknown",
+        procedural_defects: [],
+        mode: "draft",
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to start generation");
+      if (!res.success) {
+        throw new Error(res.error || "Draft generation failed");
       }
 
-      if (!response.body) {
-        throw new Error("No response body");
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-
-      while (!done) {
-        const { value, done: readerDone } = await reader.read();
-        done = readerDone;
-
-        if (value) {
-          const chunk = decoder.decode(value, { stream: !done });
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              try {
-                const data = JSON.parse(line.substring(6));
-                
-                setState((prev) => {
-                  const newState = { ...prev };
-                  
-                  if (data.stage) newState.stage = data.stage;
-                  if (data.message) newState.message = data.message;
-                  if (data.content) {
-                    // If we receive content, append it
-                    // The server might send incremental chunks depending on how it's implemented.
-                    // Assuming data.content contains the incremental chunk when stage === 'streaming'
-                    // or full content. Let's assume it sends full content cumulatively or we just append.
-                    // The prompt implies "stream text as it arrives", usually data.content is the chunk.
-                    if (data.stage === "streaming") {
-                        newState.content += data.content;
-                    } else if (data.content && data.stage === "complete") {
-                         newState.content = data.content; // fallback if final content is sent
-                    }
-                  }
-                  if (data.draftId) newState.draftId = data.draftId;
-
-                  return newState;
-                });
-
-                if (data.done) {
-                  setState((prev) => ({ ...prev, isStreaming: false, stage: "complete" }));
-                  return data.draftId;
-                }
-              } catch (e) {
-                console.error("Error parsing SSE data", e, line);
-              }
-            }
-          }
-        }
-      }
+      const draftId = Date.now();
+      setState((p) => ({
+        ...p,
+        stage: "complete",
+        message: "Generation complete.",
+        content: res.draft || "",
+        isStreaming: false,
+        draftId,
+      }));
+      saveDraft(draftId, { query: options.query, content: res.draft || "", createdAt: Date.now() });
+      return draftId;
     } catch (error: any) {
       setState((prev) => ({
         ...prev,
