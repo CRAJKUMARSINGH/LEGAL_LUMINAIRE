@@ -40,9 +40,19 @@ def preload_hemraj_case(workspace_root: Path | None = None) -> dict:
         logger.warning(f"CASE_01_HemrajG not found at {case_dir}")
         return {"success": False, "error": str(case_dir)}
 
+    # If both v3 and v4 artefacts exist, we want retrieval to prefer the latest.
+    # Exclude old v3 defence reply from indexing to avoid conflicting content in RAG.
+    excluded_filenames = {
+        "DEFENCE_REPLY_FINAL_v3.lex",
+        "DEFENCE_REPLY_FINAL_v3.pdf",
+        "DEFENCE_REPLY_FINAL_v3.pdf.txt",
+    }
+
     # Priority files to index (most important first)
     priority_files = [
-        "DEFENCE_REPLY_FINAL_v3.lex",
+        # Latest Hemraj defence reply (v4) — ensure it is indexed first
+        "DEFENCE_REPLY_FINAL_v4.lex",
+        "DEFENCE_REPLY_FINAL_v4.pdf",
         "WRITTEN_SUBMISSION_RHC_FINAL_v3.lex",
         "Comprehensive_Legal_Defence_Report_Stadium_Collapse.md",
         "VERIFIED_DEEP_RESEARCH_DEFENCE_PACK.md",
@@ -71,7 +81,12 @@ def preload_hemraj_case(workspace_root: Path | None = None) -> dict:
     # Add any remaining .md, .lex, .txt files
     extensions = {".md", ".lex", ".txt"}
     for f in case_dir.rglob("*"):
-        if f.suffix.lower() in extensions and f.is_file() and f not in files_to_index:
+        if (
+            f.suffix.lower() in extensions
+            and f.is_file()
+            and f.name not in excluded_filenames
+            and f not in files_to_index
+        ):
             files_to_index.append(f)
 
     # Add PDFs from INPUT_DATA

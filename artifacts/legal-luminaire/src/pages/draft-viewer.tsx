@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Download, Printer, FileText } from "lucide-react";
 
-// Placeholder draft viewer — shows the DEFENCE_REPLY_FINAL_v3 content
+// Placeholder draft viewer — shows the DEFENCE_REPLY_FINAL_v4 document
 export default function DraftViewer() {
   const handleDownload = () => {
     const a = document.createElement("a");
-    a.href = "/CASE_01_HemrajG/DEFENCE_REPLY_FINAL_v3.pdf.txt";
-    a.download = "DEFENCE_REPLY_FINAL_v3.txt";
+    // v4 ships as PDF+LEX; keep frontend download simple by serving the PDF.
+    a.href = "/CASE_01_HemrajG/DEFENCE_REPLY_FINAL_v4.pdf";
+    a.download = "DEFENCE_REPLY_FINAL_v4.pdf";
     a.click();
   };
 
@@ -38,7 +39,7 @@ export default function DraftViewer() {
         <div className="bg-[#FDFBF7] dark:bg-[#1C1D21] border border-border shadow-lg rounded-sm overflow-hidden">
           <div className="p-8 sm:p-12 devanagari">
             <h1 className="text-2xl font-bold font-serif text-center mb-8 text-foreground underline decoration-1 underline-offset-4">
-              उन्मोचन प्रार्थना-पत्र — DEFENCE REPLY FINAL v3
+              उन्मोचन प्रार्थना-पत्र — DEFENCE REPLY FINAL v4
             </h1>
             <div className="text-center text-muted-foreground text-sm mb-8">
               <p>विशेष सत्र वाद संख्या 1/2025 | FIR 496/2011 | उदयपुर, राजस्थान</p>

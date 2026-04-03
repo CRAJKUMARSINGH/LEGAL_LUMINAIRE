@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Scale, FileText, BookOpen, FlaskConical, Clock,
   AlertTriangle, CheckCircle2, Info, ArrowRight,
-  MessageSquare, LayoutDashboard, Files, Upload,
+  MessageSquare, LayoutDashboard, Files, Upload, PlayCircle,
 } from "lucide-react";
 import {
   caseInfo, caseLawMatrix, standardsMatrix,
@@ -38,7 +38,7 @@ const QUICK_LINKS = [
   { href: "/case/case01/documents",             label: "Documents",            icon: Files },
   { href: "/case/case01/upload",                label: "Upload Files",         icon: Upload },
   { href: "/case/case01/discharge-application", label: "Discharge App",        icon: Scale },
-  { href: "/case/case01/defence-reply",         label: "Defence Reply v3",     icon: FileText },
+  { href: "/case/case01/defence-reply",         label: "Defence Reply v4",     icon: FileText },
 ];
 
 const STRATEGY_PILLARS = [
@@ -65,6 +65,22 @@ export default function Home() {
 
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
+
+      {/* ── Demo CTA Banner ──────────────────────────────────────────────── */}
+      <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 flex items-center gap-4">
+        <PlayCircle className="h-8 w-8 text-amber-500 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-amber-900 text-sm">Try the Demo — No API key needed</p>
+          <p className="text-xs text-amber-700 mt-0.5">
+            Explore 21 pre-loaded case types: forensic defence, NDPS bail, writ petitions, consumer complaints and more.
+          </p>
+        </div>
+        <Link href="/case/case01/dashboard">
+          <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white shrink-0 gap-1.5">
+            <PlayCircle className="h-3.5 w-3.5" /> Try Demo
+          </Button>
+        </Link>
+      </div>
 
       {/* ── Case Header ─────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-border bg-card p-6">

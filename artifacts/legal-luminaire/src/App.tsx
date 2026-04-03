@@ -18,7 +18,8 @@ import VerificationPanel from "@/pages/VerificationPanel";
 import SessionWorkspace from "@/pages/session-workspace";
 import DraftViewer from "@/pages/draft-viewer";
 // New views from update
-import { DashboardView } from "@/components/views/DashboardView";
+import { DynamicDashboardView } from "@/components/views/DynamicDashboardView";
+import { CaseSelector } from "@/components/case-selector";
 import { CaseLawView } from "@/components/views/CaseLawView";
 import { StandardsView } from "@/components/views/StandardsView";
 import { TimelineView } from "@/components/views/TimelineView";
@@ -36,27 +37,57 @@ import { AccuracyProvider } from "@/context/AccuracyContext";
 
 const queryClient = new QueryClient();
 
-const navItems = [
-  { path: "/", label: "मुख्य पृष्ठ", labelEn: "Home", icon: HomeIcon, caseScoped: false },
-  { path: "/intake", label: "नया केस इंटेक", labelEn: "New Case Intake", icon: FilePlus, caseScoped: false },
-  { path: "/dashboard", label: "डैशबोर्ड", labelEn: "Case Dashboard", icon: LayoutDashboard, caseScoped: true },
-  { path: "/ai-draft", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine", icon: Bot, caseScoped: true },
-  { path: "/ai-research", label: "AI रिसर्च इंजन", labelEn: "AI Research Engine", icon: Zap, caseScoped: true },
-  { path: "/chat", label: "AI ड्राफ्टर चैट", labelEn: "AI Drafter Chat", icon: MessageSquare, caseScoped: true },
-  { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale, caseScoped: true },
-  { path: "/defence-reply", label: "डिफेंस रिप्लाई v3", labelEn: "Defence Reply Final", icon: FileText, caseScoped: true },
-  { path: "/case-research", label: "विधिक शोध", labelEn: "Legal Research", icon: BookOpen, caseScoped: true },
-  { path: "/case-law", label: "केस लॉ मैट्रिक्स", labelEn: "Case Law Matrix", icon: BookOpen, caseScoped: true },
-  { path: "/standards", label: "मानक मैट्रिक्स", labelEn: "Standards Matrix", icon: FlaskConical, caseScoped: true },
-  { path: "/timeline", label: "केस टाइमलाइन", labelEn: "Case Timeline", icon: Clock, caseScoped: true },
-  { path: "/cross-reference", label: "क्रॉस-रेफरेंस", labelEn: "Cross Reference", icon: Table2, caseScoped: true },
-  { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments", icon: Mic, caseScoped: true },
-  { path: "/standards-validity", label: "मानक वैधता नोट", labelEn: "Standards Note", icon: Scale, caseScoped: true },
-  { path: "/documents", label: "दस्तावेज़", labelEn: "Documents", icon: Files, caseScoped: true },
-  { path: "/upload", label: "फाइल अपलोड", labelEn: "Upload Files", icon: Upload, caseScoped: true },
-  { path: "/filing-checklist", label: "फाइलिंग चेकलिस्ट", labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
-  { path: "/verification", label: "सत्यापन पैनल", labelEn: "Verification Panel", icon: ShieldCheck, caseScoped: true },
+// ── Grouped nav — replaces flat 19-item list ─────────────────────────────
+type NavItem = {
+  path: string; label: string; labelEn: string;
+  icon: React.ComponentType<{ className?: string }>; caseScoped: boolean;
+};
+type NavGroup = { groupLabel: string; items: NavItem[] };
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    groupLabel: "शुरुआत / Setup",
+    items: [
+      { path: "/",        label: "मुख्य पृष्ठ",    labelEn: "Home",            icon: HomeIcon,        caseScoped: false },
+      { path: "/cases",   label: "सभी केस",         labelEn: "All Cases",       icon: Files,           caseScoped: false },
+      { path: "/intake",  label: "नया केस इंटेक",   labelEn: "New Case Intake", icon: FilePlus,        caseScoped: false },
+      { path: "/dashboard", label: "डैशबोर्ड",      labelEn: "Case Dashboard",  icon: LayoutDashboard, caseScoped: true },
+    ],
+  },
+  {
+    groupLabel: "AI शोध / Research",
+    items: [
+      { path: "/ai-research", label: "AI रिसर्च",     labelEn: "AI Research",    icon: Zap,           caseScoped: true },
+      { path: "/case-research", label: "विधिक शोध",   labelEn: "Legal Research", icon: BookOpen,      caseScoped: true },
+      { path: "/case-law",    label: "केस लॉ",        labelEn: "Case Law Matrix", icon: BookOpen,     caseScoped: true },
+      { path: "/standards",   label: "मानक मैट्रिक्स", labelEn: "Standards",    icon: FlaskConical,  caseScoped: true },
+      { path: "/cross-reference", label: "क्रॉस-रेफरेंस", labelEn: "Cross Ref", icon: Table2,        caseScoped: true },
+    ],
+  },
+  {
+    groupLabel: "AI ड्राफ्टिंग / Drafting",
+    items: [
+      { path: "/ai-draft",    label: "AI ड्राफ्ट",    labelEn: "AI Draft Engine", icon: Bot,          caseScoped: true },
+      { path: "/chat",        label: "AI चैट",         labelEn: "AI Chat",         icon: MessageSquare, caseScoped: true },
+      { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale, caseScoped: true },
+      { path: "/defence-reply", label: "डिफेंस रिप्लाई", labelEn: "Defence Reply", icon: FileText,   caseScoped: true },
+      { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments",  icon: Mic,          caseScoped: true },
+    ],
+  },
+  {
+    groupLabel: "समीक्षा / Review",
+    items: [
+      { path: "/verification",    label: "सत्यापन",       labelEn: "Verification",    icon: ShieldCheck, caseScoped: true },
+      { path: "/filing-checklist", label: "चेकलिस्ट",    labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
+      { path: "/timeline",        label: "टाइमलाइन",     labelEn: "Timeline",         icon: Clock,       caseScoped: true },
+      { path: "/documents",       label: "दस्तावेज़",     labelEn: "Documents",        icon: Files,       caseScoped: true },
+      { path: "/upload",          label: "अपलोड",         labelEn: "Upload",           icon: Upload,      caseScoped: true },
+    ],
+  },
 ];
+
+// Flat list kept for route matching only
+const navItems: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [location] = useLocation();
@@ -108,38 +139,41 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
             </select>
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wider text-sidebar-accent-foreground opacity-60 mb-3 px-2">
-            मेनू
-          </p>
-
-          {navItems.map((item) => {
-            const href = item.caseScoped
-              ? `/case/${selectedCaseId}${item.path}`
-              : item.path;
-            const isActive =
-              location === item.path ||
-              location === href ||
-              (item.path !== "/" && location.endsWith(item.path));
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.path}
-                href={href}
-                onClick={onClose}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
-                  ${isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  }`}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <div>
-                  <div>{item.label}</div>
-                  <div className="text-xs opacity-70">{item.labelEn}</div>
-                </div>
-              </Link>
-            );
-          })}
+          {NAV_GROUPS.map((group) => (
+            <div key={group.groupLabel} className="mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-accent-foreground opacity-50 mb-1 px-2">
+                {group.groupLabel}
+              </p>
+              {group.items.map((item) => {
+                const href = item.caseScoped
+                  ? `/case/${selectedCaseId}${item.path}`
+                  : item.path;
+                const isActive =
+                  location === item.path ||
+                  location === href ||
+                  (item.path !== "/" && location.endsWith(item.path));
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    href={href}
+                    onClick={onClose}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                      ${isActive
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      }`}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <div>
+                      <div className="leading-tight">{item.label}</div>
+                      <div className="text-[10px] opacity-60">{item.labelEn}</div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="p-4 border-t border-sidebar-border">
@@ -202,6 +236,7 @@ function Router() {
       <Switch>
         {/* Global routes */}
         <Route path="/" component={Home} />
+        <Route path="/cases" component={() => <div className="p-6"><CaseSelector /></div>} />
         <Route path="/intake" component={CaseIntakeAssistant} />
 
         {/* Legacy flat routes (Case 01 default) */}
@@ -217,7 +252,7 @@ function Router() {
         <Route path="/verification" component={VerificationPanel} />
 
         {/* New view routes */}
-        <Route path="/dashboard" component={() => <div className="p-6"><DashboardView /></div>} />
+        <Route path="/dashboard" component={() => <div className="p-6"><DynamicDashboardView /></div>} />
         <Route path="/chat" component={() => <div className="flex flex-col h-full"><ChatView /></div>} />
         <Route path="/case-law" component={() => <div className="p-0"><CaseLawView /></div>} />
         <Route path="/standards" component={() => <div className="p-0"><StandardsView /></div>} />
@@ -241,7 +276,7 @@ function Router() {
         <Route path="/case/:caseId/filing-checklist" component={FilingChecklist} />
         <Route path="/case/:caseId/defence-reply" component={DefenceReply} />
         <Route path="/case/:caseId/verification" component={VerificationPanel} />
-        <Route path="/case/:caseId/dashboard" component={() => <div className="p-6"><DashboardView /></div>} />
+        <Route path="/case/:caseId/dashboard" component={() => <div className="p-6"><DynamicDashboardView /></div>} />
         <Route path="/case/:caseId/chat" component={() => <div className="flex flex-col h-full"><ChatView /></div>} />
         <Route path="/case/:caseId/case-law" component={() => <div className="p-0"><CaseLawView /></div>} />
         <Route path="/case/:caseId/standards" component={() => <div className="p-0"><StandardsView /></div>} />
@@ -259,11 +294,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CaseProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-        </CaseProvider>
+        <AccuracyProvider>
+          <CaseProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+          </CaseProvider>
+        </AccuracyProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

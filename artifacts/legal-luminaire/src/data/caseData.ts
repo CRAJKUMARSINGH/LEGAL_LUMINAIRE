@@ -124,6 +124,15 @@ export const caseLawMatrix = [
     status: "PENDING" as const,
     action: "Citation authenticity check required",
   },
+  {
+    case: "C.J. Christopher Signi v. State of Tamil Nadu, 2025 SCC OnLine Mad 3214",
+    court: "Madras HC",
+    useForDefence:
+      "Persuasive precedent that mere apprehension of tampering is no ground to deny forensic examination; supports right to independent expert comparison of defence material.",
+    status: "SECONDARY" as const,
+    action:
+      "Upload/verify full SCC judgment; use only as persuasive authority after confirming authentic text.",
+  },
 ];
 
 export const standardsMatrix = [
@@ -185,8 +194,8 @@ export const standardsMatrix = [
 
 export const caseDocuments = [
   { name: "Comprehensive_Legal_Defence_Report_Stadium_Collapse.md", type: "report", size: "45 KB" },
-  { name: "DEFENCE_REPLY_FINAL_v3.pdf", type: "draft", size: "128 KB" },
-  { name: "DEFENCE_REPLY_FINAL_v3.pdf.txt", type: "text", size: "92 KB" },
+  { name: "DEFENCE_REPLY_FINAL_v4.pdf", type: "draft", size: "32 KB" },
+  { name: "DEFENCE_REPLY_FINAL_v4.lex", type: "application", size: "36 KB" },
   { name: "DEFENCE_REPLY_UPDATED_v2.lex", type: "draft", size: "78 KB" },
   { name: "DISCHARGE_APPLICATION_UPDATED_v2.lex", type: "application", size: "65 KB" },
   { name: "SUPERIOR_HINDI_DISCHARGE_APPLICATION_FULL.lex", type: "application", size: "110 KB" },

@@ -24,7 +24,7 @@ function VBadge({ s }: { s: VS }) {
   );
 }
 
-// ── Section data (v3 FINAL) ────────────────────────────────────────────────
+// ── Section data (v4 FINAL) ────────────────────────────────────────────────
 const SECTIONS = [
   {
     id: "heading",
@@ -294,7 +294,7 @@ export default function DefenceReply() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "DEFENCE_REPLY_FINAL_v3.txt";
+    a.download = "DEFENCE_REPLY_FINAL_v4.txt";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -309,7 +309,7 @@ export default function DefenceReply() {
             उन्मोचन प्रार्थना-पत्र — Defence Reply
           </h1>
           <p className="text-sm text-muted-foreground">
-            FINAL v3 · धारा 250 BNSS 2023 · विशेष सत्र वाद 1/2025 · FIR 496/2011
+            FINAL v4 · धारा 250 BNSS 2023 · विशेष सत्र वाद 1/2025 · FIR 496/2011
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -331,7 +331,7 @@ export default function DefenceReply() {
       {/* Status banner */}
       <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-800 no-print flex flex-wrap gap-3 items-center">
         <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-        <span className="font-semibold">Court-ready · FINAL v3</span>
+        <span className="font-semibold">Court-ready · FINAL v4</span>
         <VBadge s="VERIFIED" />
         <span className="text-xs">4 VERIFIED निर्णय · 4 PENDING (प्रमाणित प्रति प्राप्त करें)</span>
       </div>
