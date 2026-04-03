@@ -2,6 +2,7 @@ import { caseLawMatrix } from "@/data/caseData";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CheckCircle2, Info, AlertTriangle } from "lucide-react";
+import { formatCitation } from "@/lib/citation-formatter";
 
 const statusConfig = {
   VERIFIED: { icon: CheckCircle2, class: "text-emerald-600 border-emerald-500/30" },
@@ -24,6 +25,7 @@ export const CaseLawView = () => (
           <TableRow className="bg-muted/50">
             <TableHead className="w-[30%]">Case</TableHead>
             <TableHead>Court</TableHead>
+            <TableHead>Para</TableHead>
             <TableHead>Use for Defence</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Action Before Filing</TableHead>
@@ -35,8 +37,9 @@ export const CaseLawView = () => (
             const Icon = cfg.icon;
             return (
               <TableRow key={i}>
-                <TableCell className="font-medium text-foreground text-sm">{row.case}</TableCell>
+                <TableCell className="font-medium text-foreground text-sm">{formatCitation(row as any)}</TableCell>
                 <TableCell className="text-sm">{row.court}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{(row as any).para || "—"}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{row.useForDefence}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={`gap-1 ${cfg.class}`}>

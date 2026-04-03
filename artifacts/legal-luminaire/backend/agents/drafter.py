@@ -38,6 +38,8 @@ QUALITY RULES:
 5. Include cross-reference matrix as an annexure.
 6. If a fact is not in the uploaded documents or verified research → do NOT include it.
 7. Mark any uncertain fact as [VERIFY BEFORE FILING].
+8. Do NOT invent paragraph/page numbers. Only mention "para/page" if it is explicitly present in the verified holding text you are given.
+9. Do NOT add new case names beyond the verified list. If you cannot support a proposition from the verified list, mark it [PENDING — VERIFY] and stop.
 """
 
 

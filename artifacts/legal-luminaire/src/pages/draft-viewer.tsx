@@ -2,6 +2,8 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Download, Printer, FileText } from "lucide-react";
+import { caseLawMatrix } from "@/data/caseData";
+import { findCitationsInText } from "@/lib/citation-formatter";
 
 // Placeholder draft viewer — shows the DEFENCE_REPLY_FINAL_v4 document
 export default function DraftViewer() {
@@ -26,6 +28,28 @@ export default function DraftViewer() {
 
   const handleDownload = () => {
     if (storedDraft?.content) {
+      const hits = findCitationsInText(
+        storedDraft.content,
+        caseLawMatrix.map((c) => ({ case: c.case, status: c.status }))
+      );
+      const pending = hits.filter((h) => h.status === "PENDING");
+      const secondary = hits.filter((h) => h.status === "SECONDARY");
+      if (pending.length > 0) {
+        alert(
+          `Download blocked: this draft contains ${pending.length} PENDING (unverified) citation(s).\n\n` +
+            pending.map((p) => `- ${p.case}`).join("\n") +
+            `\n\nVerify before filing.`
+        );
+        return;
+      }
+      if (secondary.length > 0) {
+        const ok = confirm(
+          `Warning: this draft contains ${secondary.length} SECONDARY citation(s) (not court-verified).\n\n` +
+            secondary.map((s) => `- ${s.case}`).join("\n") +
+            `\n\nProceed to download anyway?`
+        );
+        if (!ok) return;
+      }
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([storedDraft.content], { type: "text/plain;charset=utf-8" }));
       a.download = `draft_${draftId}.txt`;
