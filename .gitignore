@@ -72,3 +72,6 @@ node_modules/.cache/
 
 # Test artifacts (generated outputs — not source)
 artifacts/demo-outputs/*.pdf
+
+# Local scratch / reference drops
+REFERENCE-APP00/
