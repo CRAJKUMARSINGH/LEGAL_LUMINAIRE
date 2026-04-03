@@ -1,0 +1,10 @@
+[build]
+  base = "artifacts/legal-luminaire"
+  command = "npm install --ignore-scripts && npm run build"
+  publish = "artifacts/legal-luminaire/dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+

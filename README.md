@@ -140,6 +140,12 @@ uvicorn main:app --reload
 - Local run manual: `docs/USER_MANUAL.md`
 - Video guide script (record-ready): `docs/VIDEO_GUIDE_SCRIPT.md`
 
+### **STATIC DEPLOY (FRONTEND-ONLY DEMO)**
+- **Netlify**: root `netlify.toml` builds `artifacts/legal-luminaire` and publishes `dist/`
+- **Vercel**: root `vercel.json` builds and rewrites SPA routes to `index.html`
+
+> Note: this is a **frontend-only demo**. Full RAG + agents require the FastAPI backend running locally or on a private server with keys.
+
 ---
 
 ### **ACCURACY COMPLIANCE**
