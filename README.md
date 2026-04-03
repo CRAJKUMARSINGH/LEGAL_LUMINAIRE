@@ -139,6 +139,8 @@ uvicorn main:app --reload
 - Start here: `docs/INDEX.md`
 - Local run manual: `docs/USER_MANUAL.md`
 - Video guide script (record-ready): `docs/VIDEO_GUIDE_SCRIPT.md`
+- Contributing: `CONTRIBUTING.md`
+- Roadmap: `ROADMAP.md`
 
 ### **STATIC DEPLOY (FRONTEND-ONLY DEMO)**
 - **Netlify**: root `netlify.toml` builds `artifacts/legal-luminaire` and publishes `dist/`
@@ -257,12 +259,7 @@ uvicorn main:app --reload
 
 ### **LICENSE**
 
-#### **LICENSE INFORMATION**
-- **License Type**: MIT License
-- **Copyright**: 2026 Legal Luminaire
-- **Permissions**: Use, modify, distribute
-- **Conditions**: Include license, copyright notice
-- **Limitations**: No warranty, no liability
+See `LICENSE` (MIT).
 
 ---
 
