@@ -3,13 +3,28 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Legal Luminaire - Construction Contract Legal Case Management API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: cases
+    description: Legal case management
+  - name: notices
+    description: Legal notices
+  - name: correspondence
+    description: Correspondence letters
+  - name: drafts
+    description: Draft replies
+  - name: parties
+    description: Parties (clients, contractors, trusts)
+  - name: bills
+    description: Bills and payment claims
+  - name: dashboard
+    description: Dashboard summaries
+
 paths:
   /healthz:
     get:
@@ -24,6 +39,529 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /cases:
+    get:
+      operationId: listCases
+      tags: [cases]
+      summary: List all legal cases
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, closed, pending, disputed]
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of cases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Case"
+    post:
+      operationId: createCase
+      tags: [cases]
+      summary: Create a new legal case
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCaseBody"
+      responses:
+        "201":
+          description: Case created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+
+  /cases/{id}:
+    get:
+      operationId: getCase
+      tags: [cases]
+      summary: Get a specific case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Case detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+    put:
+      operationId: updateCase
+      tags: [cases]
+      summary: Update a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCaseBody"
+      responses:
+        "200":
+          description: Updated case
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+    delete:
+      operationId: deleteCase
+      tags: [cases]
+      summary: Delete a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /cases/{id}/notices:
+    get:
+      operationId: getCaseNotices
+      tags: [cases]
+      summary: Get all notices for a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notice"
+
+  /cases/{id}/correspondence:
+    get:
+      operationId: getCaseCorrespondence
+      tags: [cases]
+      summary: Get full correspondence timeline for a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Correspondence list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Correspondence"
+
+  /cases/{id}/bills:
+    get:
+      operationId: getCaseBills
+      tags: [cases]
+      summary: Get bills for a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bills
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bill"
+
+  /notices:
+    get:
+      operationId: listNotices
+      tags: [notices]
+      summary: List all notices
+      parameters:
+        - name: caseId
+          in: query
+          schema:
+            type: integer
+        - name: noticeType
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Notices list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notice"
+    post:
+      operationId: createNotice
+      tags: [notices]
+      summary: Create a notice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNoticeBody"
+      responses:
+        "201":
+          description: Notice created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notice"
+
+  /notices/{id}:
+    get:
+      operationId: getNotice
+      tags: [notices]
+      summary: Get a notice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notice"
+
+  /drafts:
+    get:
+      operationId: listDrafts
+      tags: [drafts]
+      summary: List all draft replies
+      parameters:
+        - name: caseId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, finalized, sent]
+      responses:
+        "200":
+          description: Drafts list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Draft"
+    post:
+      operationId: createDraft
+      tags: [drafts]
+      summary: Create a draft reply
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDraftBody"
+      responses:
+        "201":
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Draft"
+
+  /drafts/{id}:
+    get:
+      operationId: getDraft
+      tags: [drafts]
+      summary: Get a draft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Draft"
+    put:
+      operationId: updateDraft
+      tags: [drafts]
+      summary: Update a draft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDraftBody"
+      responses:
+        "200":
+          description: Updated draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Draft"
+    delete:
+      operationId: deleteDraft
+      tags: [drafts]
+      summary: Delete a draft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /correspondence:
+    get:
+      operationId: listCorrespondence
+      tags: [correspondence]
+      summary: List correspondence
+      parameters:
+        - name: caseId
+          in: query
+          schema:
+            type: integer
+        - name: direction
+          in: query
+          schema:
+            type: string
+            enum: [incoming, outgoing]
+      responses:
+        "200":
+          description: Correspondence list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Correspondence"
+    post:
+      operationId: createCorrespondence
+      tags: [correspondence]
+      summary: Create a correspondence entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCorrespondenceBody"
+      responses:
+        "201":
+          description: Correspondence created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Correspondence"
+
+  /bills:
+    get:
+      operationId: listBills
+      tags: [bills]
+      summary: List all bills
+      parameters:
+        - name: caseId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, paid, disputed, overdue]
+      responses:
+        "200":
+          description: Bills list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bill"
+    post:
+      operationId: createBill
+      tags: [bills]
+      summary: Create a bill/payment claim
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBillBody"
+      responses:
+        "201":
+          description: Bill created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+
+  /bills/{id}:
+    get:
+      operationId: getBill
+      tags: [bills]
+      summary: Get a bill
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bill
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+    put:
+      operationId: updateBill
+      tags: [bills]
+      summary: Update a bill
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBillBody"
+      responses:
+        "200":
+          description: Updated bill
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+
+  /parties:
+    get:
+      operationId: listParties
+      tags: [parties]
+      summary: List all parties
+      responses:
+        "200":
+          description: Parties list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Party"
+    post:
+      operationId: createParty
+      tags: [parties]
+      summary: Create a party
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePartyBody"
+      responses:
+        "201":
+          description: Party created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Party"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary statistics
+      responses:
+        "200":
+          description: Summary stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/recent-activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Get recent activity across all cases
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /dashboard/pending-bills:
+    get:
+      operationId: getPendingBillsSummary
+      tags: [dashboard]
+      summary: Get pending bills total and breakdown
+      responses:
+        "200":
+          description: Pending bills summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PendingBillsSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +572,652 @@ components:
       required:
         - status
 
+    Case:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        caseNumber:
+          type: string
+        category:
+          type: string
+          enum: [construction_contract, civil_dispute, arbitration, show_cause, breach_of_contract, payment_claim]
+        status:
+          type: string
+          enum: [open, closed, pending, disputed]
+        clientPartyId:
+          type: integer
+        contractorPartyId:
+          type: integer
+        contractReference:
+          type: string
+        contractDate:
+          type: string
+          format: date
+        scheduledStartDate:
+          type: string
+          format: date
+        scheduledCompletionDate:
+          type: string
+          format: date
+        actualStartDate:
+          type: string
+          format: date
+          nullable: true
+        description:
+          type: string
+        legalGrounds:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - caseNumber
+        - category
+        - status
+        - createdAt
+        - updatedAt
+
+    CreateCaseBody:
+      type: object
+      properties:
+        title:
+          type: string
+        caseNumber:
+          type: string
+        category:
+          type: string
+          enum: [construction_contract, civil_dispute, arbitration, show_cause, breach_of_contract, payment_claim]
+        status:
+          type: string
+          enum: [open, closed, pending, disputed]
+        clientPartyId:
+          type: integer
+        contractorPartyId:
+          type: integer
+        contractReference:
+          type: string
+        contractDate:
+          type: string
+          format: date
+        scheduledStartDate:
+          type: string
+          format: date
+        scheduledCompletionDate:
+          type: string
+          format: date
+        actualStartDate:
+          type: string
+          format: date
+          nullable: true
+        description:
+          type: string
+        legalGrounds:
+          type: string
+          nullable: true
+      required:
+        - title
+        - category
+        - status
+        - description
+
+    UpdateCaseBody:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: string
+          enum: [open, closed, pending, disputed]
+        description:
+          type: string
+        legalGrounds:
+          type: string
+          nullable: true
+
+    Notice:
+      type: object
+      properties:
+        id:
+          type: integer
+        caseId:
+          type: integer
+        noticeNumber:
+          type: string
+        noticeType:
+          type: string
+          enum: [show_cause, termination, payment_demand, breach_notice, time_extension_denial, legal_notice]
+        title:
+          type: string
+        issuedBy:
+          type: string
+        issuedTo:
+          type: string
+        issuedDate:
+          type: string
+          format: date
+        responseDeadline:
+          type: string
+          format: date
+          nullable: true
+        clauseReferences:
+          type: string
+          nullable: true
+        content:
+          type: string
+        status:
+          type: string
+          enum: [received, responded, overdue, acknowledged]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - caseId
+        - noticeType
+        - title
+        - issuedBy
+        - issuedTo
+        - issuedDate
+        - content
+        - status
+        - createdAt
+
+    CreateNoticeBody:
+      type: object
+      properties:
+        caseId:
+          type: integer
+        noticeNumber:
+          type: string
+        noticeType:
+          type: string
+          enum: [show_cause, termination, payment_demand, breach_notice, time_extension_denial, legal_notice]
+        title:
+          type: string
+        issuedBy:
+          type: string
+        issuedTo:
+          type: string
+        issuedDate:
+          type: string
+          format: date
+        responseDeadline:
+          type: string
+          format: date
+          nullable: true
+        clauseReferences:
+          type: string
+          nullable: true
+        content:
+          type: string
+        status:
+          type: string
+          enum: [received, responded, overdue, acknowledged]
+      required:
+        - caseId
+        - noticeType
+        - title
+        - issuedBy
+        - issuedTo
+        - issuedDate
+        - content
+        - status
+
+    Draft:
+      type: object
+      properties:
+        id:
+          type: integer
+        caseId:
+          type: integer
+        noticeId:
+          type: integer
+          nullable: true
+        title:
+          type: string
+        draftType:
+          type: string
+          enum: [reply_to_show_cause, counter_notice, legal_objection, payment_demand, time_extension_request, general_correspondence]
+        status:
+          type: string
+          enum: [draft, finalized, sent]
+        subject:
+          type: string
+        toParty:
+          type: string
+        fromParty:
+          type: string
+        content:
+          type: string
+        legalBasis:
+          type: string
+          nullable: true
+        enclosures:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - caseId
+        - title
+        - draftType
+        - status
+        - subject
+        - toParty
+        - fromParty
+        - content
+        - createdAt
+        - updatedAt
+
+    CreateDraftBody:
+      type: object
+      properties:
+        caseId:
+          type: integer
+        noticeId:
+          type: integer
+          nullable: true
+        title:
+          type: string
+        draftType:
+          type: string
+          enum: [reply_to_show_cause, counter_notice, legal_objection, payment_demand, time_extension_request, general_correspondence]
+        status:
+          type: string
+          enum: [draft, finalized, sent]
+        subject:
+          type: string
+        toParty:
+          type: string
+        fromParty:
+          type: string
+        content:
+          type: string
+        legalBasis:
+          type: string
+          nullable: true
+        enclosures:
+          type: string
+          nullable: true
+      required:
+        - caseId
+        - title
+        - draftType
+        - status
+        - subject
+        - toParty
+        - fromParty
+        - content
+
+    UpdateDraftBody:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: string
+          enum: [draft, finalized, sent]
+        subject:
+          type: string
+        content:
+          type: string
+        legalBasis:
+          type: string
+          nullable: true
+        enclosures:
+          type: string
+          nullable: true
+
+    Correspondence:
+      type: object
+      properties:
+        id:
+          type: integer
+        caseId:
+          type: integer
+        referenceNumber:
+          type: string
+          nullable: true
+        direction:
+          type: string
+          enum: [incoming, outgoing]
+        subject:
+          type: string
+        fromParty:
+          type: string
+        toParty:
+          type: string
+        correspondenceDate:
+          type: string
+          format: date
+        summary:
+          type: string
+        content:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - caseId
+        - direction
+        - subject
+        - fromParty
+        - toParty
+        - correspondenceDate
+        - summary
+        - createdAt
+
+    CreateCorrespondenceBody:
+      type: object
+      properties:
+        caseId:
+          type: integer
+        referenceNumber:
+          type: string
+          nullable: true
+        direction:
+          type: string
+          enum: [incoming, outgoing]
+        subject:
+          type: string
+        fromParty:
+          type: string
+        toParty:
+          type: string
+        correspondenceDate:
+          type: string
+          format: date
+        summary:
+          type: string
+        content:
+          type: string
+          nullable: true
+      required:
+        - caseId
+        - direction
+        - subject
+        - fromParty
+        - toParty
+        - correspondenceDate
+        - summary
+
+    Bill:
+      type: object
+      properties:
+        id:
+          type: integer
+        caseId:
+          type: integer
+        billNumber:
+          type: string
+        billType:
+          type: string
+          enum: [work_executed, consultancy_fee, advance_recovery, liquidated_damages, material_escalation]
+        description:
+          type: string
+        amountRs:
+          type: number
+        gstPercent:
+          type: number
+          nullable: true
+        totalAmountRs:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, disputed, overdue]
+        billDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - caseId
+        - billNumber
+        - billType
+        - description
+        - amountRs
+        - totalAmountRs
+        - status
+        - billDate
+        - createdAt
+
+    CreateBillBody:
+      type: object
+      properties:
+        caseId:
+          type: integer
+        billNumber:
+          type: string
+        billType:
+          type: string
+          enum: [work_executed, consultancy_fee, advance_recovery, liquidated_damages, material_escalation]
+        description:
+          type: string
+        amountRs:
+          type: number
+        gstPercent:
+          type: number
+          nullable: true
+        totalAmountRs:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, disputed, overdue]
+        billDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+        - caseId
+        - billNumber
+        - billType
+        - description
+        - amountRs
+        - totalAmountRs
+        - status
+        - billDate
+
+    UpdateBillBody:
+      type: object
+      properties:
+        description:
+          type: string
+        amountRs:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, disputed, overdue]
+        notes:
+          type: string
+          nullable: true
+
+    Party:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        partyType:
+          type: string
+          enum: [trust, contractor, government, individual, firm, company]
+        address:
+          type: string
+          nullable: true
+        contactPerson:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        gstin:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - partyType
+        - createdAt
+
+    CreatePartyBody:
+      type: object
+      properties:
+        name:
+          type: string
+        partyType:
+          type: string
+          enum: [trust, contractor, government, individual, firm, company]
+        address:
+          type: string
+          nullable: true
+        contactPerson:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        gstin:
+          type: string
+          nullable: true
+      required:
+        - name
+        - partyType
+
+    DashboardSummary:
+      type: object
+      properties:
+        totalCases:
+          type: integer
+        openCases:
+          type: integer
+        closedCases:
+          type: integer
+        pendingCases:
+          type: integer
+        disputedCases:
+          type: integer
+        totalPendingAmountRs:
+          type: number
+        totalNotices:
+          type: integer
+        overdueNotices:
+          type: integer
+        totalDrafts:
+          type: integer
+        finalizedDrafts:
+          type: integer
+      required:
+        - totalCases
+        - openCases
+        - closedCases
+        - pendingCases
+        - disputedCases
+        - totalPendingAmountRs
+        - totalNotices
+        - overdueNotices
+        - totalDrafts
+        - finalizedDrafts
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        activityType:
+          type: string
+          enum: [notice_received, draft_created, bill_submitted, correspondence_added, case_updated]
+        caseId:
+          type: integer
+        caseTitle:
+          type: string
+        description:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - activityType
+        - caseId
+        - caseTitle
+        - description
+        - occurredAt
+
+    PendingBillsSummary:
+      type: object
+      properties:
+        totalPendingRs:
+          type: number
+        pendingCount:
+          type: integer
+        overdueRs:
+          type: number
+        overdueCount:
+          type: integer
+        disputedRs:
+          type: number
+        disputedCount:
+          type: integer
+        breakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              billType:
+                type: string
+              totalRs:
+                type: number
+              count:
+                type: integer
+            required:
+              - billType
+              - totalRs
+              - count
+      required:
+        - totalPendingRs
+        - pendingCount
+        - overdueRs
+        - overdueCount
+        - disputedRs
+        - disputedCount
+        - breakdown
