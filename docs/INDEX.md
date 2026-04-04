@@ -1,21 +1,28 @@
-# Documentation Index
+# Legal Luminaire — Documentation Index
 
-## Quick links
-- **User manual (local run)**: `docs/USER_MANUAL.md`
-- **Video walkthrough script (recording-ready)**: `docs/VIDEO_GUIDE_SCRIPT.md`
-- **Accuracy governance**: `docs/accuracy-governance/ACCURACY_RULES.md` and `docs/accuracy-governance/ACCURACY_GUIDELINES.md`
-- **Cache hygiene**: `docs/CACHE_HYGIENE.md` + `scripts/clean.ps1`
+## Quick Start
+- Local run manual: `docs/USER_MANUAL.md`
+- Video walkthrough (record-ready): `docs/VIDEO_MANUAL_SCRIPT.md`
 
-## Product / marketing specs (demo content)
-- **Demo Mode spec**: `docs/task-specs/DEMO_MODE_TASK_SPEC.md`
-- **Accuracy Gate spec**: `docs/task-specs/ACCURACY_GATE_TASK_SPEC.md`
-- **Marketing spec**: `docs/marketing/MARKETING_TASK_SPEC.md` (canonical)  
+## Accuracy Governance
+- Canonical accuracy rules (v2): `docs/accuracy-governance/ACCURACY_RULES.md`
 
 ## Testing
-- **Robustness report**: `docs/testing/ROBUSTNESS_REPORT.md`
-- **Test case matrix**: `docs/testing/TEST_CASE_MATRIX_21.md`
-- **Synthetic test data guide**: `docs/testing/SYNTHETIC_TEST_DATA_GUIDE.md`
+- Robustness report: `docs/testing/ROBUSTNESS_REPORT.md`
+- Test case matrix (21 cases): `docs/testing/TEST_CASE_MATRIX_21.md`
+- Synthetic test data guide: `docs/testing/SYNTHETIC_TEST_DATA_GUIDE.md`
 
-## Case packs
-- **Hemraj case pack**: `CASE_01_HemrajG/` (working folder; includes `.lex/.pdf`, standards, matrices)
+## Product / Marketing
+- Demo mode spec: `docs/task-specs/DEMO_MODE_TASK_SPEC.md`
+- Accuracy gate spec: `docs/task-specs/ACCURACY_GATE_TASK_SPEC.md`
+- Marketing spec (canonical): `docs/marketing/MARKETING_TASK_SPEC.md`
+- Marketing showcase map: `docs/marketing/MARKETING_SHOWCASE_MAP.md`
 
+## Planning
+- Modernization plan: `docs/MODERNIZATION_PLAN.md`
+- Cache hygiene: `docs/CACHE_HYGIENE.md`
+- Self-assessment: `docs/SELF_ASSESSMENT.md`
+
+## Case Packs
+- Hemraj case pack (working folder): `CASE_01_HemrajG/`
+- 21 test cases: `test-cases/`

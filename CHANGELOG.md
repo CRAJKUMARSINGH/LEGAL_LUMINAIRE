@@ -1,4 +1,23 @@
 # CHANGELOG - LEGAL LUMINAIRE
+
+## VERSION 1.1.0 - APRIL 4, 2026
+
+### CLEANED
+- Deleted stale/redundant files: `ACCURACY_GUIDELINES.md` (root), `TASK_COMPLETION_SUMMARY.md`, `docs/ARCHIVE.md` (binary diff), `docs/REPO_UPDATE_SUMMARY.md`, `docs/VIDEO_GUIDE_SCRIPT.md` (merged into VIDEO_MANUAL_SCRIPT.md), `docs/accuracy-governance/ACCURACY_GUIDELINES.md` (superseded by ACCURACY_RULES.md)
+- Cleared all `__pycache__/`, `.pytest_cache/`, `*.tsbuildinfo`, `dist/` build artifacts
+
+### MERGED / CONSOLIDATED
+- Combined `docs/VIDEO_GUIDE_SCRIPT.md` + `docs/VIDEO_MANUAL_SCRIPT.md` → single `docs/VIDEO_MANUAL_SCRIPT.md` (8-scene record-ready script)
+- Single canonical accuracy rules file: `docs/accuracy-governance/ACCURACY_RULES.md`
+- `docs/INDEX.md` updated to reflect cleaned structure
+
+### IMPROVED
+- `README.md` — complete rewrite with GitHub attraction notes, Streamlit badge, 21-case table, architecture overview, accuracy rules summary
+- `streamlit_app.py` — full rewrite: 4-tab UI (User Manual, Upload, Research/Draft, Demo Case), embedded video script, download button, metrics display, demo case file browser
+- `docs/VIDEO_MANUAL_SCRIPT.md` — merged + expanded to 8 scenes with recording notes and deploy instructions
+
+---
+
 ## VERSION 1.0.0 - APRIL 3, 2026
 
 ### ADDED

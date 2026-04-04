@@ -1,315 +1,187 @@
-# LEGAL LUMINAIRE
-## Accuracy-First Legal Research and Drafting (Local PC + Browser)
+# Legal Luminaire ⚖️
 
-**VERSION**: 1.0.0  
-**LAST UPDATED**: April 3, 2026  
-**STATUS**: Demo + Case-pack workspace (local-first)  
+**Accuracy-first AI legal research + drafting for Indian courts.**  
+Runs locally on your PC. No subscription. No hallucinations.
 
----
-
-### **OVERVIEW**
-
-Legal Luminaire is an accuracy-first legal research + drafting workspace that runs locally and supports:
-- Case workspaces
-- Upload + RAG indexing (optional backend)
-- Verification tiers (VERIFIED / SECONDARY / PENDING)
-- Court-draft outputs (`.lex` + `.pdf`) for demo case packs (e.g. Hemraj stadium-collapse defence)
+[![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/placeholder/deploy-status)](https://app.netlify.com/)
 
 ---
 
-### **KEY FEATURES**
+## Why Legal Luminaire?
 
-#### **AI-POWERED CAPABILITIES**
-- **Legal Research**: Comprehensive legal research with precedent analysis
-- **Document Analysis**: Intelligent document processing and analysis
-- **Drafting Assistance**: AI-assisted legal document drafting
-- **Case Management**: Complete case workflow management
-- **Verification System**: Built-in accuracy verification and validation
+**Surgical precision.** The app catches what the prosecution misses.
 
-#### **LEGAL EXPERTISE**
-- **Multiple Domains**: 12+ legal domains covered
-- **Bilingual Support**: Hindi and English language support
-- **Precedent Database**: Extensive legal precedent database
-- **Regulatory Compliance**: Regulatory compliance analysis
-- **Technical Legal**: Technical-legal interface capabilities
+Real example from the included Hemraj case pack:  
+The prosecution's FSL report applied **IS 1199:2018** (fresh concrete standard) to hardened masonry mortar. The correct standard is **IS 2250:1981**. Legal Luminaire flags this automatically — instantly destroying the scientific basis of the prosecution's case.
 
-#### **QUALITY ASSURANCE**
-- **Accuracy Compliance**: Strict accuracy guidelines enforcement
-- **Verification System**: Multi-tier verification process
-- **Quality Control**: Comprehensive quality control measures
-- **Error Detection**: Advanced error detection and correction
-- **Professional Standards**: Professional legal standards compliance
+That's not a feature. That's a weapon.
 
 ---
 
-### **TECHNICAL ARCHITECTURE**
+## What it does
 
-#### **FRONTEND**
-- **React 19**: Modern React framework
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Modern styling framework
-- **Radix UI**: Accessible UI components
-- **Vite**: Fast build tool
-
-#### **BACKEND**
-- **FastAPI**: Python web framework
-- **CrewAI**: Multi-agent AI framework
-- **LangChain**: AI application framework
-- **ChromaDB**: Vector database for RAG
-- **Express**: Node.js API server
-
-#### **DEVELOPMENT**
-- **pnpm**: Package manager
-- **Monorepo**: Shared library packages
-- **TypeScript**: Strict type checking
-- **Zod**: Schema validation
-- **Docker**: Containerization support
+- Ingests FIRs, charge-sheets, FSL reports, and handwritten notes (PDF, DOCX, images)
+- Builds a case timeline and cross-reference matrix automatically
+- Researches precedents and scores them via the **Fact-Fit Gate** (0–100 pts)
+- Blocks unverified (PENDING) citations from all draft output
+- Generates court-ready documents in Hindi and English:
+  - Discharge applications
+  - Defence replies
+  - Bail applications
+  - Written submissions
+  - Oral argument notes
+- Every draft includes a **Verification Report** and **Pre-Filing Checklist**
 
 ---
 
-### **DOCUMENTATION**
+## Verification Tiers
 
-#### **GOVERNANCE**
-- **[Accuracy Guidelines](docs/ACCURACY_GUIDELINES.md)**: Strict accuracy rules
-- **[Modernization Plan](docs/MODERNIZATION_PLAN.md)**: Improvement roadmap
-- **[Cache Hygiene](docs/CACHE_HYGIENE.md)**: Cache management procedures
-- **[Self Assessment](docs/SELF_ASSESSMENT.md)**: Quality assessment
-
-#### **TESTING**
-- **[Test Data Guide](docs/SYNTHETIC_TEST_DATA_GUIDE.md)**: Synthetic test data
-- **[Test Case Matrix](docs/TEST_CASE_MATRIX_21.md)**: Test case specifications
-- **[Robustness Report](docs/ROBUSTNESS_REPORT.md)**: Robustness assessment
-- **[Document Library](docs/MISC_CASE_DOCUMENT_LIBRARY.md)**: Template library
-
-#### **MARKETING**
-- **[Marketing Task Spec](docs/MARKETING_TASK_SPEC.md)**: Marketing features
-- **[Marketing Showcase](docs/MARKETING_SHOWCASE_MAP.md)**: Marketing assets
-- **[Client Success Stories](test-assets/marketing-test-cases/client-success-stories.md)**: Success stories
-- **[Performance Metrics](test-assets/marketing-test-cases/performance-metrics.md)**: Performance data
+| Tier | Meaning | Draft Output |
+|------|---------|-------------|
+| `COURT_SAFE` | Certified copy + para number confirmed | ✅ Allowed |
+| `VERIFIED` | Confirmed on official source | ✅ Allowed |
+| `SECONDARY` | Credible secondary source | ⚠️ With qualification note |
+| `PENDING` | Unverified | ❌ Blocked |
+| `FATAL_ERROR` | Factually mismatched | ❌ Blocked |
 
 ---
 
-### **TEST ASSETS**
+## Quick Start (Local PC)
 
-#### **SYNTHETIC INPUTS**
-- **[Civil Cases](test-assets/synthetic-inputs/civil_case_notes.md)**: Civil dispute documents
-- **[Criminal Cases](test-assets/synthetic-inputs/criminal_complaint_summary.md)**: Criminal law documents
-- **[Property Cases](test-assets/synthetic-inputs/property_dispute_brief.md)**: Property law documents
-- **[All Documents](test-assets/synthetic-inputs/)**: Complete synthetic document collection
+**Prerequisites**: Node.js 18+, Python 3.11+ (optional)
 
-#### **TEMPLATES**
-- **[Legal Templates](test-assets/misc-case-docs/)**: Reusable legal templates
-- **[Case Documents](test-assets/misc-case-docs/synopsis_template.md)**: Case synopsis templates
-- **[Hearing Notes](test-assets/misc-case-docs/hearing_note_template.md)**: Hearing documentation
-- **[All Templates](test-assets/misc-case-docs/README.md)**: Complete template library
-
-#### **TEST CASES**
-- **[Comprehensive Test Suite](TEST_CASES/COMPREHENSIVE_TEST_SUITE/)**: 21 comprehensive test cases
-- **[Functional Tests](TEST_CASES/COMPREHENSIVE_TEST_SUITE/CONTRACT_LAW/)**: Functional test cases
-- **[Edge Cases](TEST_CASES/COMPREHENSIVE_TEST_SUITE/CRIMINAL_LAW/)**: Edge case testing
-- **[All Tests](TEST_CASES/COMPREHENSIVE_TEST_SUITE/README.md)**: Complete test documentation
-
----
-
-### **GETTING STARTED (LOCAL PC)**
-
-#### **PREREQUISITES**
-- **Node.js**: 18+
-- **Python**: 3.11+ (optional: only needed for backend/RAG)
-
-#### **Frontend (browser UI)**
 ```powershell
+# Frontend (browser UI)
 cd artifacts\legal-luminaire
 npm install --ignore-scripts
 npm run dev
 ```
-Open `http://localhost:5173/`
 
-#### **Backend (optional: RAG + multi-agent drafting)**
+Open `http://localhost:5173/` — the demo case (Hemraj stadium collapse) loads automatically.
+
 ```powershell
+# Backend (optional — enables RAG + multi-agent AI drafting)
 cd artifacts\legal-luminaire\backend
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env
+# Edit .env: set OPENAI_API_KEY and TAVILY_API_KEY
 uvicorn main:app --reload
 ```
 
-### **DOCS**
-- Start here: `docs/INDEX.md`
-- Local run manual: `docs/USER_MANUAL.md`
-- Video guide script (record-ready): `docs/VIDEO_GUIDE_SCRIPT.md`
-- Contributing: `CONTRIBUTING.md`
-- Roadmap: `ROADMAP.md`
+**Or run everything with Docker:**
 
-### **STATIC DEPLOY (FRONTEND-ONLY DEMO)**
-- **Netlify**: root `netlify.toml` builds `artifacts/legal-luminaire` and publishes `dist/`
-- **Vercel**: root `vercel.json` builds and rewrites SPA routes to `index.html`
+```powershell
+docker compose up --build
+```
 
-### **PYTHON DEPLOY (STREAMLIT CLOUD) 🚀**
-You can deploy the Python client instantly to **Streamlit Community Cloud** without a credit card.
-[![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
+---
+
+## Deploy
+
+### Streamlit Cloud (Python client — free, no credit card)
+
 1. Go to [share.streamlit.io](https://share.streamlit.io/)
-2. Connect your GitHub account and select this repository.
-3. Set the main file path to `streamlit_app.py`.
-4. Click **Deploy**.
+2. Connect your GitHub account and select this repo
+3. Set main file path: `streamlit_app.py`
+4. Click Deploy
 
-> Note: The static demo is **frontend-only**. Full RAG + AI agents require the FastAPI backend running locally or utilizing the Streamlit app with the backend API URL.
+### Netlify / Vercel (frontend-only static demo)
 
----
+- Netlify: root `netlify.toml` is pre-configured — just connect the repo
+- Vercel: root `vercel.json` is pre-configured — just connect the repo
 
-### **ACCURACY COMPLIANCE**
-
-#### **STRICT ACCURACY RULES**
-- **No Unverified Claims**: All claims must be verified
-- **Evidence-Based**: All content must be evidence-based
-- **Synthetic Data**: All test data clearly marked as synthetic
-- **Professional Standards**: Professional legal standards compliance
-- **Transparency**: Full transparency about limitations
-
-#### **QUALITY ASSURANCE**
-- **Multi-Tier Verification**: VERIFIED/SECONDARY/PENDING classification
-- **Error Detection**: Advanced error detection capabilities
-- **Quality Control**: Comprehensive quality control processes
-- **Regular Audits**: Regular accuracy audits
-- **Continuous Improvement**: Continuous quality improvement
+Both deploy the React SPA with SPA route rewrites. No backend required for demo mode.
 
 ---
 
-### **LEGAL DOMAINS**
+## Included Case Pack
 
-#### **PRIMARY DOMAINS**
-- **Civil Law**: Contract disputes, consumer protection, property matters
-- **Criminal Law**: Criminal complaints, defense strategies, investigations
-- **Corporate Law**: Corporate compliance, regulatory matters, governance
-- **Family Law**: Divorce proceedings, child custody, inheritance
-- **Property Law**: Property disputes, title issues, real estate
+`CASE_01_HemrajG/` — Hemraj Vardar, Special Sessions Case No. 1/2025, Udaipur
 
-#### **SPECIALIZED DOMAINS**
-- **Labor Law**: Employment disputes, wage issues, labor compliance
-- **Insurance Law**: Insurance claims, coverage disputes, risk assessment
-- **Tax Law**: Tax assessments, notices, compliance
-- **Environmental Law**: Environmental compliance, public safety
-- **Intellectual Property**: Patents, trademarks, copyrights
+Includes:
+- Defence Reply v3, v4, v5 (`.lex` + `.pdf`)
+- Discharge Application
+- Written Submission (HC Writ)
+- Standards Matrix (IS/ASTM/NABL)
+- Case Law Matrix (VERIFIED/SECONDARY/PENDING)
+- Cross-Reference Matrix
+- Forensic Protocol Checklist
 
 ---
 
-### **PERFORMANCE METRICS**
+## 21 Test Cases
 
-#### **ACCURACY METRICS**
-- **Legal Analysis**: 92% average accuracy
-- **Precedent Matching**: 88% accuracy
-- **Document Processing**: 95% accuracy
-- **Strategic Recommendations**: 90% accuracy
-- **Error Detection**: 85% accuracy
+Covers the full spectrum of Indian criminal and civil law:
 
-#### **PERFORMANCE METRICS**
-- **Processing Speed**: <2 seconds for simple documents
-- **Scalability**: Handles large document bundles
-- **Memory Efficiency**: Optimized memory usage
-- **System Reliability**: 95% reliability
-- **User Experience**: 90% satisfaction
-
----
-
-### **MARKETING CAPABILITIES**
-
-#### **DEMONSTRATION FEATURES**
-- **Success Stories**: 10 detailed client success stories
-- **Performance Metrics**: Comprehensive performance data
-- **Competitive Analysis**: Evidence-based competitive advantages
-- **Use Cases**: Practical application examples
-- **Testimonials**: Client testimonials
-
-#### **MARKETING ASSETS**
-- **Brochures**: Professional marketing brochures
-- **Presentations**: Sales presentation materials
-- **Case Studies**: Detailed case study documentation
-- **White Papers**: Technical white papers
-- **Video Content**: Demonstration videos
+| # | Type | Court | Charges |
+|---|------|-------|---------|
+| 01 | Building collapse / forensic | Sessions, Udaipur | IPC 304A + PCA |
+| 02 | Bail — NDPS | HC Rajasthan | NDPS §8/21/29 |
+| 03 | Discharge — NI Act | MM Court Delhi | NI Act §138 |
+| 04 | Bail — Domestic Violence | Sessions, Jaipur | IPC 498A + DV Act |
+| 05 | Bail — Cyber Fraud | Sessions, Mumbai | IT Act §66C/66D |
+| 06 | Writ — Land Acquisition | HC Rajasthan | Art. 226 |
+| 07 | Discharge — Medical Negligence | Sessions, Delhi | IPC 304A |
+| 08 | Bail — Road Accident | Sessions, Jodhpur | IPC 304A/279 |
+| 09 | Bail — Forest Offence | Sessions, Udaipur | Forest Act §26 |
+| 10 | Discharge — Arms Act | Sessions, Jaipur | Arms Act §25/27 |
+| 11 | Discharge — Corruption | Special Court | PCA §7/13 |
+| 12 | Bail — Murder | HC Rajasthan | IPC 302 |
+| 13 | Discharge — POCSO | Sessions, Kota | POCSO §4 + IPC 376 |
+| 14 | Bail — GST Fraud | Sessions, Delhi | CGST Act §132 |
+| 15 | Writ — Environment | NGT | EP Act + Water Act |
+| 16 | Written Submission — Landlord/Tenant | HC Rajasthan | Transfer of Property Act |
+| 17 | Writ — Service Matter | HC Rajasthan | Art. 226 |
+| 18 | Written Submission — Insurance | Consumer Forum | Consumer Protection Act |
+| 19 | Written Submission — Contract | Commercial Court | Contract Act §73/74 |
+| 20 | Application — Maintenance | Family Court | CrPC §125 / BNSS §144 |
+| 21 | Written Submission — Election | HC Rajasthan | RPA §100 |
 
 ---
 
-### **SUPPORT AND RESOURCES**
+## Architecture
 
-#### **DOCUMENTATION**
-- **[User Guide](docs/)**: Comprehensive user documentation
-- **[API Documentation](docs/api/)**: API reference documentation
-- **[Developer Guide](docs/development/)**: Development guidelines
-- **[Troubleshooting](docs/troubleshooting/)**: Common issues and solutions
-
-#### **COMMUNITY**
-- **GitHub Issues**: Bug reports and feature requests
-- **Discussions**: Community discussions and Q&A
-- **Wiki**: Community-maintained documentation
-- **Blog**: Latest updates and announcements
+```
+Frontend  →  React 19 + TypeScript + Vite + Tailwind CSS + Radix UI
+Backend   →  FastAPI + CrewAI + LangChain + ChromaDB (RAG)
+Deploy    →  Streamlit Cloud / Netlify / Vercel / Docker Compose
+```
 
 ---
 
-### **CONTRIBUTING**
+## Documentation
 
-#### **DEVELOPMENT GUIDELINES**
-- **Code Standards**: Follow established code standards
-- **Testing**: Comprehensive testing requirements
-- **Documentation**: Documentation requirements
-- **Review Process**: Code review process
-- **Quality Assurance**: Quality assurance procedures
-
-#### **CONTRIBUTION PROCESS**
-1. **Fork Repository**: Fork the repository
-2. **Create Branch**: Create feature branch
-3. **Make Changes**: Implement changes with testing
-4. **Submit PR**: Submit pull request
-5. **Review**: Code review and approval
-6. **Merge**: Merge to main branch
+- [User Manual](docs/USER_MANUAL.md) — local run guide
+- [Video Script](docs/VIDEO_MANUAL_SCRIPT.md) — record your own 8-minute demo
+- [Accuracy Rules](docs/accuracy-governance/ACCURACY_RULES.md) — mandatory governance
+- [Test Case Matrix](docs/testing/TEST_CASE_MATRIX_21.md) — 21 test cases
+- [Modernization Plan](docs/MODERNIZATION_PLAN.md) — Q2 2026 roadmap
+- [Contributing](CONTRIBUTING.md) — dev quickstart + PR guidelines
+- [Changelog](CHANGELOG.md) — version history
+- [Audit Report](AUDIT-REPORT-v1.0.md) — known issues + remediation plan
 
 ---
 
-### **LICENSE**
+## Accuracy Rules (non-negotiable)
 
-See `LICENSE` (MIT).
-
----
-
-### **DISCLAIMER**
-
-**IMPORTANT DISCLAIMER**: Legal Luminaire is an AI-powered legal assistance platform designed for educational and demonstration purposes. All synthetic documents, test cases, and examples are entirely fictional and do not represent any real legal matters, persons, or proceedings.
-
-**PROFESSIONAL USE**: This platform is not a substitute for professional legal advice. Always consult qualified legal professionals for actual legal matters.
-
-**ACCURACY**: While the platform maintains strict accuracy guidelines, users should verify all legal information before reliance.
+- Every citation: full case name + citation + court + date + verified URL + para number
+- Holdings: verbatim quotes only — paraphrasing is forbidden
+- IS 1199:2018 applies to **fresh concrete only** — never to hardened masonry mortar
+- IS 2250:1981 is the correct standard for masonry mortar
+- PENDING citations are blocked from all draft output
+- Fact-Fit Gate score < 30 → citation rejected, never used as primary authority
 
 ---
 
-### **VERSION INFORMATION**
+## Disclaimer
 
-**CURRENT VERSION**: 1.0.0  
-**RELEASE DATE**: April 3, 2026  
-**NEXT RELEASE**: Planned Q2 2026  
-**SUPPORT STATUS**: Active development  
+All synthetic documents, test cases, and examples are entirely fictional and do not represent any real legal matters, persons, or proceedings. This platform is not a substitute for professional legal advice.
 
 ---
 
-### **REPO ATTRACTION NOTES: THE VIRUTAL SENIOR ADVOCATE**
-- **Surgical Precision**: Our app catches what the prosecution misses. Example: Automatically detecting that the forensics lab applied fresh concrete standards (IS 1199:2018) to hardened masonry mortar (IS 2250:1981) — instantly destroying their case.
-- **Demo-first**: explore a complete case pack and see verification tiers.
-- **Court outputs**: `.lex` + `.pdf` artefacts included for the Hemraj case pack.
+**Legal Luminaire** — *Stop researching. Start winning.*
 
-> [!TIP]
-> 📺 **Want to see it in action?** 
-> Check out the [Video Training Manual Script](docs/VIDEO_MANUAL_SCRIPT.md) to record your own 3-minute viral showcase of the app tearing apart a prosecution's case.
-
----
-
-**LEGAL LUMINAIRE**  
-*AI-Powered Legal Excellence*  
-
----
-
-**VERSION**: 1.0.0  
-**LAST UPDATED**: April 3, 2026  
-**STATUS**: DEMO / IMAGINARY / TEST DATA  
-
----
-
-**IMPORTANT DISCLAIMER**: This platform and all associated materials are for educational and demonstration purposes only. All content is entirely fictional and does not represent any real legal matters, persons, or proceedings.
+MIT License
