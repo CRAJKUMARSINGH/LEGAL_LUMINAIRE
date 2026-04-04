@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, Send, Eye, FileText, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Save, Send, Eye, FileText, CheckCircle2, Printer } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -106,6 +106,10 @@ export default function DraftEditor({ params }: { params: { id: string } }) {
 
   const isSaving = createDraft.isPending || updateDraft.isPending;
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (isLoadingCase || (isEditing && isLoadingDraft)) {
     return (
       <AppLayout>
@@ -159,6 +163,13 @@ export default function DraftEditor({ params }: { params: { id: string } }) {
               disabled={isSaving || status === 'sent' || status === 'draft'}
             >
               <Send className="h-4 w-4 mr-2" /> Mark Sent
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handlePrint}
+              title="Print as A4"
+            >
+              <Printer className="h-4 w-4 mr-2" /> Print A4
             </Button>
           </div>
         </div>
@@ -302,6 +313,42 @@ export default function DraftEditor({ params }: { params: { id: string } }) {
             )}
           </div>
         </div>
+      </div>
+
+      {/* ── Hidden A4 Print Area ─────────────────────────────── */}
+      <div id="print-letter-area" style={{ display: "none" }} aria-hidden="true">
+        <div className="print-header">
+          <div>
+            <div style={{ fontWeight: "bold", fontSize: "13pt" }}>{toParty || "Recipient"}</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div>{format(new Date(), "dd MMMM yyyy")}</div>
+            <div style={{ marginTop: "6pt", fontWeight: "bold" }}>{fromParty}</div>
+          </div>
+        </div>
+
+        <div className="print-subject">
+          <span>Sub: </span>{subject}
+        </div>
+
+        <div className="print-salutation">Sir/Madam,</div>
+
+        <div className="print-body">{content}</div>
+
+        <div className="print-signature">
+          <div>Yours faithfully,</div>
+          <div style={{ marginTop: "48pt" }}>
+            <div className="print-sig-line" />
+            <div style={{ fontStyle: "italic", fontSize: "10pt" }}>Authorized Signatory</div>
+            <div style={{ fontWeight: "bold" }}>{fromParty}</div>
+          </div>
+        </div>
+
+        {enclosures && (
+          <div className="print-enclosures">
+            <strong>Enclosures:</strong> {enclosures}
+          </div>
+        )}
       </div>
     </AppLayout>
   );
