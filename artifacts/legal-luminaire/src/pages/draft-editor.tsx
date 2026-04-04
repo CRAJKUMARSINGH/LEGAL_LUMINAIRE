@@ -316,7 +316,7 @@ export default function DraftEditor({ params }: { params: { id: string } }) {
       </div>
 
       {/* ── Hidden A4 Print Area ─────────────────────────────── */}
-      <div id="print-letter-area" style={{ display: "none" }} aria-hidden="true">
+      <div id="print-letter-area" aria-hidden="true">
         <div className="print-header">
           <div>
             <div style={{ fontWeight: "bold", fontSize: "13pt" }}>{toParty || "Recipient"}</div>
