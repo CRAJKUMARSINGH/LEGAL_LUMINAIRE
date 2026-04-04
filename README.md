@@ -146,7 +146,15 @@ uvicorn main:app --reload
 - **Netlify**: root `netlify.toml` builds `artifacts/legal-luminaire` and publishes `dist/`
 - **Vercel**: root `vercel.json` builds and rewrites SPA routes to `index.html`
 
-> Note: this is a **frontend-only demo**. Full RAG + agents require the FastAPI backend running locally or on a private server with keys.
+### **PYTHON DEPLOY (STREAMLIT CLOUD) 🚀**
+You can deploy the Python client instantly to **Streamlit Community Cloud** without a credit card.
+[![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
+1. Go to [share.streamlit.io](https://share.streamlit.io/)
+2. Connect your GitHub account and select this repository.
+3. Set the main file path to `streamlit_app.py`.
+4. Click **Deploy**.
+
+> Note: The static demo is **frontend-only**. Full RAG + AI agents require the FastAPI backend running locally or utilizing the Streamlit app with the backend API URL.
 
 ---
 
@@ -282,12 +290,14 @@ See `LICENSE` (MIT).
 
 ---
 
-### **REPO ATTRACTION NOTES**
+### **REPO ATTRACTION NOTES: THE VIRUTAL SENIOR ADVOCATE**
+- **Surgical Precision**: Our app catches what the prosecution misses. Example: Automatically detecting that the forensics lab applied fresh concrete standards (IS 1199:2018) to hardened masonry mortar (IS 2250:1981) — instantly destroying their case.
 - **Demo-first**: explore a complete case pack and see verification tiers.
-- **Accuracy gate**: warns on OCR noise, blocks contradictory dates, deduplicates documents.
 - **Court outputs**: `.lex` + `.pdf` artefacts included for the Hemraj case pack.
 
-> Add screenshots/GIFs here once you record the demo (recommended).
+> [!TIP]
+> 📺 **Want to see it in action?** 
+> Check out the [Video Training Manual Script](docs/VIDEO_MANUAL_SCRIPT.md) to record your own 3-minute viral showcase of the app tearing apart a prosecution's case.
 
 ---
 

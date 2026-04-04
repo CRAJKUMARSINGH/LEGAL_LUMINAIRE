@@ -4,11 +4,11 @@
 ### EXECUTIVE SUMMARY
 
 **Strongest Defence Points:**
-1. **Surface Contamination Violation**: Mortar samples collected from weathered outer surface without removing contaminated layer, violating IS 1199 and international standards
-2. **Rain/Storm Sampling**: Collection during stormy weather compromised sample integrity through moisture contamination
-3. **Absence of Representative**: No contractor representative present during sampling/testing violates natural justice and BIS protocols
-4. **Chain of Custody Failure**: No documented chain of custody, storage conditions, or sealing procedures
-5. **Supreme Court Precedent**: Recent Kattavellai judgment establishes that forensic evidence without proper chain of custody loses evidentiary value
+1. **Foundational Scientific Error (Wrong Standard)**: Prosecution applied **IS 1199:2018** (Fresh Concrete only) to analyze **hardened masonry mortar** from a 15-year-old structure. This is a scientific mismatch; the correct standards are **IS 2250:1981** and **ASTM C1324**.
+2. **Surface Contamination Violation**: Mortar samples collected from weathered outer surface without removing contaminated layer (10-15mm depth), violating ASTM C1324 and masonry best practices.
+3. **Rain/Storm Sampling**: Collection during stormy weather compromised sample integrity; ASTM C780 explicitly invalidates such samples.
+4. **Absence of Representative & Reserve Sample**: No contractor representative present and no reserve sample provided violates IS 3535:1986 and principles of natural justice.
+5. **Chain of Custody Failure**: Complete absence of documented chain of custody from site to FSL, violating the SC Kattavellai 2025 mandate.
 
 ---
 
@@ -16,15 +16,19 @@
 
 ### A. INDIAN STANDARDS (BIS) VIOLATIONS
 
-#### IS 1199 - Methods of Sampling and Analysis of Concrete
+#### IS 1199:2018 - Methods of Sampling and Analysis of Concrete (WRONG STANDARD)
 
-**Key Violations:**
-- **Weather Protection Requirement**: IS 1199 mandates protection from rain/moisture during sampling
-- **Representative Sampling**: Requires systematic sampling methodology, not haphazard collection
-- **Storage Conditions**: Specific temperature and humidity requirements for sample preservation
+**The Foundational Error:**
+- **Scope Clause 1**: Specifically states it is for **Fresh Concrete** only.
+- **Inapplicability**: It has no jurisdiction over **Hardened Masonry Mortar**. Using this standard for an existing stone masonry wall is a "Scientific Category Error."
+- **Prosecution's Error**: By using the wrong standard, the prosecution applied testing methods and acceptance criteria that are irrelevant to the material in question.
 
-**Specific Clause Reference**: IS 1199:2018 (Latest Revision)
-- **Source**: [Archive.org BIS Portal](https://archive.org/details/gov.in.is.1199.2.2018)
+#### IS 2250:1981 - Preparation and Use of Masonry Mortars (CORRECT STANDARD)
+
+**Key Application:**
+- **Standard for Mortar**: The only Indian Standard specifically governing masonry mortars.
+- **Proportioning & Properties**: Defines the correct chemical and physical expectations for the mortar used in the stadium wall.
+- **Source**: [Archive.org BIS Portal](https://archive.org/details/gov.in.is.2250.1981)
 
 #### IS 4031 - Methods of Physical Tests for Hydraulic Cement
 
@@ -48,19 +52,14 @@
 
 ### B. SURFACE CONTAMINATION - CRITICAL DEFENCE POINT
 
-**Avoiding Surface Contamination Protocol:**
-> "The outer surface of the mortar is exposed to weathering, rain, and carbonation. The strict procedure requires removing the exposed outer layer and taking the sample from the inner depth of the joint. If they took surface-level scrapings (especially during rain), the sample is inherently compromised."
+#### ASTM C1324 - Hardened Masonry Mortar Analysis (CORRECT FORENSIC STD)
 
-**Technical Basis:**
-- Carbonation affects outer 5-10mm of mortar joints
-- Rain exposure causes leaching of cement compounds
-- Surface weathering alters chemical composition
-- Only inner core represents original mortar properties
+**The Mandate for Hardened Mortar:**
+- **Section 7 & 8**: Explicitly requires the removal of the **carbonated outer layer** (weathered crust) before taking a sample for chemical analysis.
+- **Depth Requirement**: Typically 10-15mm must be removed to reach the "unaltered core."
+- **Leaching Consideration**: Acknowledges that rain exposure (leaching) alters the cement-to-aggregate ratio in the outer layers.
 
-**Standard References:**
-- **ASTM C780**: Requires removal of weathered surface before sampling
-- **BS EN 1015-2**: Mandates sampling from uncontaminated core material
-- **IS 1199**: Prohibits sampling from deteriorated surfaces
+**Reference**: [ASTM C1324 Full Text](https://www.astm.org/c1324-20a.html)
 
 ### C. INTERNATIONAL STANDARDS SUPPORTING DEFENCE
 
@@ -139,8 +138,11 @@
 
 ### A. Primary Challenge - Forensic Report Inadmissibility
 
-**Argument 1: Surface Contamination**
-"The forensic laboratory tested samples from the weathered outer surface of mortar joints, which is scientifically invalid. As per IS 1199 and ASTM C780, the outer 5-10mm layer is contaminated by carbonation, rain exposure, and weathering. Only the inner core represents the original mortar properties. Testing surface scrapings is equivalent to testing a different material altogether."
+**Argument 1: Foundational Standard Mismatch (The "Wrong Yardstick")**
+"The entire forensic investigation is void ab initio because the prosecution applied **IS 1199:2018** — a standard strictly for **Fresh Concrete** — to analyze **Hardened Masonry Mortar** from a 15-year-old structure. This is not a minor deviation; it is a fundamental scientific error. Applying fresh concrete protocols to hardened mortar is scientifically equivalent to using a thermometer to measure weight. The report is based on an irrelevant standard and must be discarded."
+
+**Argument 2: Surface Contamination & Weathering**
+"The laboratory tested samples from the weathered outer surface without removing the carbonated layer. As per **ASTM C1324**, the outer 10-15mm layer is contaminated by carbonation and leaching over time. Testing surface level mortar scrapings taken during a storm (violating **ASTM C780**) ensures a 'failure' result that does not reflect the original construction quality."
 
 **Argument 2: Rain Contamination**
 "Samples were collected during stormy weather, causing moisture contamination that alters cement chemistry. This violates IS 1199 weather protection requirements and renders the samples scientifically unreliable for strength testing."

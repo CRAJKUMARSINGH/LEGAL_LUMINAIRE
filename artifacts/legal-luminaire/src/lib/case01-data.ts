@@ -552,26 +552,29 @@ export const ANNEXURE_DEMAND_LIST = [
   "FIR No. 496/2011 dated 28-12-2011 â€” certified copy",
   "Complete charge sheet with all annexures â€” certified copy",
   "Spot inspection memo / panchnama at sampling site â€” original",
-  "Sample collection memo (who, when, where, method) â€” original",
-  "Seal memo and sample label photographs â€” original",
+  "FIR No. 496/2011 dated 28-12-2011 — certified copy",
+  "Complete charge sheet with all annexures — certified copy",
+  "Spot inspection memo / panchnama at sampling site — original",
+  "Sample collection memo (who, when, where, method) — original",
+  "Seal memo and sample label photographs — original",
   "Dispatch register + malkhana register + custody transfer acknowledgments",
   "FSL inward register + seal verification letter at lab intake",
-  "Raw lab worksheet, machine logs, analyst notes â€” original",
+  "Raw lab worksheet, machine logs, analyst notes — original",
   "IMD / local weather records for 28-12-2011 (storm conditions)",
   "Any notice served to contractor for sampling attendance",
-  "IS 2250:1981 â€” certified/licensed copy (correct standard)",
-  "IS 3535:1986 â€” certified/licensed copy (contractor presence requirement)",
-  "ASTM C1324 â€” certified copy (carbonated layer removal requirement)",
-  "Kattavellai @ Devakar v. State of TN (2025 INSC 845) â€” certified copy",
-  "State of Maharashtra v. Damu (2000) 6 SCC 269 â€” certified copy",
-  "State of Punjab v. Baldev Singh (1999) 6 SCC 172 â€” certified copy",
-  "Rajasthan HC Suo Motu PIL orders (29 July 2025 + 23 August 2025) â€” certified copies",
-  "Structural condition report of stadium wall (pre-collapse) â€” if any",
-  "Photographs of extraction process â€” if any",
+  "IS 2250:1981 — certified/licensed copy (correct standard)",
+  "IS 3535:1986 — certified/licensed copy (contractor presence requirement)",
+  "ASTM C1324 — certified copy (carbonated layer removal requirement)",
+  "Kattavellai @ Devakar v. State of TN (2025 INSC 845) — certified copy",
+  "State of Maharashtra v. Damu (2000) 6 SCC 269 — certified copy",
+  "State of Punjab v. Baldev Singh (1999) 6 SCC 172 — certified copy",
+  "Rajasthan HC Suo Motu PIL orders (29 July 2025 + 23 August 2025) — certified copies",
+  "Structural condition report of stadium wall (pre-collapse) — if any",
+  "Photographs of extraction process — if any",
   "Analyst qualifications / NABL accreditation certificate of FSL",
 ];
 
-// â”€â”€â”€ CASE METADATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ————————————————————————————————————————————————————————————————————————————————————————————————
 // Source: WRITTEN_SUBMISSION_RHC_FINAL_v3.lex
 
 export const CASE01_META = {
@@ -606,8 +609,13 @@ export const CASE01_META = {
 export const CASE01_ARGUMENT_PARAGRAPHS = [
   {
     id: "arg1",
+    ground: "Foundational Scientific Error (Wrong Standard)",
+    para: "It is respectfully submitted that the entire forensic foundation is void ab initio because the prosecution applied IS 1199:2018 — a standard strictly for 'Fresh Concrete' — to analyze 'Hardened Masonry Mortar' from a 15-year-old structure. This is a scientific category error. As per the Hon'ble Supreme Court in Tomaso Bruno v. State of Uttar Pradesh (2015) 7 SCC 178, expert evidence based on a defective foundation or incorrect assumptions cannot be relied upon. The correct standards were IS 2250:1981 and ASTM C1324, which were entirely ignored.",
+  },
+  {
+    id: "arg2",
     ground: "Chain of Custody",
-    para: "It is submitted that the prosecution has not established an unbroken chain of custody for the impugned mortar samples from collection to laboratory analysis. In absence of documentary continuity regarding sealing, transit, custody transfer, and laboratory receipt, the forensic opinion cannot be treated as a reliable incriminating foundation at the stage of charge. The Hon'ble Supreme Court in Kattavellai @ Devakar v. State of Tamil Nadu (2025 INSC 845) has laid down binding nationwide guidelines requiring a Chain of Custody Register to be maintained from collection to the logical end of the proceedings.",
+    para: "It is further submitted that the prosecution has not established an unbroken chain of custody for the impugned mortar samples from collection to laboratory analysis. In absence of documentary continuity regarding sealing, transit, custody transfer, and laboratory receipt, the forensic opinion cannot be treated as a reliable incriminating foundation at the stage of charge. The Hon'ble Supreme Court in Kattavellai @ Devakar v. State of Tamil Nadu (2025 INSC 845) has laid down binding nationwide guidelines requiring a Chain of Custody Register to be maintained from collection to the logical end of the proceedings.",
   },
   {
     id: "arg2",

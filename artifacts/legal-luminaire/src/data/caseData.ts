@@ -8,7 +8,7 @@ export const caseInfo = {
   court: "Sessions Court, Udaipur",
   status: "Active — Defence Preparation",
   summary:
-    "Outer stadium wall collapse post-construction/repair phase. Prosecution relies on FSL mortar quality report. Defence challenges sampling methodology, chain of custody, weather contamination, and absence of contractor representation.",
+    "Outer stadium wall collapse occurred post-construction. Prosecution based its case on an FSL report using IS 1199:2018 (Fresh Concrete standard), which is technologically inapplicable to the hardened masonry mortar sampled. Defence challenges this foundational scientific error, along with sampling methodology, chain of custody, and weather contamination.",
 };
 
 export const timelineEvents = [
@@ -139,9 +139,23 @@ export const standardsMatrix = [
   {
     standard: "IS 1199:2018",
     proposition:
-      "Sampling must be systematic and representative; process discipline matters before testing inference",
-    caseFact: "Haphazard collection claim weakens representativeness",
-    confidence: "SECONDARY" as const,
+      "WRONG STANDARD. Applies to FRESH CONCRETE only; cannot be used for hardened masonry mortar in existing structures.",
+    caseFact: "Prosecution's entire case rests on this foundational category error.",
+    confidence: "VERIFIED" as const,
+  },
+  {
+    standard: "IS 2250:1981",
+    proposition:
+      "CORRECT standard for masonry mortar. Mandates weather protection.",
+    caseFact: "Directly applicable to stadium wall mortar joints.",
+    confidence: "VERIFIED" as const,
+  },
+  {
+    standard: "ASTM C1324",
+    proposition:
+      "CORRECT forensic standard for hardened mortar. Mandates removal of carbonated outer layer (10-15mm) before analysis.",
+    caseFact: "Prosecution's failure to remove surface layer ensures 'failure' due to natural weathering, not poor construction.",
+    confidence: "VERIFIED" as const,
   },
   {
     standard: "IS 3535:1986",
@@ -194,7 +208,7 @@ export const standardsMatrix = [
 
 export const caseDocuments = [
   { name: "Comprehensive_Legal_Defence_Report_Stadium_Collapse.md", type: "report", size: "45 KB" },
-  { name: "DEFENCE_REPLY_FINAL_v4.pdf", type: "draft", size: "32 KB" },
+  { name: "DEFENCE_REPLY_FINAL_v5.lex", type: "application", size: "40 KB" },
   { name: "DEFENCE_REPLY_FINAL_v4.lex", type: "application", size: "36 KB" },
   { name: "DEFENCE_REPLY_UPDATED_v2.lex", type: "draft", size: "78 KB" },
   { name: "DISCHARGE_APPLICATION_UPDATED_v2.lex", type: "application", size: "65 KB" },
