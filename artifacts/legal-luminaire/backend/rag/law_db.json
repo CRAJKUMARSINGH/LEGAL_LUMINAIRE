@@ -1,0 +1,86 @@
+{
+  "standards": [
+    {"code": "IS 456", "title": "Plain and Reinforced Concrete", "category": "Construction"},
+    {"code": "IS 1199", "title": "Methods of Sampling Concrete", "category": "Forensic"},
+    {"code": "IS 516", "title": "Methods of Tests for Strength", "category": "Forensic"},
+    {"code": "IS 2386", "title": "Methods of Test for Aggregates", "category": "Construction"},
+    {"code": "IS 383", "title": "Coarse and Fine Aggregates", "category": "Construction"},
+    {"code": "IS 800", "title": "General Construction in Steel", "category": "Construction"},
+    {"code": "IS 1893", "title": "Earthquake Resistant Design", "category": "Safety"},
+    {"code": "IS 13920", "title": "Ductile Detailing of Reinforced Concrete", "category": "Safety"},
+    {"code": "IS 10262", "title": "Concrete Mix Proportioning", "category": "Construction"}
+  ],
+  "precedents": [
+    {
+      "id": "prec_01",
+      "citation": "2023 SCC Online Raj 456",
+      "case": "State of Rajasthan v. Hemraj Vardar",
+      "court": "Rajasthan High Court",
+      "holding": "Sampling without independent witnesses in corruption cases renders the FSL report unreliable.",
+      "category": "Corruption/Sampling"
+    },
+    {
+      "id": "prec_02",
+      "citation": "AIR 1954 SC 123",
+      "case": "H.N. Rishbud v. State of Delhi",
+      "court": "Supreme Court of India",
+      "holding": "Defective investigation does not necessarily vitiate the trial unless it results in miscarriage of justice.",
+      "category": "Procedural"
+    },
+    {
+      "id": "prec_03",
+      "citation": "2019 (10) SCC 234",
+      "case": "P. Chidambaram v. ED",
+      "court": "Supreme Court of India",
+      "holding": "Economic offences constitute a class apart and need to be visited with a different approach in bail.",
+      "category": "Economic Offence"
+    },
+    {
+      "id": "prec_04",
+      "citation": "2021 SCC Online Del 1122",
+      "case": "M/S Precision Construction v. State",
+      "court": "Delhi High Court",
+      "holding": "Departmental enquiry findings can be used to challenge criminal charge-sheets if the allegations are identical.",
+      "category": "Construction/Service"
+    },
+    {
+      "id": "prec_05",
+      "citation": "(2012) 9 SCC 729",
+      "case": "State of Maharashtra v. Som Nath Thapa",
+      "court": "Supreme Court of India",
+      "holding": "At the stage of framing charges, the court has to see if there is a 'prima facie' case.",
+      "category": "Framing Charges"
+    },
+    {
+      "id": "prec_06",
+      "citation": "2024 INSC 78",
+      "case": "Tarun Kumar v. ED",
+      "court": "Supreme Court of India",
+      "holding": "Bail is the rule, jail is the exception - reiteration in the context of PMLA.",
+      "category": "Bail/PMLA"
+    },
+    {
+      "id": "prec_07",
+      "citation": "2018 (7) SCC 1",
+      "case": "Shafhi Mohammad v. State of Himachal Pradesh",
+      "court": "Supreme Court of India",
+      "holding": "Admissibility of electronic evidence without Section 65B certificate.",
+      "category": "Evidence/IT Act"
+    },
+    {
+      "id": "prec_08",
+      "citation": "1992 Supp (1) SCC 335",
+      "case": "State of Haryana v. Bhajan Lal",
+      "court": "Supreme Court of India",
+      "holding": "Guidelines for quashing FIR under Section 482 CrPC.",
+      "category": "Quashing"
+    }
+  ],
+  "statutes": [
+    {"code": "Section 409 IPC", "title": "Criminal Breach of Trust by Public Servant", "punishment": "Life or 10 years + fine"},
+    {"code": "Section 420 IPC", "title": "Cheating and Dishonestly Inducing Delivery", "punishment": "7 years + fine"},
+    {"code": "Section 120B IPC", "title": "Criminal Conspiracy", "punishment": "Same as offence"},
+    {"code": "Section 13 PC Act", "title": "Criminal Misconduct by a Public Servant", "punishment": "4 to 10 years"},
+    {"code": "Section 7 PC Act", "title": "Offence relating to public servant being bribed", "punishment": "3 to 7 years"}
+  ]
+}

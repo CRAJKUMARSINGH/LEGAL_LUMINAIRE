@@ -1,0 +1,72 @@
+version: "3.9"
+
+# Legal Luminaire — Optimized Full Stack Local Setup
+# Usage: docker compose up
+# Requires: OPENAI_API_KEY and TAVILY_API_KEY in .env
+
+services:
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: artifacts/legal-luminaire
+      dockerfile: Dockerfile.frontend.optimized
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:8000/api/v1
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend:
+    build:
+      context: artifacts/legal-luminaire/backend
+      dockerfile: Dockerfile.optimized
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+      - CHROMA_PATH=/data/chroma_db
+      - CASE_DOCS_PATH=/data/case_docs
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - chroma_data:/data/chroma_db
+      - case_docs:/data/case_docs
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  chroma_data:
+  case_docs:
+  redis_data:
