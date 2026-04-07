@@ -1,11 +1,19 @@
-export type VerificationTier = "VERIFIED" | "SECONDARY" | "PENDING";
+/**
+ * Citation Formatter — Legal Luminaire
+ * Formatting utilities for case law citations.
+ * VerificationTier re-exported from verification-engine (single source of truth).
+ */
+
+// Re-export from the single source of truth — do not redefine
+export type { AccuracyTier as VerificationTier } from "./verification-engine";
+
 export type VerifiedBy = "case-file" | "indiankanoon" | "manual" | "unknown";
 
 export interface CaseLawMatrixEntry {
   case: string;
   court: string;
   useForDefence: string;
-  status: VerificationTier;
+  status: "COURT_SAFE" | "VERIFIED" | "SECONDARY" | "PENDING" | "FATAL_ERROR";
   action: string;
   year?: string;
   reporter?: string;
@@ -27,8 +35,8 @@ export function formatCitation(entry: CaseLawMatrixEntry): string {
 export function findCitationsInText(
   text: string,
   entries: Array<Pick<CaseLawMatrixEntry, "case" | "status">>
-): Array<{ case: string; status: VerificationTier }> {
-  const hits: Array<{ case: string; status: VerificationTier }> = [];
+): Array<{ case: string; status: CaseLawMatrixEntry["status"] }> {
+  const hits: Array<{ case: string; status: CaseLawMatrixEntry["status"] }> = [];
   const hay = (text || "").toLowerCase();
   for (const e of entries) {
     const needle = (e.case || "").toLowerCase();

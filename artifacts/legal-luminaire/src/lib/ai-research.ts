@@ -28,13 +28,9 @@ export type DatabaseSource =
 /** Fact-fit level derived from 3-axis score */
 export type FitLevel = "exact" | "analogous" | "weak" | "rejected";
 
-/** Verification tier for a citation */
-export type VerificationTier =
-  | "COURT_SAFE"   // certified copy + para number confirmed
-  | "VERIFIED"     // existence confirmed on official source
-  | "SECONDARY"    // credible secondary source, needs primary verification
-  | "PENDING"      // unverified — must not appear in filed documents
-  | "FATAL_ERROR"; // factually mismatched or fabricated — blocked
+// Import from single source of truth and re-export for consumers
+import type { AccuracyTier as VerificationTier } from "./verification-engine";
+export type { AccuracyTier as VerificationTier } from "./verification-engine";
 
 export type FitScoreBreakdown = {
   incidentScore: number;   // 0-40
