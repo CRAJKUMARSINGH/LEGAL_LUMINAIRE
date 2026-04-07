@@ -42,6 +42,8 @@ export default function CaseIntakeAssistant() {
   const [court, setCourt] = useState("");
   const [caseNo, setCaseNo] = useState("");
   const [brief, setBrief] = useState("");
+  const [caseType, setCaseType] = useState<CaseRecord["case_type"]>("discharge");
+  const [accusedName, setAccusedName] = useState("");
   const [incidentDate, setIncidentDate] = useState("");
   const [firDate, setFirDate] = useState("");
   const [arrestDate, setArrestDate] = useState("");
@@ -141,6 +143,10 @@ export default function CaseIntakeAssistant() {
       brief: brief.trim(),
       createdAt: new Date().toISOString(),
       files: files.map(({ name, size, type }) => ({ name, size, type })),
+      case_type: caseType,
+      parties: accusedName.trim()
+        ? [{ name: accusedName.trim(), role: "accused" as const }]
+        : [],
     };
     addCase(record);
     setCreated(true);
@@ -186,6 +192,25 @@ export default function CaseIntakeAssistant() {
             placeholder="Court name"
             value={court}
             onChange={(e) => setCourt(e.target.value)}
+          />
+          <select
+            className="border rounded-lg px-3 py-2 text-sm bg-background"
+            value={caseType}
+            onChange={(e) => setCaseType(e.target.value as CaseRecord["case_type"])}
+          >
+            <option value="discharge">Discharge Application</option>
+            <option value="bail">Bail Application</option>
+            <option value="writ">Writ Petition</option>
+            <option value="notice-reply">Notice Reply</option>
+            <option value="appeal">Appeal</option>
+            <option value="revision">Revision</option>
+            <option value="other">Other</option>
+          </select>
+          <input
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="Accused / Petitioner name"
+            value={accusedName}
+            onChange={(e) => setAccusedName(e.target.value)}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

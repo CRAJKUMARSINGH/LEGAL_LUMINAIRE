@@ -23,6 +23,7 @@ type CaseContextType = {
 
 const CaseContext = createContext<CaseContextType | null>(null);
 
+// Support both live app (/api) and local backend (/api/v1)
 const API_BASE = import.meta.env.VITE_API_URL || "/api/v1";
 
 export function CaseProvider({ children }: { children: React.ReactNode }) {
@@ -32,20 +33,25 @@ export function CaseProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Optionally sync from backend — never blocks UI
+  // Optionally sync from backend — never blocks UI, tries live app prefix first
   useEffect(() => {
     async function syncFromBackend() {
-      try {
-        const res = await fetch(`${API_BASE}/cases`, { signal: AbortSignal.timeout(3000) });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setCases(data);
-            saveCases(data);
+      // Try live app prefix first (/api), then local backend (/api/v1)
+      const endpoints = ["/api/cases", `${API_BASE}/cases`];
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              setCases(data);
+              saveCases(data);
+              break; // stop on first success
+            }
           }
+        } catch {
+          // try next endpoint
         }
-      } catch {
-        // Backend unavailable — localStorage data already loaded, continue silently
       }
     }
     syncFromBackend();

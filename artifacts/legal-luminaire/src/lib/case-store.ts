@@ -4,6 +4,28 @@ export type CaseFile = {
   type: string;
 };
 
+/** Party to a case — from live app schema */
+export type CaseParty = {
+  id?: string;
+  name: string;
+  role: "accused" | "complainant" | "petitioner" | "respondent" | "witness" | "other";
+  address?: string;
+  lawyer?: string;
+};
+
+/** Verified citation entry — from live app schema */
+export type CaseCitation = {
+  id?: string;
+  caseName: string;
+  citation: string;
+  court: string;
+  year?: string;
+  holding?: string;
+  status: "COURT_SAFE" | "VERIFIED" | "SECONDARY" | "PENDING" | "FATAL_ERROR";
+  sourceUrl?: string;
+  blockedFromDraft?: boolean;
+};
+
 export type CaseRecord = {
   id: string;
   title: string;
@@ -12,8 +34,16 @@ export type CaseRecord = {
   brief: string;
   createdAt: string;
   files: CaseFile[];
-  status?: string;
-  charges?: string;
+
+  // From live app schema
+  case_type?: "bail" | "discharge" | "writ" | "notice-reply" | "appeal" | "revision" | "other";
+  status?: string;                     // case status (active, archived, draft)
+  filing_date?: string;                // ISO date string
+  charges?: string | string[];         // supports both old string and new array format
+  parties?: CaseParty[];               // structured party list
+  citations?: CaseCitation[];          // verified citations attached to case
+
+  // Existing extended fields
   forensic_grounding?: Array<{ code: string; title: string; keywords: string[]; violations: string[] }>;
   documents?: Array<{ id: string; name: string; type: string; status: string; size: number; uploadedAt: string; description?: string }>;
   caseLaw?: Array<{ case: string; court: string; useForDefence: string; status: string; action: string; citation?: string; holding?: string; fitScore?: number }>;
@@ -29,13 +59,13 @@ export type CaseRecord = {
     estimatedDuration: string;
     requiredResources: string[];
   };
-  collisions?: Array<{ 
-    id: string; 
-    type: string; 
-    description: string; 
-    evidence_a: string; 
-    evidence_b: string; 
-    target_event_id?: number; 
+  collisions?: Array<{
+    id: string;
+    type: string;
+    description: string;
+    evidence_a: string;
+    evidence_b: string;
+    target_event_id?: number;
     severity: string;
   }>;
 };
@@ -50,11 +80,25 @@ export const defaultCase: CaseRecord = {
   title: "Special Session Case 1/2025 - Hemraj Vardar",
   court: "Special Session Judge (PC Act), Udaipur, Rajasthan",
   caseNo: "1/2025",
-  brief:
-    "Stadium outer wall partial collapse; prosecution relies on mortar forensic failure; defence alleges rain-time sampling, no representative, no chain-of-custody.",
+  brief: "Stadium outer wall partial collapse; prosecution relies on mortar forensic failure; defence alleges rain-time sampling, no representative, no chain-of-custody.",
   createdAt: new Date().toISOString(),
   files: [],
+  case_type: "discharge",
+  filing_date: "2025-01-01",
+  charges: ["IPC 304A", "PC Act §13(1)(d)", "IPC 120B"],
+  parties: [
+    { name: "Hemraj Vardar", role: "accused", lawyer: "Defence Counsel" },
+    { name: "State of Rajasthan", role: "complainant" },
+  ],
+  citations: [],
 };
+
+/** Normalise charges to always return a string array */
+export function getChargesArray(record: CaseRecord): string[] {
+  if (!record.charges) return [];
+  if (Array.isArray(record.charges)) return record.charges;
+  return [record.charges];
+}
 
 export function loadCases(): CaseRecord[] {
   try {
