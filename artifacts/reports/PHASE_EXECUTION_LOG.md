@@ -105,7 +105,7 @@ Assessment based on static code analysis and simulated workflow tracing.
 **Deliverables:**
 - `docs/marketing/MARKETING_TASK_SPEC.md` — Demo mode feature spec
 - `docs/marketing/MARKETING_SHOWCASE_MAP.md` — Walkthroughs, use-case cards, social posts
-- `test-assets/test-cases/marketing-showcase/` — 4 showcase case files
+- `Sample_cases/showcase/` — 4 showcase case files
 
 **Content Created:**
 - 3 demo walkthroughs (5-min, 3-min, 5-min)

@@ -55,13 +55,13 @@ Evidence files:
 - `CASE01_HEMRAJ_STATE_2025/` — 25+ page Hindi discharge application
 - `docs/case-docs/MISC_CASE_DOCUMENT_LIBRARY.md` — 20 templates
 - `docs/testing/SYNTHETIC_TEST_DATA_GUIDE.md` — 21 synthetic inputs
-- `test-assets/test-cases/marketing-showcase/` — 4 showcase cases
+- `Sample_cases/showcase/` — 4 showcase cases
 
 ### Marketing Usefulness: 7/10
 Evidence files:
 - `docs/marketing/MARKETING_TASK_SPEC.md` — demo mode spec
 - `docs/marketing/MARKETING_SHOWCASE_MAP.md` — walkthroughs + copy
-- `test-assets/test-cases/marketing-showcase/` — 4 showcase files
+- `Sample_cases/showcase/` — 4 showcase files
 - Demo mode not yet implemented in UI (confirmed by App.tsx inspection)
 
 ### Repo Readiness: 7/10

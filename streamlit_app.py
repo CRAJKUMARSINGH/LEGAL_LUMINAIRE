@@ -275,4 +275,4 @@ sampled from a collapsed wall. The correct standard is **IS 2250:1981** (masonry
         st.info("Case 01 folder not found. Clone the full repo to access the case pack.")
 
     st.divider()
-    st.markdown("**21 Test Cases available** — see `test-cases/README.md` for the full index.")
+    st.markdown("**21 Test Cases available** — see `Sample_cases/functional/` for all TC-01 to TC-21 specs.")

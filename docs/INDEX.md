@@ -11,6 +11,7 @@
 - Robustness report: `docs/testing/ROBUSTNESS_REPORT.md`
 - Test case matrix (21 cases): `docs/testing/TEST_CASE_MATRIX_21.md`
 - Synthetic test data guide: `docs/testing/SYNTHETIC_TEST_DATA_GUIDE.md`
+- All sample cases (21 functional + edge + stress + showcase): `Sample_cases/`
 
 ## Product / Marketing
 - Demo mode spec: `docs/task-specs/DEMO_MODE_TASK_SPEC.md`

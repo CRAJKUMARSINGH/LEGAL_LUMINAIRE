@@ -2,7 +2,7 @@
 ## Version 1.0 | April 3, 2026
 
 > All test cases are SYNTHETIC / FICTIONAL unless marked as real case data.
-> Test IDs map to folders in `test-cases/` and `test-assets/test-cases/`.
+> Test IDs map to folders in `test-cases/` and `Sample_cases/`.
 
 ---
 

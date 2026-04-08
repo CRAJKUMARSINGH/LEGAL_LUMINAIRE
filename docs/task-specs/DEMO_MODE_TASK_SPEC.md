@@ -73,7 +73,7 @@ See `docs/marketing/MARKETING_TASK_SPEC.md` for full output type matrix.
 ## TRACEABILITY
 | Requirement | Source |
 |-------------|--------|
-| 21 case types | `test-assets/test-cases/functional/TC-01 to TC-21` |
+| 21 case types | `Sample_cases/functional/TC-01 to TC-21` |
 | Demo outputs | `artifacts/demo-outputs/` |
 | Accuracy rules | `docs/accuracy-governance/ACCURACY_RULES.md` |
 | Marketing copy | `docs/marketing/MARKETING_SHOWCASE_MAP.md` |
