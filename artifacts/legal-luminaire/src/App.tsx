@@ -28,6 +28,7 @@ const VerificationPanel = lazy(() => import("@/pages/VerificationPanel"));
 const ForensicFAQ = lazy(() => import("@/pages/ForensicFAQ"));
 const SafeDraftPage = lazy(() => import("@/pages/SafeDraftPage"));
 const NoticeReplyPage = lazy(() => import("@/pages/NoticeReplyPage"));
+const DischargeApplicationPrint = lazy(() => import("@/pages/DischargeApplicationPrint"));
 
 // Lazy load heavy view components
 const DynamicDashboardView = lazy(() => import("@/components/views/DynamicDashboardView").then(module => ({ default: module.DynamicDashboardView })));
@@ -82,6 +83,7 @@ const NAV_GROUPS: NavGroup[] = [
       { path: "/defence-reply", label: "डिफेंस रिप्लाई", labelEn: "Defence Reply",   icon: FileText,        caseScoped: true },
       { path: "/safe-draft",  label: "सेफ ड्राफ्ट",   labelEn: "Safe Draft Editor",  icon: ShieldCheck,     caseScoped: true, badge: "NEW" },
       { path: "/notice-reply", label: "नोटिस रिप्लाई", labelEn: "Notice Reply",       icon: FileText,        caseScoped: true, badge: "NEW" },
+      { path: "/discharge-print", label: "डिस्चार्ज PDF", labelEn: "Discharge PDF v5",  icon: Scale,           caseScoped: true, badge: "NEW" },
       { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments",     icon: Mic,             caseScoped: true },
     ],
   },
@@ -258,6 +260,7 @@ function Router() {
         <Route path="/case/:id/drafting"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><DraftingView /></Suspense></div>} />
         <Route path="/case/:id/safe-draft"            component={() => <Suspense fallback={<LoadingFallback />}><SafeDraftPage /></Suspense>} />
         <Route path="/case/:id/notice-reply"          component={() => <Suspense fallback={<LoadingFallback />}><NoticeReplyPage /></Suspense>} />
+        <Route path="/case/:id/discharge-print"       component={() => <Suspense fallback={<LoadingFallback />}><DischargeApplicationPrint /></Suspense>} />
         <Route path="/case/:id/verification"          component={() => <Suspense fallback={<LoadingFallback />}><VerificationPanel /></Suspense>} />
         <Route path="/case/:id/filing-checklist"      component={() => <Suspense fallback={<LoadingFallback />}><FilingChecklist /></Suspense>} />
         <Route path="/case/:id/discharge-application" component={() => <Suspense fallback={<LoadingFallback />}><DischargeApplication /></Suspense>} />
