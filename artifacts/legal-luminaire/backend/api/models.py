@@ -30,6 +30,7 @@ class ResearchResponse(BaseModel):
     tasks_output: list[TaskOutput] = Field(default_factory=list)
     error: Optional[str] = None
     doc_count: int = 0
+    citation_gate: dict = Field(default_factory=dict)
 
 
 class UploadResponse(BaseModel):

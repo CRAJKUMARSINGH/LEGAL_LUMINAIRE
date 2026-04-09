@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import shutil
 import uuid
 from pathlib import Path
@@ -41,6 +42,29 @@ ALLOWED_EXTENSIONS = {".pdf", ".md", ".txt", ".lex", ".doc", ".docx", ".jpg", ".
 _jobs: dict[str, dict] = {}
 
 
+def _evaluate_citation_gate(text: str) -> dict:
+    """
+    Server-side citation status gate.
+    Blocks downstream export when PENDING/FATAL_ERROR appears in output.
+    """
+    normalized = (text or "").upper()
+    statuses = {
+        "COURT_SAFE": len(re.findall(r"\bCOURT_SAFE\b", normalized)),
+        "VERIFIED": len(re.findall(r"\bVERIFIED\b", normalized)),
+        "SECONDARY": len(re.findall(r"\bSECONDARY\b", normalized)),
+        "PENDING": len(re.findall(r"\bPENDING\b", normalized)),
+        "FATAL_ERROR": len(re.findall(r"\bFATAL_ERROR\b", normalized)),
+    }
+    must_block = statuses["PENDING"] > 0 or statuses["FATAL_ERROR"] > 0
+    needs_ack = statuses["SECONDARY"] > 0 and not must_block
+    return {
+        "statuses": statuses,
+        "must_block": must_block,
+        "needs_ack": needs_ack,
+        "download_allowed": not must_block,
+    }
+
+
 def _safe_filename(name: str) -> str:
     base = Path(name).name
     base = "".join(ch for ch in base if ch.isprintable() and ch not in {"\x00", "\n", "\r", "\t"})
@@ -59,6 +83,18 @@ def _run_crew_job(job_id: str, req: ResearchRequest, case_context: str) -> None:
             procedural_defects=req.procedural_defects,
             mode=req.mode,
         )
+        # Server-side citation gate enforcement to prevent UI bypass.
+        citation_gate = _evaluate_citation_gate(result.get("draft", ""))
+        result["citation_gate"] = citation_gate
+        if citation_gate["must_block"]:
+            result["success"] = False
+            result["draft"] = ""
+            block_msg = (
+                "Citation gate blocked output due to unresolved "
+                f"PENDING={citation_gate['statuses']['PENDING']} or "
+                f"FATAL_ERROR={citation_gate['statuses']['FATAL_ERROR']}."
+            )
+            result["error"] = f"{result.get('error', '')} {block_msg}".strip()
         _jobs[job_id]["status"] = "done"
         _jobs[job_id]["result"] = result
     except Exception as e:
@@ -212,6 +248,7 @@ async def get_research_result(case_id: str, job_id: str):
             draft="",
             error=f"Job {status} — poll again shortly",
             doc_count=get_case_doc_count(case_id),
+            citation_gate={},
         )
 
     result = job["result"] or {}
@@ -226,6 +263,7 @@ async def get_research_result(case_id: str, job_id: str):
         ],
         error=result.get("error"),
         doc_count=get_case_doc_count(case_id),
+        citation_gate=result.get("citation_gate", {}),
     )
 
 
