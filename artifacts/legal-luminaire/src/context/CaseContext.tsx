@@ -3,7 +3,7 @@
  * PROTECTED FILE — always falls back to localStorage, never backend-only.
  */
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { CaseRecord, defaultCase, loadCases, saveCases, loadSelectedCaseId, saveSelectedCaseId } from "@/lib/case-store";
+import { CaseRecord, defaultCase, loadCases, saveCases, loadSelectedCaseId, saveSelectedCaseId, isSeeded, markSeeded } from "@/lib/case-store";
 import { CASE_TEMPLATES, generateCaseFromTemplate } from "@/lib/case-templates";
 import type { CaseTemplate } from "@/lib/multi-case-store";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +32,23 @@ export function CaseProvider({ children }: { children: React.ReactNode }) {
   const [selectedCaseId, setSelectedCaseIdState] = useState<string>(() => loadSelectedCaseId());
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Seed infra arb cases on first load (TC-22 to TC-26)
+  useEffect(() => {
+    if (!isSeeded()) {
+      import("@/data/demo-cases/infra-arb-cases").then(({ INFRA_ARB_CASES }) => {
+        setCases((prev) => {
+          const existingIds = new Set(prev.map((c) => c.id));
+          const toAdd = INFRA_ARB_CASES.filter((c) => !existingIds.has(c.id));
+          if (toAdd.length === 0) { markSeeded(); return prev; }
+          const next = [...prev, ...toAdd];
+          saveCases(next);
+          markSeeded();
+          return next;
+        });
+      }).catch(() => { /* infra cases optional */ });
+    }
+  }, []);
 
   // Optionally sync from backend — never blocks UI, tries live app prefix first
   useEffect(() => {

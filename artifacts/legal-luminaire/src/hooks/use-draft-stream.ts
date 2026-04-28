@@ -68,15 +68,10 @@ export function useDraftStream() {
                   if (data.stage) newState.stage = data.stage;
                   if (data.message) newState.message = data.message;
                   if (data.content) {
-                    // If we receive content, append it
-                    // The server might send incremental chunks depending on how it's implemented.
-                    // Assuming data.content contains the incremental chunk when stage === 'streaming'
-                    // or full content. Let's assume it sends full content cumulatively or we just append.
-                    // The prompt implies "stream text as it arrives", usually data.content is the chunk.
                     if (data.stage === "streaming") {
                         newState.content += data.content;
                     } else if (data.content && data.stage === "complete") {
-                         newState.content = data.content; // fallback if final content is sent
+                         newState.content = data.content;
                     }
                   }
                   if (data.draftId) newState.draftId = data.draftId;
@@ -85,7 +80,12 @@ export function useDraftStream() {
                 });
 
                 if (data.done) {
-                  setState((prev) => ({ ...prev, isStreaming: false, stage: "complete" }));
+                  setState((prev) => ({
+                    ...prev,
+                    isStreaming: false,
+                    stage: data.stage === "error" ? "error" : "complete",
+                    error: typeof data.error === "string" ? data.error : prev.error,
+                  }));
                   return data.draftId;
                 }
               } catch (e) {

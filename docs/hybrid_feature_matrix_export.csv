@@ -1,0 +1,16 @@
+wave,area,our_app_baseline,reference_input,decision,status
+1,Global navigation shell,Multi-group sidebar case-scoped routing,Enhanced workspace blocks,Keep shell add hybrid pages,Merged
+1,Case management,Case selector case-scoped routes,Session workspace pattern,Session workspace behind VITE flag,Improved
+1,Draft generation UI,Legacy drafting surfaces,Streaming panel,DraftGenerator added,New
+1,Streaming hook,Request/response flow,SSE state machine,useDraftStream wired,New
+1,Standards validity page,Standards matrix,Printable validity note,Route + VITE flag,New
+1,Draft viewer route,Document pages,Dedicated viewer,/draft/:id + VITE flag,Improved
+1,Legacy drafting,Safe draft notice discharge print,Reference variants,All legacy routes kept,Kept
+1,Infra arb browser,Production module,No replacement,Unchanged,Kept
+1,Demo case browser,26-case browser,No replacement,Unchanged,Kept
+1,Verification filing,Existing flows,No replacement,Unchanged,Kept
+1,Error prevention,Stable baseline,Import fixes,Icon + route fixes,Improved
+2,Case Research page,Code only no route,N/A,/case/:id/case-research,Improved
+2,Cross-Reference Matrix,Code only no route,N/A,/case/:id/cross-reference,Improved
+2,AI Research Engine,Code only no route,N/A,/case/:id/ai-research,Improved
+2,AI Draft Engine,Code only no route,N/A,/case/:id/ai-draft-engine,Improved

@@ -4,6 +4,7 @@ Deploy to Streamlit Community Cloud: https://share.streamlit.io/
 Main file: streamlit_app.py
 """
 import os
+import json
 import requests
 import streamlit as st
 from pathlib import Path
@@ -19,6 +20,15 @@ except ImportError:
 
 
 DEFAULT_API = os.environ.get("LEGAL_LUMINAIRE_API", "http://127.0.0.1:8000/api/v1")
+
+_REPO_ROOT = Path(__file__).resolve().parent
+_REAL_CASES = _REPO_ROOT / "real_cases"
+
+
+def _real_case_dir(folder_name: str) -> Path:
+    """Full packs live under real_cases/ (legacy: repo root)."""
+    p = _REAL_CASES / folder_name
+    return p if p.exists() else _REPO_ROOT / folder_name
 
 
 def evaluate_citation_gate(text: str) -> dict:
@@ -123,9 +133,9 @@ with st.sidebar:
     st.markdown("- [Accuracy Rules](docs/accuracy-governance/ACCURACY_RULES.md)")
 
 # ── Main tabs ─────────────────────────────────────────────────────────────────
-tab_demo, tab_research, tab_standards, tab_upload, tab_manual = st.tabs([
+tab_demo, tab_research, tab_standards, tab_upload, tab_manual, tab_edit = st.tabs([
     "🎬 Try Demo", "🤖 Research / Draft", "📐 Standards Validator",
-    "📂 Setup: Upload & Index", "📖 Setup: Manual"
+    "📂 Setup: Upload & Index", "📖 Setup: Manual", "📝 Editable Interface"
 ])
 
 # ── Tab 1: User Manual ────────────────────────────────────────────────────────
@@ -598,8 +608,8 @@ with tab_demo:
                 st.metric("Fact-Fit Precedents", "4 Verified", "+1 Pending")
                 st.progress(0.80)
             with col_c:
-                st.metric("Prosecution Contradictions", "3 Critical", "Fatal")
-                st.progress(1.0)
+                st.metric("Tech-Legal Synergy", "UNIQUE", "Artemis-II")
+                st.progress(0.95)
                 
             st.divider()
             
@@ -616,7 +626,7 @@ with tab_demo:
             st.warning("**[HIGH] Procedural Defect (Evidence Act)**")
             st.markdown("No panchnama was prepared during sampling, and no contractor representative was present as required by IS 3535:1986 Clause 4.1.")
             
-            case_dir = Path("CASE01_HEMRAJ_STATE_2025")
+            case_dir = _real_case_dir("CASE01_HEMRAJ_STATE_2025")
         
         elif active_case == "TC-23":
             st.header("🎬 TC-23: Highway Arbitration (NH-758 Contract)")
@@ -650,7 +660,7 @@ with tab_demo:
             - **Contradiction:** The Supreme Court restricts formula-based damage computation without proving actual opportunity loss. Flagged as **SECONDARY**.
             """)
             
-            case_dir = Path("INFRA_ARB_02_ROAD_HIGHWAY_2026")
+            case_dir = _real_case_dir("INFRA_ARB_02_ROAD_HIGHWAY_2026")
             
         elif active_case == "TC-24":
             st.header("🎬 TC-24: Medium Irrigation Dam")
@@ -678,7 +688,7 @@ with tab_demo:
             - **Impact:** Directly invokes FIDIC 4.12. Fatal to Employer's defense.
             """)
             
-            case_dir = Path("INFRA_ARB_03_DAM_IRRIGATION_2026")
+            case_dir = _real_case_dir("INFRA_ARB_03_DAM_IRRIGATION_2026")
 
         elif active_case == "TC-25":
             st.header("🎬 TC-25: 220 kV GIS Substation")
@@ -705,7 +715,7 @@ with tab_demo:
             - **Evidence Match:** PO copies and Delivery Challans prove 220kV modules arrived 5 months late. Contradicts Special Conditions Clause 12.
             """)
             
-            case_dir = Path("INFRA_ARB_04_ELECTRICAL_SUBSTATION_2026")
+            case_dir = _real_case_dir("INFRA_ARB_04_ELECTRICAL_SUBSTATION_2026")
 
         elif active_case == "TC-26":
             st.header("🎬 TC-26: 185 Acres Township Landscape")
@@ -732,7 +742,7 @@ with tab_demo:
             - **Forensic Reality:** Irrigation Log proves employer failed to supply treated water as per contract.
             """)
             
-            case_dir = Path("INFRA_ARB_05_LANDSCAPE_TOWNSHIP_2026")
+            case_dir = _real_case_dir("INFRA_ARB_05_LANDSCAPE_TOWNSHIP_2026")
             
         else:
             st.header("🎬 " + demo_case.split(":")[0])
@@ -810,3 +820,149 @@ with tab_demo:
     start_real = st.button("🚀 Start Your Own Case (Real-case Mode)", type="primary", use_container_width=True)
     if start_real:
         st.success("Switch to the **Setup: Upload & Index** tab to ingest your FIR, Work Order, or Charge-sheet!")
+
+# ── Tab 6: Editable Interface ──────────────────────────────────────────────────
+with tab_edit:
+    st.header("📝 Editable Interface")
+    st.caption("Edit a legal case payload live and export it for review or filing workflow.")
+
+    col_a, col_b = st.columns(2)
+    with col_a:
+        edit_case_id = st.text_input("Case ID", value="udaipur_residential_connection_01")
+        edit_party = st.text_input("Petitioner / Applicant", value="Residential Owner Association, Udaipur")
+        edit_authority = st.text_input("Respondent Authority", value="Municipal/Utility Authority, Udaipur")
+        edit_relief = st.text_input("Primary Relief", value="Direction to grant new residential connection within fixed timeline")
+    with col_b:
+        edit_forum = st.selectbox(
+            "Forum",
+            options=["Representation", "Writ-ready Draft", "Consumer Forum", "Civil Court"],
+            index=1,
+        )
+        edit_language = st.selectbox("Language", options=["Hindi", "English", "Bilingual"], index=0)
+        edit_priority = st.selectbox("Urgency", options=["Standard", "Urgent", "Very Urgent"], index=1)
+        edit_status = st.selectbox("Current Status", options=["Drafting", "Review", "Filed"], index=0)
+
+    edit_facts = st.text_area(
+        "Facts (editable)",
+        value=(
+            "The applicant submitted a complete file for new residential connection in Udaipur. "
+            "Despite multiple reminders, no speaking order was passed and repeated oral objections were raised "
+            "without a formal deficiency memo."
+        ),
+        height=130,
+    )
+    edit_grounds = st.text_area(
+        "Legal Grounds (editable)",
+        value=(
+            "1) Arbitrariness and delay without reasons.\n"
+            "2) Violation of natural justice due to non-communication of deficiencies.\n"
+            "3) Unequal treatment against similarly placed applicants."
+        ),
+        height=130,
+    )
+    edit_prayer = st.text_area(
+        "Prayer (editable)",
+        value=(
+            "Issue directions to process and grant the new residential connection within a defined period, "
+            "and restrain arbitrary refusal without a written speaking order."
+        ),
+        height=100,
+    )
+
+    payload = {
+        "case_id": edit_case_id,
+        "forum": edit_forum,
+        "language": edit_language,
+        "priority": edit_priority,
+        "status": edit_status,
+        "applicant": edit_party,
+        "respondent_authority": edit_authority,
+        "primary_relief": edit_relief,
+        "facts": edit_facts,
+        "grounds": edit_grounds,
+        "prayer": edit_prayer,
+    }
+
+    st.subheader("Live Preview")
+    st.json(payload)
+
+    preview_text = (
+        f"Case ID: {payload['case_id']}\n"
+        f"Forum: {payload['forum']} | Language: {payload['language']} | Priority: {payload['priority']}\n"
+        f"Status: {payload['status']}\n\n"
+        f"Applicant: {payload['applicant']}\n"
+        f"Respondent: {payload['respondent_authority']}\n"
+        f"Primary Relief: {payload['primary_relief']}\n\n"
+        f"Facts:\n{payload['facts']}\n\n"
+        f"Grounds:\n{payload['grounds']}\n\n"
+        f"Prayer:\n{payload['prayer']}\n"
+    )
+    st.text_area("Editable Draft Preview", value=preview_text, height=240)
+
+    dl_col1, dl_col2 = st.columns(2)
+    with dl_col1:
+        st.download_button(
+            "⬇ Download Editable Payload (.json)",
+            data=json.dumps(payload, ensure_ascii=False, indent=2),
+            file_name=f"{edit_case_id}.json",
+            mime="application/json",
+        )
+    with dl_col2:
+        st.download_button(
+            "⬇ Download Editable Draft (.txt)",
+            data=preview_text,
+            file_name=f"{edit_case_id}.txt",
+            mime="text/plain",
+        )
+
+    if st.button("💾 Save + Index", type="primary"):
+        try:
+            safe_case_id = "".join(c for c in edit_case_id if c.isalnum() or c in ("-", "_")).strip("_-")
+            if not safe_case_id:
+                raise ValueError("Case ID is empty after sanitization. Use letters/numbers/-/_")
+
+            target_dir = Path("artifacts/legal-luminaire/backend/uploaded_cases") / safe_case_id
+            target_dir.mkdir(parents=True, exist_ok=True)
+
+            json_path = target_dir / "editable_payload.json"
+            txt_path = target_dir / "editable_draft.txt"
+
+            json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            txt_path.write_text(preview_text, encoding="utf-8")
+
+            st.success(f"Saved files to `{target_dir}`")
+            st.caption(f"- `{json_path.name}`")
+            st.caption(f"- `{txt_path.name}`")
+            st.text_input(
+                "Saved folder path (copy this)",
+                value=str(target_dir.resolve()),
+                key=f"saved_path_{safe_case_id}",
+                help="Select and copy this path to open the saved case folder.",
+            )
+
+            # Auto-index immediately via backend upload API.
+            with json_path.open("rb") as f_json, txt_path.open("rb") as f_txt:
+                files = [
+                    ("files", (json_path.name, f_json, "application/json")),
+                    ("files", (txt_path.name, f_txt, "text/plain")),
+                ]
+                resp = requests.post(
+                    f"{api_base}/cases/{safe_case_id}/upload",
+                    files=files,
+                    timeout=120,
+                )
+
+            if resp.ok:
+                out = resp.json()
+                st.success(
+                    f"Indexed {len(out.get('indexed', []))} file(s) for case `{safe_case_id}`"
+                )
+                if out.get("skipped"):
+                    st.info(f"Skipped: {out['skipped']}")
+                if out.get("errors"):
+                    st.warning(f"Indexing warnings: {out['errors']}")
+                st.json(out)
+            else:
+                st.error(f"Indexing failed: HTTP {resp.status_code} - {resp.text[:500]}")
+        except Exception as e:
+            st.error(f"Save failed: {e}")

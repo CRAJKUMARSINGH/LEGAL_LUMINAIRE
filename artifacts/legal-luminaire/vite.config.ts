@@ -48,6 +48,13 @@ export default defineConfig({
   server: {
     port: 5173,
     host: "0.0.0.0",
+    proxy: {
+      // Hybrid draft stream (FastAPI) — same path the SPA calls in dev
+      "/api/legal": {
+        target: process.env.VITE_BACKEND_URL || "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+    },
     fs: {
       allow: [
         __dirname,

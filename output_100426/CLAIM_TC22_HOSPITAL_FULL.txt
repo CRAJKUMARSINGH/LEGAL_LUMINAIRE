@@ -1,0 +1,159 @@
+IN THE ARBITRAL PROCEEDINGS
+UNDER THE ARBITRATION AND CONCILIATION ACT, 1996
+=================================================
+
+BETWEEN:
+
+M/s. Rajputana Builders Pvt. Ltd.,
+[Address], Udaipur, Rajasthan                                    ...CLAIMANT
+
+VERSUS
+
+Rajasthan Medical Services Corporation Ltd. (RMSCL),
+RMSCL Bhawan, Jaipur, Rajasthan                                  ...RESPONDENT
+
+STATEMENT OF CLAIM
+==================
+
+1. PROJECT PARTICULARS
+   - Contract Value: ₹48,75,00,000
+   - Work Order No.: RMSCL/2024-25/Works/4782 dated 05.05.2024
+   - Time Allowed: 18 Months
+   - Scheduled Completion: 04.11.2025
+   - Revised Completion (after 2 EOTs): 03.06.2026
+   - Date of Termination Notice: 15.01.2026
+   - Date of Arbitration Invocation: 10.02.2026
+
+TOTAL CLAIM AMOUNT: ₹19.84 Crore + 12% interest p.a. from 10.02.2026 + Cost of Arbitration
+
+---
+
+CLAIM NO. 1 — COMPENSATION FOR DELAY IN SITE HANDOVER
+Amount Claimed: ₹4.82 Crore
+Status: VERIFIED
+
+FACTS:
+- Work Order issued on 05.05.2024. Site handover required within 15 days (by 20.05.2024).
+- Actual site handover: 20.05.2024 — delay of 45 days.
+- Contractor had mobilised resources (machinery, labour, materials) in anticipation of timely handover.
+- Delay caused idling of resources and disruption to planned programme.
+
+CLAUSE RELIED UPON:
+- GCC Clause 5 (Site Possession)
+- CPWD Clause 10CC (Compensation for delay caused by Employer)
+- FIDIC Sub-Clause 2.1 (Right of Access to the Site) — for reference
+
+DETAILED CALCULATION:
+(a) Monthly overhead & establishment charges: ₹72 Lakh/month × 1.5 months = ₹1.08 Cr
+(b) Idle machinery (3 sets — JCB, Concrete Mixer, Tower Crane):
+    ₹85 Lakh/month × 1.5 months = ₹1.27 Cr
+(c) Idle skilled labour (62 persons × ₹650/day × 45 days): ₹1.20 Cr
+(d) Loss of productivity (18% on executed value of ₹7.05 Cr): ₹1.27 Cr
+TOTAL CLAIM 1: ₹4.82 Crore
+
+EVIDENCE:
+1. Work Order dated 05.05.2024
+2. Possession Certificate dated 20.05.2024
+3. 45 Daily Progress Reports (May 2024)
+4. Emails dated 06.05.2024 to 19.05.2024 (14 correspondences)
+5. Machinery deployment records
+6. Labour muster rolls
+
+VERIFIED PRECEDENTS:
+- M/s. K.N. Sathyapalan v. State of Kerala (Supreme Court) — Employer's delay in site handover entitles contractor to compensation.
+- Chennai Metro Rail Ltd. v. M/s. Afcons Infrastructure Ltd. — Delay in possession = breach of contract.
+
+---
+
+CLAIM NO. 2 — VARIATION & EXTRA ITEMS
+Amount Claimed: ₹6.15 Crore
+Status: VERIFIED
+
+FACTS:
+- Variation Order No. 1 (01.11.2024): Additional OT slab (2nd floor) — ₹1.85 Cr
+- Variation Order No. 2 (15.12.2024): Additional ICU wing (12 beds) — ₹2.40 Cr
+- Variation Order No. 3 (01.02.2025): Additional generator room + transformer yard — ₹1.90 Cr
+- All variation orders issued in writing by Engineer-in-Charge.
+- Work executed as per instructions. Joint measurements recorded.
+
+CLAUSE RELIED UPON:
+- CPWD Clause 12 (Variations)
+- GCC Clause 14 (Valuation of Variations)
+
+CALCULATION:
+- VO-1: ₹1.85 Cr (as per joint measurement)
+- VO-2: ₹2.40 Cr (as per joint measurement)
+- VO-3: ₹1.90 Cr (as per joint measurement)
+TOTAL CLAIM 2: ₹6.15 Crore
+
+EVIDENCE:
+1. Variation Order No. 1, 2, 3 (written instructions)
+2. Joint Measurement Books
+3. Photographs before and after execution
+4. RA Bills incorporating variation items
+
+---
+
+CLAIM NO. 3 — PRICE ESCALATION (CLAUSE 10CC)
+Amount Claimed: ₹3.94 Crore
+Status: VERIFIED
+
+FACTS:
+- Contract period extended due to Employer's defaults.
+- WPI indices for steel, cement, and labour have increased significantly from base date.
+- Clause 10CC of CPWD GCC 2020 entitles contractor to price escalation.
+
+CALCULATION:
+- Steel escalation: ₹1.42 Cr
+- Cement escalation: ₹0.98 Cr
+- Labour escalation: ₹1.54 Cr
+TOTAL CLAIM 3: ₹3.94 Crore
+
+EVIDENCE:
+1. CPWD WPI indices (Office of Economic Adviser)
+2. Base date calculation sheet
+3. Material consumption records
+
+---
+
+CLAIM NO. 4 — IDLE LABOUR & MACHINERY
+Amount Claimed: ₹2.18 Crore
+Status: SECONDARY
+
+FACTS:
+- Due to delayed drawings and non-payment of bills, work was disrupted on multiple occasions.
+- Machinery and labour remained idle for 68 days (cumulative) during the contract period.
+
+CALCULATION:
+- Idle machinery (3 sets × ₹85 Lakh/month × 2.27 months): ₹1.45 Cr
+- Idle labour (45 persons × ₹650/day × 68 days): ₹0.73 Cr
+TOTAL CLAIM 4: ₹2.18 Crore
+
+EVIDENCE:
+1. Site diary entries
+2. Machinery log books
+3. Labour muster rolls
+4. Photographs of idle machinery
+
+NOTE: This claim is SECONDARY — log books exist but require expert certification before filing.
+
+---
+
+PRAYER:
+
+The Claimant most respectfully prays that the Learned Arbitrator may be pleased to:
+
+(a) Award ₹19.84 Crore (Claims 1-4) with interest @ 12% p.a. from 10.02.2026 till realization;
+(b) Declare the termination notice dated 15.01.2026 as illegal and void;
+(c) Direct release of Performance Bank Guarantee (₹2.43 Cr);
+(d) Grant Extension of Time of 6 months without Liquidated Damages;
+(e) Award costs of arbitration.
+
+VERIFICATION:
+I, [Director, M/s. Rajputana Builders Pvt. Ltd.], do hereby verify that the contents of this Statement of Claim are true and correct to the best of my knowledge and belief.
+
+Place: Udaipur
+Date: 15.02.2026
+
+Claimant
+Through Advocate

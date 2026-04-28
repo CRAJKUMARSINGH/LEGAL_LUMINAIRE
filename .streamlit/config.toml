@@ -1,0 +1,7 @@
+[theme]
+# Executive Midnight Theme
+primaryColor = "#fbbf24"          # Amber Gold
+backgroundColor = "#020617"       # Deepest Navy
+secondaryBackgroundColor = "#0f172a" # Midnight Sapphire Sidebar
+textColor = "#f8fafc"             # Slate White
+font = "sans serif"

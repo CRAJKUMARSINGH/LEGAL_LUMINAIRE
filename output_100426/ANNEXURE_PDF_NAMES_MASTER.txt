@@ -1,0 +1,79 @@
+ANNEXURE PDF/IMAGE FILE NAMES — MASTER LIST
+Legal Luminaire | Artemis-II Accuracy | 10 April 2026
+=======================================================
+
+TC-01 HEMRAJ VARDAR — DISCHARGE APPLICATION ANNEXURES
+======================================================
+
+Annexure A  : IS_1199_2018_Scope_Clause_1_Fresh_Concrete_Only.pdf
+Annexure B  : IS_2250_1981_Title_Page_Masonry_Mortar_Correct_Standard.pdf
+Annexure C  : ASTM_C1324_Sections_7_8_Carbonated_Layer_Removal.pdf
+Annexure D  : Tomaso_Bruno_v_State_UP_2015_7_SCC_178_Expert_Evidence.pdf          [SECONDARY]
+Annexure E  : Kattavellai_Devakar_2025_INSC_845_Chain_of_Custody.pdf              [VERIFIED]
+Annexure F  : State_Maharashtra_v_Damu_2000_6_SCC_269_Panchnama.pdf               [VERIFIED]
+Annexure G  : Surendra_Koli_v_State_UP_SC_November_2025_Chain_Custody.pdf         [VERIFIED]
+Annexure H  : Uttarakhand_HC_March_2026_Chain_Custody_Forensic_Evidence.pdf       [SECONDARY]
+Annexure I  : IS_3535_1986_Clause_4_1_Contractor_Representative_Mandatory.pdf     [VERIFIED]
+Annexure J  : IS_3535_1986_Clause_5_7_5_Three_Way_Split_Referee_Sample.pdf        [VERIFIED]
+Annexure K  : State_Punjab_v_Baldev_Singh_1999_6_SCC_172_Mandatory_Procedure.pdf  [VERIFIED]
+Annexure L  : CPWD_Manual_Sections_3_7_4_and_12_2_1_Contractor_Presence.pdf      [VERIFIED]
+Annexure M  : IS_4031_Part6_Clause_5_1_Temperature_27_Celsius_Mandatory.pdf       [VERIFIED]
+Annexure N  : ASTM_C1324_Full_Standard_Hardened_Masonry_Mortar_Forensics.pdf      [VERIFIED]
+Annexure O  : IS_2250_1981_Clause_5_2_Weather_Protection_Sampling.pdf             [VERIFIED]
+Annexure P  : Sushil_Sharma_v_State_NCT_Delhi_2014_4_SCC_317_Expert_Opinion.pdf   [SECONDARY]
+Annexure Q  : CJ_Christopher_Signi_v_State_TN_2025_SCC_OnLine_Mad_3214.pdf        [SECONDARY]
+Annexure R  : NBC_2016_Section_3_4_Force_Majeure_Extreme_Weather.pdf              [VERIFIED]
+Annexure S  : Rajasthan_HC_Suo_Motu_PIL_Orders_29July2025_23August2025.pdf        [VERIFIED]
+Annexure T  : RSMML_v_Contractor_Rajasthan_HC_Division_Bench_30March2026.pdf      [VERIFIED]
+Annexure U  : Jacob_Mathew_v_State_Punjab_2005_6_SCC_1_Para48_Negligence.pdf      [VERIFIED]
+Annexure V  : IS_13311_Parts_1_2_NDT_UPV_Rebound_Hammer_Existing_Structures.pdf  [VERIFIED]
+Annexure W  : Union_India_v_Prafulla_Kumar_Samal_1979_3_SCC_4_Para10.pdf          [VERIFIED]
+Annexure X  : State_Bihar_v_Ramesh_Singh_1977_4_SCC_39_Para5_Discharge.pdf        [VERIFIED]
+
+TOTAL: 24 Annexures | 18 VERIFIED | 4 SECONDARY | 0 PENDING (blocked)
+
+=======================================================
+TC-22 HOSPITAL — ARBITRATION ANNEXURES
+=======================================================
+
+Annexure 1  : Work_Order_RMSCL_2024_25_Works_4782_05May2024.pdf
+Annexure 2  : Possession_Certificate_20May2024_45Day_Delay.pdf
+Annexure 3  : Variation_Order_1_OT_Slab_01Nov2024.pdf
+Annexure 4  : Variation_Order_2_ICU_Wing_15Dec2024.pdf
+Annexure 5  : Variation_Order_3_Generator_Room_01Feb2025.pdf
+Annexure 6  : RA_Bills_3_4_5_Pending_4_to_7_Months.pdf
+Annexure 7  : EOT_1_Grant_Letter_90_Days.pdf
+Annexure 8  : EOT_2_Grant_Letter_120_Days.pdf
+Annexure 9  : Standing_Committee_Minutes_08Jan2026_RMSCL.pdf
+Annexure 10 : Legal_Notice_12Dec2025_Contractor_to_RMSCL.pdf
+Annexure 11 : Termination_Notice_15Jan2026_RMSCL.pdf
+Annexure 12 : Joint_Measurement_Books_VO1_VO2_VO3.pdf
+
+=======================================================
+TC-23 HIGHWAY — ARBITRATION ANNEXURES (HIGHEST PRIORITY)
+=======================================================
+
+Annexure 1  : LOA_NHAI_PIU_Udaipur_NH758_10Jun2024.pdf
+Annexure 2  : Possession_Certificate_12Sep2024_78Day_Delay.pdf
+Annexure 3  : Forest_Department_Clearance_Letters_Pending.pdf
+Annexure 4  : Revenue_Records_Land_Acquisition_Status.pdf
+Annexure 5  : Police_Complaints_Farmer_Protests_12_Locations.pdf
+Annexure 6  : 47_Daily_Progress_Reports_Jun_Sep_2024.pdf
+Annexure 7  : 42_Emails_15Jun2024_to_10Sep2024_Site_Possession.pdf
+Annexure 8  : Variation_Order_1_Retaining_Wall_Chainage_12450_13200.pdf
+Annexure 9  : Variation_Order_2_Extra_Earthwork_Alignment_Change.pdf
+Annexure 10 : Joint_Measurement_Books_VO1_VO2.pdf
+Annexure 11 : GPS_Logs_Machinery_110_Idle_Days.pdf
+Annexure 12 : RA_Bills_4_5_6_Pending_5_to_8_Months.pdf
+Annexure 13 : EOT_1_Grant_Letter_120_Days.pdf
+Annexure 14 : Standing_Committee_Minutes_12Feb2026_NHAI.pdf
+Annexure 15 : Legal_Notice_10Jan2026_Contractor_to_NHAI.pdf
+Annexure 16 : Termination_Notice_20Feb2026_NHAI_Blacklisting.pdf
+Annexure 17 : WPI_Indices_Bitumen_Steel_Cement_Labour_Jun2024_Mar2026.pdf
+
+=======================================================
+ACCURACY STATUS LEGEND
+=======================================================
+[VERIFIED]   = Safe to file immediately
+[SECONDARY]  = File with qualification note — obtain certified copy first
+[PENDING]    = BLOCKED — do not file without certified copy

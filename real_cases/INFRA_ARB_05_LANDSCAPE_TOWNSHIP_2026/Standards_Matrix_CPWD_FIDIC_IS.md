@@ -1,0 +1,5 @@
+- IS 1897:1982 (Plantation & Landscaping)
+- CPWD Specifications for Horticulture Works 2021
+- IRC:SP:93-2017 (Urban Roads)
+- BIS Standards for Soil & Irrigation
+- FIDIC Clause 12 & 13

@@ -6,11 +6,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Scale, BookOpen, CheckSquare, Mic,
   Home as HomeIcon, Menu, FilePlus, X, FileText,
-  LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe,
+  LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
+  FileSearch, Table2, Brain, Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { CaseProvider, useCaseContext } from "@/context/CaseContext";
 import { AccuracyProvider } from "@/context/AccuracyContext";
+import { featureFlags } from "@/config/featureFlags";
 
 // Lazy load components for code splitting
 const NotFound = lazy(() => import("@/pages/not-found"));
@@ -29,6 +31,11 @@ const ForensicFAQ = lazy(() => import("@/pages/ForensicFAQ"));
 const SafeDraftPage = lazy(() => import("@/pages/SafeDraftPage"));
 const NoticeReplyPage = lazy(() => import("@/pages/NoticeReplyPage"));
 const DischargeApplicationPrint = lazy(() => import("@/pages/DischargeApplicationPrint"));
+const InfraArbBrowser = lazy(() => import("@/pages/InfraArbBrowser"));
+const DemoCaseBrowser = lazy(() => import("@/pages/DemoCaseBrowser"));
+const StandardsValidity = lazy(() => import("@/pages/StandardsValidity"));
+const SessionWorkspace = lazy(() => import("@/pages/session-workspace"));
+const DraftViewer = lazy(() => import("@/pages/draft-viewer"));
 
 // Lazy load heavy view components
 const DynamicDashboardView = lazy(() => import("@/components/views/DynamicDashboardView").then(module => ({ default: module.DynamicDashboardView })));
@@ -68,6 +75,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { path: "/",        label: "मुख्य पृष्ठ",    labelEn: "Home",            icon: HomeIcon,        caseScoped: false },
       { path: "/cases",   label: "सभी केस",         labelEn: "All Cases",       icon: Files,           caseScoped: false },
+      { path: "/demo-browser", label: "26 डेमो केस", labelEn: "26 Demo Cases",  icon: Globe,           caseScoped: false, badge: "26" },
       { path: "/intake",  label: "नया केस इंटेक",   labelEn: "New Case Intake", icon: FilePlus,        caseScoped: false },
       { path: "/new-case-ingest", label: "AI केस इंजेस्ट", labelEn: "AI Case Ingest", icon: Upload,   caseScoped: false },
     ],
@@ -77,6 +85,10 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { path: "/dashboard",   label: "डैशबोर्ड",       labelEn: "Dashboard",          icon: LayoutDashboard, caseScoped: true },
       { path: "/case-law",    label: "कानून खोज",      labelEn: "Case Law Research",  icon: BookOpen,        caseScoped: true },
+      { path: "/case-research", label: "विधिक शोध", labelEn: "Case Research", icon: FileSearch, caseScoped: true },
+      { path: "/cross-reference", label: "क्रॉस-रेफ मैट्रिक्स", labelEn: "Cross-Ref Matrix", icon: Table2, caseScoped: true },
+      { path: "/ai-research", label: "AI शोध इंजन", labelEn: "AI Research Engine", icon: Brain, caseScoped: true },
+      { path: "/ai-draft-engine", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine", icon: Sparkles, caseScoped: true },
       { path: "/standards",   label: "मानक / Lab",     labelEn: "Forensic Standards", icon: FlaskConical,    caseScoped: true },
       { path: "/chat",        label: "AI चैट",         labelEn: "AI Chat",            icon: MessageSquare,   caseScoped: true },
       { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale,    caseScoped: true },
@@ -84,6 +96,12 @@ const NAV_GROUPS: NavGroup[] = [
       { path: "/safe-draft",  label: "सेफ ड्राफ्ट",   labelEn: "Safe Draft Editor",  icon: ShieldCheck,     caseScoped: true, badge: "NEW" },
       { path: "/notice-reply", label: "नोटिस रिप्लाई", labelEn: "Notice Reply",       icon: FileText,        caseScoped: true, badge: "NEW" },
       { path: "/discharge-print", label: "डिस्चार्ज PDF", labelEn: "Discharge PDF v5",  icon: Scale,           caseScoped: true, badge: "NEW" },
+      ...(featureFlags.hybridStandardsValidity ? [
+        { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+      ...(featureFlags.hybridSessionWorkspace ? [
+        { path: "/session-workspace", label: "कार्यस्थान", labelEn: "Hybrid Workspace", icon: LayoutDashboard, caseScoped: true, badge: "BETA" as const },
+      ] : []),
       { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments",     icon: Mic,             caseScoped: true },
     ],
   },
@@ -107,6 +125,7 @@ const NAV_GROUPS: NavGroup[] = [
     groupLabel: "संदर्भ / Reference",
     items: [
       { path: "/forensic-faq", label: "फोरेंसिक FAQ", labelEn: "Forensic FAQ", icon: FlaskConical, caseScoped: false },
+      { path: "/infra-arb", label: "इन्फ्रा आर्बिट्रेशन", labelEn: "Infra Arbitration", icon: Scale, caseScoped: false, badge: "NEW" },
     ],
   },
 ];
@@ -248,11 +267,17 @@ function Router() {
         <Route path="/new-case-ingest" component={() => <Suspense fallback={<LoadingFallback />}><OmniDropzone /></Suspense>} />
         <Route path="/review-queue" component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><ReviewQueueView /></Suspense></div>} />
         <Route path="/forensic-faq" component={() => <Suspense fallback={<LoadingFallback />}><ForensicFAQ /></Suspense>} />
+        <Route path="/infra-arb" component={() => <Suspense fallback={<LoadingFallback />}><InfraArbBrowser /></Suspense>} />
+        <Route path="/demo-browser" component={() => <Suspense fallback={<LoadingFallback />}><DemoCaseBrowser /></Suspense>} />
 
         {/* Case-scoped routes */}
         <Route path="/case/:id/dashboard"             component={() => <div className="p-6"><Suspense fallback={<LoadingFallback />}><DynamicDashboardView /></Suspense></div>} />
         <Route path="/case/:id/chat"                  component={() => <div className="flex flex-col h-full"><Suspense fallback={<LoadingFallback />}><ChatView /></Suspense></div>} />
         <Route path="/case/:id/case-law"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><CaseLawView /></Suspense></div>} />
+        <Route path="/case/:id/case-research"         component={() => <Suspense fallback={<LoadingFallback />}><CaseResearch /></Suspense>} />
+        <Route path="/case/:id/cross-reference"       component={() => <Suspense fallback={<LoadingFallback />}><CrossReferenceMatrix /></Suspense>} />
+        <Route path="/case/:id/ai-research"           component={() => <Suspense fallback={<LoadingFallback />}><AIResearchEngine /></Suspense>} />
+        <Route path="/case/:id/ai-draft-engine"       component={() => <Suspense fallback={<LoadingFallback />}><AIDraftEngine /></Suspense>} />
         <Route path="/case/:id/standards"             component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><StandardsView /></Suspense></div>} />
         <Route path="/case/:id/timeline"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><TimelineView /></Suspense></div>} />
         <Route path="/case/:id/documents"             component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><DocumentsView /></Suspense></div>} />
@@ -266,6 +291,15 @@ function Router() {
         <Route path="/case/:id/discharge-application" component={() => <Suspense fallback={<LoadingFallback />}><DischargeApplication /></Suspense>} />
         <Route path="/case/:id/defence-reply"         component={() => <Suspense fallback={<LoadingFallback />}><DefenceReply /></Suspense>} />
         <Route path="/case/:id/oral-arguments"        component={() => <Suspense fallback={<LoadingFallback />}><OralArguments /></Suspense>} />
+        {featureFlags.hybridStandardsValidity && (
+          <Route path="/case/:id/standards-validity"  component={() => <Suspense fallback={<LoadingFallback />}><StandardsValidity /></Suspense>} />
+        )}
+        {featureFlags.hybridSessionWorkspace && (
+          <Route path="/case/:id/session-workspace"   component={() => <Suspense fallback={<LoadingFallback />}><SessionWorkspace /></Suspense>} />
+        )}
+        {featureFlags.hybridDraftViewer && (
+          <Route path="/draft/:id"                    component={() => <Suspense fallback={<LoadingFallback />}><DraftViewer /></Suspense>} />
+        )}
 
         <Route component={() => <Suspense fallback={<LoadingFallback />}><NotFound /></Suspense>} />
       </Switch>

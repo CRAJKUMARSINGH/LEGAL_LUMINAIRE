@@ -100,9 +100,20 @@ export function getChargesArray(record: CaseRecord): string[] {
   return [record.charges];
 }
 
+/** Seed key — bump version to force re-seed when new cases are added */
+const SEED_KEY = "legal_luminaire_seeded_v3";
+
 export function loadCases(): CaseRecord[] {
   try {
     const raw = localStorage.getItem(CASES_KEY);
+    const seeded = localStorage.getItem(SEED_KEY);
+
+    // Lazy import to avoid circular deps — infra cases seeded on first load
+    if (!seeded) {
+      // Will be seeded by CaseContext on mount via seedInfraCases()
+      if (!raw) return [defaultCase];
+    }
+
     if (!raw) return [defaultCase];
     const parsed = JSON.parse(raw) as CaseRecord[];
     if (!Array.isArray(parsed) || parsed.length === 0) return [defaultCase];
@@ -110,6 +121,14 @@ export function loadCases(): CaseRecord[] {
   } catch {
     return [defaultCase];
   }
+}
+
+export function markSeeded() {
+  localStorage.setItem(SEED_KEY, "1");
+}
+
+export function isSeeded(): boolean {
+  return !!localStorage.getItem(SEED_KEY);
 }
 
 export function saveCases(cases: CaseRecord[]) {

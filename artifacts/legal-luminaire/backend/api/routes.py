@@ -397,15 +397,14 @@ async def preload_case01():
     Pre-load all CASE01_HEMRAJ_STATE_2025 documents into ChromaDB.
     Indexes: defence reports, discharge applications, standards matrices, etc.
     """
-    from pathlib import Path as _Path
-    case_id = "case01"
-    case_dir = _Path("../../CASE01_HEMRAJ_STATE_2025")  # relative to backend/
+    from repo_paths import hemraj_case_dir, workspace_root
 
+    case_id = "case01"
+    case_dir = hemraj_case_dir()
     if not case_dir.exists():
-        # Try absolute path from workspace root
-        import os
-        workspace = _Path(os.getcwd()).parent.parent
-        case_dir = workspace / "CASE01_HEMRAJ_STATE_2025"
+        legacy = workspace_root() / "CASE01_HEMRAJ_STATE_2025"
+        if legacy.exists():
+            case_dir = legacy
 
     if not case_dir.exists():
         return {"success": False, "error": f"CASE01_HEMRAJ_STATE_2025 directory not found at {case_dir}"}

@@ -27,6 +27,11 @@ node_modules
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Python / duty-scan output
+__pycache__/
+*.py[cod]
+scripts/reports/
+
 # misc
 /.sass-cache
 /connect.lock
@@ -50,3 +55,10 @@ Thumbs.db
 
 # Unrelated projects in workspace root
 moonshot-muse-main/
+
+# Secrets — never commit API keys or local env files
+.env
+.env.local
+.env.*.local
+Attached_Assets/OPENAI AND TAVILY KEY.MD
+.streamlit/secrets.toml

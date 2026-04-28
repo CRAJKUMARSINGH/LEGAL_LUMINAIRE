@@ -1,0 +1,8 @@
+- Tender Date: 22.01.2024
+- Work Order: 08.05.2024 (₹68.25 Cr, 21 months)
+- Site Handover: 25.05.2024
+- Major Issues: Delay in supply of 220 kV GIS equipment by employer + Right of Way (RoW) issues
+- Scheduled Completion: 07.02.2026
+- Progress as on 31.03.2026: 52%
+- Termination Notice: 05.03.2026
+- Arbitration Invoked: 20.03.2026

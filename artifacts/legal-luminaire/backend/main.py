@@ -25,6 +25,7 @@ from api.routes_lab import router as lab_router
 from api.routes_collision import router as collision_router
 from api.routes_auto_research import router as auto_research_router
 from api.routes_verify import router as verify_router
+from api.routes_legal_stream import router as legal_stream_router
 
 # ── Logging ────────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -123,6 +124,7 @@ app.include_router(lab_router, prefix="/api/v1")
 app.include_router(collision_router, prefix="/api/v1")
 app.include_router(auto_research_router, prefix="/api/v1")
 app.include_router(verify_router, prefix="/api/v1")
+app.include_router(legal_stream_router, prefix="/api/legal")
 
 
 @app.get("/")
