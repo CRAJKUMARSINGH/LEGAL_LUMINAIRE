@@ -1,408 +1,255 @@
 /**
  * Citation Extraction Module
- * Extracts and parses legal citations from judgments and documents
+ * Extracts and validates legal citations from judgment text
  * Part of Phase 3: Citation Intelligence
  */
 
 import { featureFlags } from "@/config/featureFlags";
 
-/**
- * Extracted citation data
- */
+//  Types 
+
+export type CitationReporter =
+  | "SCC"
+  | "AIR"
+  | "SCR"
+  | "Cri LJ"
+  | "SLT"
+  | "SCALE"
+  | "HC"
+  | "UNKNOWN";
+
 export interface ExtractedCitation {
   id: string;
-  caseTitle: string;
-  citation: string;
-  court: string;
+  raw: string;
+  caseName?: string;
   year: number;
-  volume?: string;
-  reporter?: string;
-  page?: number;
-  paragraphNumber?: number;
-  sourceUrl?: string;
-  confidence: number; // 0-1
-  rawText: string;
-  position: {
-    start: number;
-    end: number;
-  };
-}
-
-/**
- * Citation patterns for Indian legal system
- */
-const CITATION_PATTERNS = {
-  // SCC (Supreme Court Cases)
-  scc: /\((\d{4})\)\s+(\d+)\s+SCC\s+(\d+)/gi,
-  
-  // AIR (All India Reporter)
-  air: /\((\d{4})\)\s+(\d+)\s+AIR\s+(\d+)/gi,
-  
-  // SCR (Supreme Court Reports)
-  scr: /\((\d{4})\)\s+(\d+)\s+SCR\s+(\d+)/gi,
-  
-  // High Court Reports
-  hcr: /\((\d{4})\)\s+(\d+)\s+(?:HC|High Court)\s+(\d+)/gi,
-  
-  // Case name with citation
-  caseWithCitation: /([A-Z][A-Za-z\s&,\.]+?)\s+(?:v\.?|vs\.?|versus)\s+([A-Z][A-Za-z\s&,\.]+?)\s*,?\s*\((\d{4})\)\s+(\d+)\s+([A-Z]+)\s+(\d+)/gi,
-  
-  // Section references
-  section: /(?:Section|Sec\.?|S\.)\s+(\d+[A-Z]?)\s+(?:of\s+)?(?:the\s+)?([A-Z][A-Za-z\s]+?)(?:\s+Act)?/gi,
-  
-  // IPC sections
-  ipc: /(?:IPC|Indian Penal Code)\s+(?:Section|Sec\.?|S\.)\s+(\d+[A-Z]?)/gi,
-  
-  // CrPC sections
-  crpc: /(?:CrPC|Cr\.?P\.?C\.?)\s+(?:Section|Sec\.?|S\.)\s+(\d+[A-Z]?)/gi,
-};
-
-/**
- * Court name mappings
- */
-const COURT_MAPPINGS: Record<string, string> = {
-  "SC": "Supreme Court",
-  "SCC": "Supreme Court",
-  "AIR": "All India Reporter",
-  "SCR": "Supreme Court Reports",
-  "HC": "High Court",
-  "DHC": "Delhi High Court",
-  "BHC": "Bombay High Court",
-  "MHC": "Madras High Court",
-  "CHC": "Calcutta High Court",
-  "PHC": "Punjab High Court",
-};
-
-/**
- * Extract all citations from text
- */
-export function extractCitations(text: string): ExtractedCitation[] {
-  if (!featureFlags.enableCitationExtraction) {
-    return [];
-  }
-  
-  const citations: ExtractedCitation[] = [];
-  const processedRanges = new Set<string>();
-  
-  // Extract case citations with full details
-  const caseMatches = text.matchAll(CITATION_PATTERNS.caseWithCitation);
-  for (const match of caseMatches) {
-    const [fullMatch, petitioner, respondent, year, volume, reporter, page] = match;
-    const position = match.index || 0;
-    const rangeKey = `${position}-${position + fullMatch.length}`;
-    
-    if (processedRanges.has(rangeKey)) continue;
-    processedRanges.add(rangeKey);
-    
-    citations.push({
-      id: generateCitationId(),
-      caseTitle: `${petitioner} v. ${respondent}`,
-      citation: `(${year}) ${volume} ${reporter} ${page}`,
-      court: COURT_MAPPINGS[reporter] || reporter,
-      year: parseInt(year),
-      volume,
-      reporter,
-      page: parseInt(page),
-      confidence: 0.95,
-      rawText: fullMatch,
-      position: { start: position, end: position + fullMatch.length },
-    });
-  }
-  
-  // Extract SCC citations
-  const sccMatches = text.matchAll(CITATION_PATTERNS.scc);
-  for (const match of sccMatches) {
-    const [fullMatch, year, volume, page] = match;
-    const position = match.index || 0;
-    const rangeKey = `${position}-${position + fullMatch.length}`;
-    
-    if (processedRanges.has(rangeKey)) continue;
-    processedRanges.add(rangeKey);
-    
-    citations.push({
-      id: generateCitationId(),
-      caseTitle: extractCaseTitleNearPosition(text, position),
-      citation: `(${year}) ${volume} SCC ${page}`,
-      court: "Supreme Court",
-      year: parseInt(year),
-      volume,
-      reporter: "SCC",
-      page: parseInt(page),
-      confidence: 0.90,
-      rawText: fullMatch,
-      position: { start: position, end: position + fullMatch.length },
-    });
-  }
-  
-  // Extract AIR citations
-  const airMatches = text.matchAll(CITATION_PATTERNS.air);
-  for (const match of airMatches) {
-    const [fullMatch, year, volume, page] = match;
-    const position = match.index || 0;
-    const rangeKey = `${position}-${position + fullMatch.length}`;
-    
-    if (processedRanges.has(rangeKey)) continue;
-    processedRanges.add(rangeKey);
-    
-    citations.push({
-      id: generateCitationId(),
-      caseTitle: extractCaseTitleNearPosition(text, position),
-      citation: `(${year}) ${volume} AIR ${page}`,
-      court: "All India Reporter",
-      year: parseInt(year),
-      volume,
-      reporter: "AIR",
-      page: parseInt(page),
-      confidence: 0.90,
-      rawText: fullMatch,
-      position: { start: position, end: position + fullMatch.length },
-    });
-  }
-  
-  return citations.sort((a, b) => a.position.start - b.position.start);
-}
-
-/**
- * Extract section references from text
- */
-export function extractSections(text: string): Array<{
-  section: string;
-  act: string;
+  volume?: number;
+  reporter: CitationReporter;
+  page: number;
+  paraNumber?: number;
+  court?: string;
   confidence: number;
-  rawText: string;
-}> {
-  if (!featureFlags.enableCitationExtraction) {
-    return [];
-  }
-  
-  const sections: Array<{
-    section: string;
-    act: string;
-    confidence: number;
-    rawText: string;
-  }> = [];
-  
-  // Extract IPC sections
-  const ipcMatches = text.matchAll(CITATION_PATTERNS.ipc);
-  for (const match of ipcMatches) {
-    const [fullMatch, section] = match;
-    sections.push({
-      section: `IPC ${section}`,
-      act: "Indian Penal Code",
-      confidence: 0.95,
-      rawText: fullMatch,
-    });
-  }
-  
-  // Extract CrPC sections
-  const crpcMatches = text.matchAll(CITATION_PATTERNS.crpc);
-  for (const match of crpcMatches) {
-    const [fullMatch, section] = match;
-    sections.push({
-      section: `CrPC ${section}`,
-      act: "Code of Criminal Procedure",
-      confidence: 0.95,
-      rawText: fullMatch,
-    });
-  }
-  
-  // Extract general sections
-  const sectionMatches = text.matchAll(CITATION_PATTERNS.section);
-  for (const match of sectionMatches) {
-    const [fullMatch, section, act] = match;
-    
-    // Skip if already captured as IPC/CrPC
-    if (sections.some(s => s.rawText === fullMatch)) continue;
-    
-    sections.push({
-      section: `${section}`,
-      act: act.trim(),
-      confidence: 0.80,
-      rawText: fullMatch,
-    });
-  }
-  
-  return sections;
+  startIndex: number;
+  endIndex: number;
 }
 
-/**
- * Validate citation format
- */
-export function validateCitation(citation: ExtractedCitation): {
-  valid: boolean;
+export interface CitationExtractionResult {
+  citations: ExtractedCitation[];
+  ipcSections: string[];
+  crpcSections: string[];
+  otherSections: string[];
+  stats: CitationStats;
   errors: string[];
-} {
+}
+
+export interface CitationStats {
+  total: number;
+  byCourt: Record<string, number>;
+  byReporter: Record<string, number>;
+  byDecade: Record<string, number>;
+  highConfidence: number;
+  lowConfidence: number;
+  duplicates: number;
+}
+
+//  Regex Patterns 
+
+const CITATION_PATTERNS: Array<{
+  pattern: RegExp;
+  reporter: CitationReporter;
+  confidence: number;
+}> = [
+  { pattern: /\((\d{4})\)\s*(\d+)\s*SCC\s*(\d+)/gi,   reporter: "SCC",    confidence: 0.95 },
+  { pattern: /AIR\s*(\d{4})\s*SC\s*(\d+)/gi,           reporter: "AIR",    confidence: 0.92 },
+  { pattern: /AIR\s*(\d{4})\s*([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\s*(\d+)/gi, reporter: "AIR", confidence: 0.85 },
+  { pattern: /\((\d{4})\)\s*(\d+)\s*SCR\s*(\d+)/gi,   reporter: "SCR",    confidence: 0.90 },
+  { pattern: /(\d{4})\s*Cri(?:minal)?\s*LJ\s*(\d+)/gi, reporter: "Cri LJ", confidence: 0.88 },
+  { pattern: /\((\d{4})\)\s*(\d+)\s*SCALE\s*(\d+)/gi, reporter: "SCALE",  confidence: 0.87 },
+  { pattern: /\((\d{4})\)\s*(?:\d+\s*)?SLT\s*(\d+)/gi, reporter: "SLT",   confidence: 0.82 },
+];
+
+const CASE_NAME_PATTERN =
+  /([A-Z][A-Za-z\s&.,'()-]{5,80}?)\s+(?:v\.?s?\.?|versus)\s+([A-Z][A-Za-z\s&.,'()-]{3,60}?)(?=\s*[\[(]?\d{4})/g;
+
+const PARA_PATTERN = /(?:para(?:graph)?\.?\s*|\s*)(\d+)/gi;
+
+const IPC_PATTERN =
+  /(?:(?:section|sec\.?|s\.)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Indian\s+Penal\s+Code|IPC)/gi;
+
+const CRPC_PATTERN =
+  /(?:(?:section|sec\.?|s\.)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Code\s+of\s+Criminal\s+Procedure|Cr\.?P\.?C\.?|CrPC)/gi;
+
+const OTHER_SECTION_PATTERN =
+  /(?:section|sec\.?|article|art\.?)\s*(\d+[A-Z]?(?:\s*\(\d+\))?)\s*(?:of\s+)?(?:the\s+)?([A-Z][A-Za-z\s]+?(?:Act|Code|Constitution))/gi;
+
+//  Helpers 
+
+function generateCitationId(year: number, reporter: string, page: number): string {
+  return `${reporter.replace(/\s+/g, "_")}_${year}_${page}`;
+}
+
+function extractCaseName(text: string, matchStart: number): string | undefined {
+  const lookback = text.slice(Math.max(0, matchStart - 120), matchStart);
+  const matches = [...lookback.matchAll(CASE_NAME_PATTERN)];
+  if (matches.length === 0) return undefined;
+  const last = matches[matches.length - 1];
+  return `${last[1].trim()} v. ${last[2].trim()}`;
+}
+
+function extractParaNumber(text: string, matchStart: number, matchEnd: number): number | undefined {
+  const window = text.slice(Math.max(0, matchStart - 60), Math.min(text.length, matchEnd + 60));
+  const match = PARA_PATTERN.exec(window);
+  PARA_PATTERN.lastIndex = 0;
+  return match ? parseInt(match[1], 10) : undefined;
+}
+
+function inferCourt(reporter: CitationReporter, raw: string): string | undefined {
+  if (["SCC", "SCR", "SCALE", "SLT"].includes(reporter)) return "Supreme Court of India";
+  if (reporter === "AIR") {
+    if (/AIR\s*\d{4}\s*SC\b/i.test(raw)) return "Supreme Court of India";
+    const hcMatch = /AIR\s*\d{4}\s*([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\s*\d/i.exec(raw);
+    if (hcMatch) return `${hcMatch[1]} High Court`;
+  }
+  return undefined;
+}
+
+//  Main Extraction 
+
+export function extractCitations(text: string): CitationExtractionResult {
+  if (!featureFlags.enableCitationExtraction) {
+    return {
+      citations: [],
+      ipcSections: [],
+      crpcSections: [],
+      otherSections: [],
+      stats: buildStats([]),
+      errors: ["Citation extraction feature flag is disabled"],
+    };
+  }
+
+  const citations: ExtractedCitation[] = [];
   const errors: string[] = [];
-  
-  // Check year
-  if (citation.year < 1950 || citation.year > new Date().getFullYear()) {
-    errors.push(`Invalid year: ${citation.year}`);
-  }
-  
-  // Check volume
-  if (citation.volume && isNaN(parseInt(citation.volume))) {
-    errors.push(`Invalid volume: ${citation.volume}`);
-  }
-  
-  // Check page
-  if (citation.page && citation.page < 1) {
-    errors.push(`Invalid page: ${citation.page}`);
-  }
-  
-  // Check case title
-  if (!citation.caseTitle || citation.caseTitle.length < 3) {
-    errors.push("Case title too short or missing");
-  }
-  
-  // Check court
-  if (!citation.court || citation.court.length < 3) {
-    errors.push("Court name too short or missing");
-  }
-  
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-}
+  const seenIds = new Set<string>();
 
-/**
- * Format citation for display
- */
-export function formatCitation(citation: ExtractedCitation): string {
-  const parts: string[] = [];
-  
-  if (citation.caseTitle) {
-    parts.push(citation.caseTitle);
-  }
-  
-  if (citation.citation) {
-    parts.push(citation.citation);
-  }
-  
-  if (citation.paragraphNumber) {
-    parts.push(`Para ${citation.paragraphNumber}`);
-  }
-  
-  return parts.join(", ");
-}
+  for (const { pattern, reporter, confidence } of CITATION_PATTERNS) {
+    pattern.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(text)) !== null) {
+      try {
+        let year: number, volume: number | undefined, page: number;
+        if (reporter === "AIR") {
+          year = parseInt(match[1], 10);
+          page = parseInt(match[match.length - 1], 10);
+        } else if (reporter === "Cri LJ") {
+          year = parseInt(match[1], 10);
+          page = parseInt(match[2], 10);
+        } else {
+          year = parseInt(match[1], 10);
+          if (match[3]) { volume = parseInt(match[2], 10); page = parseInt(match[3], 10); }
+          else { page = parseInt(match[2], 10); }
+        }
+        if (isNaN(year) || isNaN(page)) continue;
+        if (year < 1947 || year > new Date().getFullYear() + 1) continue;
 
-/**
- * Parse citation string to extract components
- */
-export function parseCitationString(citationStr: string): {
-  year?: number;
-  volume?: string;
-  reporter?: string;
-  page?: number;
-} {
-  const result: {
-    year?: number;
-    volume?: string;
-    reporter?: string;
-    page?: number;
-  } = {};
-  
-  // Match pattern: (YYYY) VV REPORTER PP
-  const match = citationStr.match(/\((\d{4})\)\s+(\d+)\s+([A-Z]+)\s+(\d+)/);
-  if (match) {
-    result.year = parseInt(match[1]);
-    result.volume = match[2];
-    result.reporter = match[3];
-    result.page = parseInt(match[4]);
-  }
-  
-  return result;
-}
+        const id = generateCitationId(year, reporter, page);
+        if (seenIds.has(id)) continue;
+        seenIds.add(id);
 
-/**
- * Extract case title near a position in text
- */
-function extractCaseTitleNearPosition(text: string, position: number): string {
-  const startPos = Math.max(0, position - 200);
-  const endPos = Math.min(text.length, position + 200);
-  const context = text.substring(startPos, endPos);
-  
-  // Look for "v." or "vs." pattern
-  const match = context.match(/([A-Z][A-Za-z\s&,\.]+?)\s+(?:v\.?|vs\.?)\s+([A-Z][A-Za-z\s&,\.]+?)/);
-  if (match) {
-    return `${match[1].trim()} v. ${match[2].trim()}`;
-  }
-  
-  return "Unknown Case";
-}
-
-/**
- * Generate unique citation ID
- */
-function generateCitationId(): string {
-  return `cit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-/**
- * Deduplicate citations
- */
-export function deduplicateCitations(citations: ExtractedCitation[]): ExtractedCitation[] {
-  const seen = new Map<string, ExtractedCitation>();
-  
-  for (const citation of citations) {
-    const key = `${citation.caseTitle}|${citation.citation}`;
-    
-    if (!seen.has(key)) {
-      seen.set(key, citation);
-    } else {
-      // Keep the one with higher confidence
-      const existing = seen.get(key)!;
-      if (citation.confidence > existing.confidence) {
-        seen.set(key, citation);
+        citations.push({
+          id,
+          raw: match[0],
+          caseName: extractCaseName(text, match.index),
+          year,
+          volume,
+          reporter,
+          page,
+          paraNumber: extractParaNumber(text, match.index, match.index + match[0].length),
+          court: inferCourt(reporter, match[0]),
+          confidence,
+          startIndex: match.index,
+          endIndex: match.index + match[0].length,
+        });
+      } catch {
+        errors.push(`Failed to parse citation: ${match[0]}`);
       }
     }
   }
-  
-  return Array.from(seen.values());
+
+  // IPC sections
+  const ipcSections: string[] = [];
+  IPC_PATTERN.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = IPC_PATTERN.exec(text)) !== null) {
+    const s = m[1].toUpperCase();
+    if (!ipcSections.includes(s)) ipcSections.push(s);
+  }
+
+  // CrPC sections
+  const crpcSections: string[] = [];
+  CRPC_PATTERN.lastIndex = 0;
+  while ((m = CRPC_PATTERN.exec(text)) !== null) {
+    const s = m[1].toUpperCase();
+    if (!crpcSections.includes(s)) crpcSections.push(s);
+  }
+
+  // Other sections
+  const otherSections: string[] = [];
+  OTHER_SECTION_PATTERN.lastIndex = 0;
+  while ((m = OTHER_SECTION_PATTERN.exec(text)) !== null) {
+    const entry = `${m[1]} of ${m[2].trim()}`;
+    if (!otherSections.includes(entry)) otherSections.push(entry);
+  }
+
+  citations.sort((a, b) => a.startIndex - b.startIndex);
+
+  return { citations, ipcSections, crpcSections, otherSections, stats: buildStats(citations), errors };
 }
 
-/**
- * Get citation statistics
- */
-export function getCitationStatistics(citations: ExtractedCitation[]): {
-  totalCitations: number;
-  byReporter: Record<string, number>;
-  byYear: Record<number, number>;
-  byCourt: Record<string, number>;
-  avgConfidence: number;
-  highConfidenceCitations: number;
-} {
-  const byReporter = new Map<string, number>();
-  const byYear = new Map<number, number>();
-  const byCourt = new Map<string, number>();
-  let totalConfidence = 0;
-  let highConfidenceCount = 0;
-  
-  for (const citation of citations) {
-    // By reporter
-    if (citation.reporter) {
-      byReporter.set(citation.reporter, (byReporter.get(citation.reporter) || 0) + 1);
-    }
-    
-    // By year
-    byYear.set(citation.year, (byYear.get(citation.year) || 0) + 1);
-    
-    // By court
-    byCourt.set(citation.court, (byCourt.get(citation.court) || 0) + 1);
-    
-    // Confidence
-    totalConfidence += citation.confidence;
-    if (citation.confidence >= 0.90) {
-      highConfidenceCount++;
-    }
+//  Stats 
+
+function buildStats(citations: ExtractedCitation[]): CitationStats {
+  const byCourt: Record<string, number> = {};
+  const byReporter: Record<string, number> = {};
+  const byDecade: Record<string, number> = {};
+  let highConfidence = 0, lowConfidence = 0;
+
+  for (const c of citations) {
+    const court = c.court ?? "Unknown";
+    byCourt[court] = (byCourt[court] ?? 0) + 1;
+    byReporter[c.reporter] = (byReporter[c.reporter] ?? 0) + 1;
+    const decade = `${Math.floor(c.year / 10) * 10}s`;
+    byDecade[decade] = (byDecade[decade] ?? 0) + 1;
+    if (c.confidence >= 0.8) highConfidence++;
+    if (c.confidence < 0.5) lowConfidence++;
   }
-  
-  return {
-    totalCitations: citations.length,
-    byReporter: Object.fromEntries(byReporter),
-    byYear: Object.fromEntries(byYear),
-    byCourt: Object.fromEntries(byCourt),
-    avgConfidence: citations.length > 0 ? totalConfidence / citations.length : 0,
-    highConfidenceCitations: highConfidenceCount,
-  };
+
+  return { total: citations.length, byCourt, byReporter, byDecade, highConfidence, lowConfidence, duplicates: 0 };
+}
+
+//  Utilities 
+
+export function validateCitation(citation: ExtractedCitation): { valid: boolean; issues: string[] } {
+  const issues: string[] = [];
+  if (!citation.caseName) issues.push("Missing case name");
+  if (!citation.paraNumber) issues.push("Missing paragraph number");
+  if (!citation.court) issues.push("Court could not be inferred");
+  if (citation.confidence < 0.7) issues.push("Low extraction confidence");
+  if (citation.year < 1950) issues.push("Unusually old citation — verify manually");
+  return { valid: issues.length === 0, issues };
+}
+
+export function formatCitation(citation: ExtractedCitation): string {
+  const parts: string[] = [];
+  if (citation.caseName) parts.push(citation.caseName);
+  parts.push(`(${citation.year})`);
+  if (citation.volume) parts.push(`${citation.volume}`);
+  parts.push(citation.reporter);
+  parts.push(`${citation.page}`);
+  if (citation.paraNumber) parts.push(`, Para ${citation.paraNumber}`);
+  return parts.join(" ");
+}
+
+export function deduplicateCitations(citations: ExtractedCitation[]): ExtractedCitation[] {
+  const seen = new Set<string>();
+  return citations.filter(c => { if (seen.has(c.id)) return false; seen.add(c.id); return true; });
 }
