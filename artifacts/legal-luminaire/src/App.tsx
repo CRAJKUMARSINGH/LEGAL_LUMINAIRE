@@ -7,7 +7,7 @@ import {
   Scale, BookOpen, CheckSquare, Mic,
   Home as HomeIcon, Menu, FilePlus, X, FileText,
   LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
-  FileSearch, Table2, Brain, Sparkles,
+  FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare,
 } from "lucide-react";
 import { useState } from "react";
 import { CaseProvider, useCaseContext } from "@/context/CaseContext";
@@ -36,6 +36,11 @@ const DemoCaseBrowser = lazy(() => import("@/pages/DemoCaseBrowser"));
 const StandardsValidity = lazy(() => import("@/pages/StandardsValidity"));
 const SessionWorkspace = lazy(() => import("@/pages/session-workspace"));
 const DraftViewer = lazy(() => import("@/pages/draft-viewer"));
+
+// Phase 3-6 Intelligence Pages
+const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
+const CaseSimilarityPage = lazy(() => import("@/pages/CaseSimilarityPage"));
+const JudgeAnalyticsPage = lazy(() => import("@/pages/JudgeAnalyticsPage"));
 
 // Lazy load heavy view components
 const DynamicDashboardView = lazy(() => import("@/components/views/DynamicDashboardView").then(module => ({ default: module.DynamicDashboardView })));
@@ -71,61 +76,61 @@ type NavGroup = { groupLabel: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    groupLabel: "शुरुआत / Setup",
+    groupLabel: "à¤¶à¥à¤°à¥à¤†à¤¤ / Setup",
     items: [
-      { path: "/",        label: "मुख्य पृष्ठ",    labelEn: "Home",            icon: HomeIcon,        caseScoped: false },
-      { path: "/cases",   label: "सभी केस",         labelEn: "All Cases",       icon: Files,           caseScoped: false },
-      { path: "/demo-browser", label: "26 डेमो केस", labelEn: "26 Demo Cases",  icon: Globe,           caseScoped: false, badge: "26" },
-      { path: "/intake",  label: "नया केस इंटेक",   labelEn: "New Case Intake", icon: FilePlus,        caseScoped: false },
-      { path: "/new-case-ingest", label: "AI केस इंजेस्ट", labelEn: "AI Case Ingest", icon: Upload,   caseScoped: false },
+      { path: "/",        label: "à¤®à¥à¤–à¥à¤¯ à¤ªà¥ƒà¤·à¥à¤ ",    labelEn: "Home",            icon: HomeIcon,        caseScoped: false },
+      { path: "/cases",   label: "à¤¸à¤­à¥€ à¤•à¥‡à¤¸",         labelEn: "All Cases",       icon: Files,           caseScoped: false },
+      { path: "/demo-browser", label: "26 à¤¡à¥‡à¤®à¥‹ à¤•à¥‡à¤¸", labelEn: "26 Demo Cases",  icon: Globe,           caseScoped: false, badge: "26" },
+      { path: "/intake",  label: "à¤¨à¤¯à¤¾ à¤•à¥‡à¤¸ à¤‡à¤‚à¤Ÿà¥‡à¤•",   labelEn: "New Case Intake", icon: FilePlus,        caseScoped: false },
+      { path: "/new-case-ingest", label: "AI à¤•à¥‡à¤¸ à¤‡à¤‚à¤œà¥‡à¤¸à¥à¤Ÿ", labelEn: "AI Case Ingest", icon: Upload,   caseScoped: false },
     ],
   },
   {
-    groupLabel: "कार्यस्थान / Case Workspace",
+    groupLabel: "à¤•à¤¾à¤°à¥à¤¯à¤¸à¥à¤¥à¤¾à¤¨ / Case Workspace",
     items: [
-      { path: "/dashboard",   label: "डैशबोर्ड",       labelEn: "Dashboard",          icon: LayoutDashboard, caseScoped: true },
-      { path: "/case-law",    label: "कानून खोज",      labelEn: "Case Law Research",  icon: BookOpen,        caseScoped: true },
-      { path: "/case-research", label: "विधिक शोध", labelEn: "Case Research", icon: FileSearch, caseScoped: true },
-      { path: "/cross-reference", label: "क्रॉस-रेफ मैट्रिक्स", labelEn: "Cross-Ref Matrix", icon: Table2, caseScoped: true },
-      { path: "/ai-research", label: "AI शोध इंजन", labelEn: "AI Research Engine", icon: Brain, caseScoped: true },
-      { path: "/ai-draft-engine", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine", icon: Sparkles, caseScoped: true },
-      { path: "/standards",   label: "मानक / Lab",     labelEn: "Forensic Standards", icon: FlaskConical,    caseScoped: true },
-      { path: "/chat",        label: "AI चैट",         labelEn: "AI Chat",            icon: MessageSquare,   caseScoped: true },
-      { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale,    caseScoped: true },
-      { path: "/defence-reply", label: "डिफेंस रिप्लाई", labelEn: "Defence Reply",   icon: FileText,        caseScoped: true },
-      { path: "/safe-draft",  label: "सेफ ड्राफ्ट",   labelEn: "Safe Draft Editor",  icon: ShieldCheck,     caseScoped: true, badge: "NEW" },
-      { path: "/notice-reply", label: "नोटिस रिप्लाई", labelEn: "Notice Reply",       icon: FileText,        caseScoped: true, badge: "NEW" },
-      { path: "/discharge-print", label: "डिस्चार्ज PDF", labelEn: "Discharge PDF v5",  icon: Scale,           caseScoped: true, badge: "NEW" },
+      { path: "/dashboard",   label: "à¤¡à¥ˆà¤¶à¤¬à¥‹à¤°à¥à¤¡",       labelEn: "Dashboard",          icon: LayoutDashboard, caseScoped: true },
+      { path: "/case-law",    label: "à¤•à¤¾à¤¨à¥‚à¤¨ à¤–à¥‹à¤œ",      labelEn: "Case Law Research",  icon: BookOpen,        caseScoped: true },
+      { path: "/case-research", label: "à¤µà¤¿à¤§à¤¿à¤• à¤¶à¥‹à¤§", labelEn: "Case Research", icon: FileSearch, caseScoped: true },
+      { path: "/cross-reference", label: "à¤•à¥à¤°à¥‰à¤¸-à¤°à¥‡à¤« à¤®à¥ˆà¤Ÿà¥à¤°à¤¿à¤•à¥à¤¸", labelEn: "Cross-Ref Matrix", icon: Table2, caseScoped: true },
+      { path: "/ai-research", label: "AI à¤¶à¥‹à¤§ à¤‡à¤‚à¤œà¤¨", labelEn: "AI Research Engine", icon: Brain, caseScoped: true },
+      { path: "/ai-draft-engine", label: "AI à¤¡à¥à¤°à¤¾à¤«à¥à¤Ÿ à¤‡à¤‚à¤œà¤¨", labelEn: "AI Draft Engine", icon: Sparkles, caseScoped: true },
+      { path: "/standards",   label: "à¤®à¤¾à¤¨à¤• / Lab",     labelEn: "Forensic Standards", icon: FlaskConical,    caseScoped: true },
+      { path: "/chat",        label: "AI à¤šà¥ˆà¤Ÿ",         labelEn: "AI Chat",            icon: MessageSquare,   caseScoped: true },
+      { path: "/discharge-application", label: "à¤ªà¥à¤°à¤¾à¤°à¥à¤¥à¤¨à¤¾-à¤ªà¤¤à¥à¤°", labelEn: "Discharge App", icon: Scale,    caseScoped: true },
+      { path: "/defence-reply", label: "à¤¡à¤¿à¤«à¥‡à¤‚à¤¸ à¤°à¤¿à¤ªà¥à¤²à¤¾à¤ˆ", labelEn: "Defence Reply",   icon: FileText,        caseScoped: true },
+      { path: "/safe-draft",  label: "à¤¸à¥‡à¤« à¤¡à¥à¤°à¤¾à¤«à¥à¤Ÿ",   labelEn: "Safe Draft Editor",  icon: ShieldCheck,     caseScoped: true, badge: "NEW" },
+      { path: "/notice-reply", label: "à¤¨à¥‹à¤Ÿà¤¿à¤¸ à¤°à¤¿à¤ªà¥à¤²à¤¾à¤ˆ", labelEn: "Notice Reply",       icon: FileText,        caseScoped: true, badge: "NEW" },
+      { path: "/discharge-print", label: "à¤¡à¤¿à¤¸à¥à¤šà¤¾à¤°à¥à¤œ PDF", labelEn: "Discharge PDF v5",  icon: Scale,           caseScoped: true, badge: "NEW" },
       ...(featureFlags.hybridStandardsValidity ? [
-        { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
+        { path: "/standards-validity", label: "à¤®à¤¾à¤¨à¤• à¤µà¥ˆà¤§à¤¤à¤¾", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
       ] : []),
       ...(featureFlags.hybridSessionWorkspace ? [
-        { path: "/session-workspace", label: "कार्यस्थान", labelEn: "Hybrid Workspace", icon: LayoutDashboard, caseScoped: true, badge: "BETA" as const },
+        { path: "/session-workspace", label: "à¤•à¤¾à¤°à¥à¤¯à¤¸à¥à¤¥à¤¾à¤¨", labelEn: "Hybrid Workspace", icon: LayoutDashboard, caseScoped: true, badge: "BETA" as const },
       ] : []),
-      { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments",     icon: Mic,             caseScoped: true },
+      { path: "/oral-arguments", label: "à¤®à¥Œà¤–à¤¿à¤• à¤¤à¤°à¥à¤•", labelEn: "Oral Arguments",     icon: Mic,             caseScoped: true },
     ],
   },
   {
-    groupLabel: "समीक्षा / Review",
+    groupLabel: "à¤¸à¤®à¥€à¤•à¥à¤·à¤¾ / Review",
     items: [
-      { path: "/verification",     label: "सत्यापन",    labelEn: "Verification",     icon: ShieldCheck, caseScoped: true },
-      { path: "/filing-checklist", label: "चेकलिस्ट",  labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
-      { path: "/timeline",         label: "टाइमलाइन",  labelEn: "Timeline",         icon: Clock,       caseScoped: true },
-      { path: "/documents",        label: "दस्तावेज़",  labelEn: "Documents",        icon: Files,       caseScoped: true },
-      { path: "/upload",           label: "अपलोड",      labelEn: "Upload",           icon: Upload,      caseScoped: true },
+      { path: "/verification",     label: "à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨",    labelEn: "Verification",     icon: ShieldCheck, caseScoped: true },
+      { path: "/filing-checklist", label: "à¤šà¥‡à¤•à¤²à¤¿à¤¸à¥à¤Ÿ",  labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
+      { path: "/timeline",         label: "à¤Ÿà¤¾à¤‡à¤®à¤²à¤¾à¤‡à¤¨",  labelEn: "Timeline",         icon: Clock,       caseScoped: true },
+      { path: "/documents",        label: "à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼",  labelEn: "Documents",        icon: Files,       caseScoped: true },
+      { path: "/upload",           label: "à¤…à¤ªà¤²à¥‹à¤¡",      labelEn: "Upload",           icon: Upload,      caseScoped: true },
     ],
   },
   {
-    groupLabel: "सीनियर रिव्यू / Senior Review",
+    groupLabel: "à¤¸à¥€à¤¨à¤¿à¤¯à¤° à¤°à¤¿à¤µà¥à¤¯à¥‚ / Senior Review",
     items: [
-      { path: "/review-queue", label: "चेंबर रिव्यू", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
+      { path: "/review-queue", label: "à¤šà¥‡à¤‚à¤¬à¤° à¤°à¤¿à¤µà¥à¤¯à¥‚", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
     ],
   },
   {
-    groupLabel: "संदर्भ / Reference",
+    groupLabel: "à¤¸à¤‚à¤¦à¤°à¥à¤­ / Reference",
     items: [
-      { path: "/forensic-faq", label: "फोरेंसिक FAQ", labelEn: "Forensic FAQ", icon: FlaskConical, caseScoped: false },
-      { path: "/infra-arb", label: "इन्फ्रा आर्बिट्रेशन", labelEn: "Infra Arbitration", icon: Scale, caseScoped: false, badge: "NEW" },
+      { path: "/forensic-faq", label: "à¤«à¥‹à¤°à¥‡à¤‚à¤¸à¤¿à¤• FAQ", labelEn: "Forensic FAQ", icon: FlaskConical, caseScoped: false },
+      { path: "/infra-arb", label: "à¤‡à¤¨à¥à¤«à¥à¤°à¤¾ à¤†à¤°à¥à¤¬à¤¿à¤Ÿà¥à¤°à¥‡à¤¶à¤¨", labelEn: "Infra Arbitration", icon: Scale, caseScoped: false, badge: "NEW" },
     ],
   },
 ];
@@ -150,7 +155,7 @@ const Sidebar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
                   <span className="bg-primary/20 text-primary text-[8px] font-black px-1 rounded border border-primary/30 uppercase tracking-tighter">Pro</span>
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-[10px] text-sidebar-accent-foreground opacity-80">अधिवक्ता शोध मंच</p>
+                  <p className="text-[10px] text-sidebar-accent-foreground opacity-80">à¤…à¤§à¤¿à¤µà¤•à¥à¤¤à¤¾ à¤¶à¥‹à¤§ à¤®à¤‚à¤š</p>
                   <span className="text-[8px] bg-emerald-500/20 text-emerald-500 px-1 rounded border border-emerald-500/30 font-bold tracking-tighter animate-pulse">BETA</span>
                 </div>
               </div>
@@ -300,7 +305,15 @@ function Router() {
         {featureFlags.hybridDraftViewer && (
           <Route path="/draft/:id"                    component={() => <Suspense fallback={<LoadingFallback />}><DraftViewer /></Suspense>} />
         )}
-
+        {(featureFlags.enableCitationGraph || featureFlags.enableCitationExtraction) && (
+          <Route path="/case/:id/citation-graph"    component={() => <Suspense fallback={<LoadingFallback />}><CitationGraphPage /></Suspense>} />
+        )}
+        {(featureFlags.enableCaseSimilarity || featureFlags.enableQueryUnderstanding) && (
+          <Route path="/case/:id/case-similarity"   component={() => <Suspense fallback={<LoadingFallback />}><CaseSimilarityPage /></Suspense>} />
+        )}
+        {(featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics) && (
+          <Route path="/case/:id/judge-analytics"   component={() => <Suspense fallback={<LoadingFallback />}><JudgeAnalyticsPage /></Suspense>} />
+        )}
         <Route component={() => <Suspense fallback={<LoadingFallback />}><NotFound /></Suspense>} />
       </Switch>
     </Layout>

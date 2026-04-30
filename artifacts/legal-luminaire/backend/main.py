@@ -1,5 +1,5 @@
 """
-Legal Luminaire — FastAPI Backend
+Legal Luminaire â€” FastAPI Backend
 Multi-agent legal research + RAG + zero-hallucination drafting
 """
 from __future__ import annotations
@@ -26,8 +26,11 @@ from api.routes_collision import router as collision_router
 from api.routes_auto_research import router as auto_research_router
 from api.routes_verify import router as verify_router
 from api.routes_legal_stream import router as legal_stream_router
+from api.routes_similarity import router as similarity_router
+from api.routes_analytics import router as analytics_router
+from api.routes_graph import router as graph_router
 
-# ── Logging ────────────────────────────────────────────────────────────────────
+# â”€â”€ Logging â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -35,7 +38,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# ── Rate limiter (simple in-memory) ───────────────────────────────────────────
+# â”€â”€ Rate limiter (simple in-memory) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _request_counts: dict[str, list[float]] = defaultdict(list)
 
 
@@ -52,7 +55,7 @@ def _check_rate_limit(client_ip: str) -> bool:
     return True
 
 
-# ── Startup ────────────────────────────────────────────────────────────────────
+# â”€â”€ Startup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Ensure directories exist
@@ -78,13 +81,13 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Case01 preload failed (non-fatal): {e}")
     else:
-        logger.info("OpenAI not configured — skipping Case01 preload")
+        logger.info("OpenAI not configured â€” skipping Case01 preload")
 
     yield
     logger.info("Shutting down Legal Luminaire backend.")
 
 
-# ── App ────────────────────────────────────────────────────────────────────────
+# â”€â”€ App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app = FastAPI(
     title="Legal Luminaire API",
     description="Zero-hallucination multi-agent legal research and drafting",
@@ -125,6 +128,9 @@ app.include_router(collision_router, prefix="/api/v1")
 app.include_router(auto_research_router, prefix="/api/v1")
 app.include_router(verify_router, prefix="/api/v1")
 app.include_router(legal_stream_router, prefix="/api/legal")
+app.include_router(similarity_router)
+app.include_router(analytics_router)
+app.include_router(graph_router)
 
 
 @app.get("/")
