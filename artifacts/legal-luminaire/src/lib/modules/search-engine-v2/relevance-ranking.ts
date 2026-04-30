@@ -326,7 +326,7 @@ export function calculateFinalScore(
   const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
   const normalizedWeights = Object.fromEntries(
     Object.entries(weights).map(([key, value]) => [key, value / totalWeight])
-  ) as RankingWeights;
+  ) as unknown as RankingWeights;
   
   // Calculate weighted sum
   const finalScore = 

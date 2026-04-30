@@ -1,4 +1,4 @@
-import { Switch, Route, Link, useLocation } from "wouter";
+﻿import { Switch, Route, Link, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -126,6 +126,20 @@ const NAV_GROUPS: NavGroup[] = [
       { path: "/review-queue", label: "à¤šà¥‡à¤‚à¤¬à¤° à¤°à¤¿à¤µà¥à¤¯à¥‚", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
     ],
   },
+  ...(featureFlags.enableCitationGraph || featureFlags.enableCitationExtraction || featureFlags.enableCaseSimilarity || featureFlags.enableQueryUnderstanding || featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics ? [{
+    groupLabel: "Intelligence",
+    items: [
+      ...(featureFlags.enableCitationGraph || featureFlags.enableCitationExtraction ? [
+        { path: "/citation-graph", label: "Citation Graph", labelEn: "Citation Graph", icon: Network, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+      ...(featureFlags.enableCaseSimilarity || featureFlags.enableQueryUnderstanding ? [
+        { path: "/case-similarity", label: "Case Similarity", labelEn: "Case Similarity", icon: GitCompare, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+      ...(featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics ? [
+        { path: "/judge-analytics", label: "Judge Analytics", labelEn: "Judge Analytics", icon: BarChart3, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+    ],
+  }] : []),
   {
     groupLabel: "à¤¸à¤‚à¤¦à¤°à¥à¤­ / Reference",
     items: [

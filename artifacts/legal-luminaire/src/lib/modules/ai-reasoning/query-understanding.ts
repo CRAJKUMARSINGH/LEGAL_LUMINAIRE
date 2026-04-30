@@ -154,8 +154,8 @@ const ISSUE_PATTERNS: Array<{
   { pattern: /\b(?:negligence|negligent|rash|careless|duty of care)\b/i, category: "NEGLIGENCE", label: "Negligence / Tort", sections: ["304A IPC"] },
 ];
 
-const IPC_PATTERN = /(?:(?:section|sec\.?|s\.)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Indian\s+Penal\s+Code|IPC)/gi;
-const CRPC_PATTERN = /(?:(?:section|sec\.?|s\.)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Code\s+of\s+Criminal\s+Procedure|Cr\.?P\.?C\.?|CrPC)/gi;
+const IPC_PATTERN = /(?:(?:IPC|Indian\s+Penal\s+Code)\s+(\d+[A-Z]?)|(?:(?:section|sec\.?|s\.)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Indian\s+Penal\s+Code|IPC))/gi;
+const CRPC_PATTERN = /(?:(?:CrPC|Cr\.?P\.?C\.?|Code\s+of\s+Criminal\s+Procedure)\s+(\d+[A-Z]?)|(?:(?:section|sec\.?|s\.)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Code\s+of\s+Criminal\s+Procedure|Cr\.?P\.?C\.?|CrPC))/gi;
 const OTHER_SECTION_PATTERN = /(?:section|sec\.?|article|art\.?)\s*(\d+[A-Z]?(?:\s*\(\d+\))?)\s*(?:of\s+)?(?:the\s+)?([A-Z][A-Za-z\s]+?(?:Act|Code|Constitution))/gi;
 const DATE_PATTERN = /\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}|\d{4}|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})\b/gi;
 
@@ -231,8 +231,8 @@ function extractSections(text: string): {
   IPC_PATTERN.lastIndex = 0;
   let m: RegExpExecArray | null;
   while ((m = IPC_PATTERN.exec(text)) !== null) {
-    const s = m[1].toUpperCase();
-    if (!ipc.includes(s)) {
+    const s = (m[1] ?? m[2] ?? "").toUpperCase();
+    if (s && !ipc.includes(s)) {
       ipc.push(s);
       entities.push({ text: m[0], type: "SECTION", normalizedText: `Section ${s} IPC`, confidence: 0.92, startIndex: m.index, endIndex: m.index + m[0].length });
     }
@@ -240,8 +240,8 @@ function extractSections(text: string): {
 
   CRPC_PATTERN.lastIndex = 0;
   while ((m = CRPC_PATTERN.exec(text)) !== null) {
-    const s = m[1].toUpperCase();
-    if (!crpc.includes(s)) {
+    const s = (m[1] ?? m[2] ?? "").toUpperCase();
+    if (s && !crpc.includes(s)) {
       crpc.push(s);
       entities.push({ text: m[0], type: "SECTION", normalizedText: `Section ${s} CrPC`, confidence: 0.92, startIndex: m.index, endIndex: m.index + m[0].length });
     }

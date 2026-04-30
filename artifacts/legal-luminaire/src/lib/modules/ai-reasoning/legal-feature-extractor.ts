@@ -118,17 +118,17 @@ function extractKeyTerms(text: string, maxTerms = 20): string[] {
 
 //  Section Extraction 
 
-const IPC_RE = /(?:(?:section|sec\.?)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Indian\s+Penal\s+Code|IPC)/gi;
-const CRPC_RE = /(?:(?:section|sec\.?)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Code\s+of\s+Criminal\s+Procedure|Cr\.?P\.?C\.?|CrPC)/gi;
+const IPC_RE = /(?:(?:IPC|Indian\s+Penal\s+Code)\s+(\d+[A-Z]?)|(?:(?:section|sec\.?)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Indian\s+Penal\s+Code|IPC))/gi;
+const CRPC_RE = /(?:(?:CrPC|Cr\.?P\.?C\.?|Code\s+of\s+Criminal\s+Procedure)\s+(\d+[A-Z]?)|(?:(?:section|sec\.?)\s*)?(\d+[A-Z]?)\s*(?:of\s+)?(?:the\s+)?(?:Code\s+of\s+Criminal\s+Procedure|Cr\.?P\.?C\.?|CrPC))/gi;
 const OTHER_RE = /(?:section|sec\.?|article|art\.?)\s*(\d+[A-Z]?(?:\s*\(\d+\))?)\s*(?:of\s+)?(?:the\s+)?([A-Z][A-Za-z\s]+?(?:Act|Code|Constitution))/gi;
 
 function extractSections(text: string) {
   const ipc: string[] = [], crpc: string[] = [], other: string[] = [];
   let m: RegExpExecArray | null;
   IPC_RE.lastIndex = 0;
-  while ((m = IPC_RE.exec(text)) !== null) { const s = m[1].toUpperCase(); if (!ipc.includes(s)) ipc.push(s); }
+  while ((m = IPC_RE.exec(text)) !== null) { const s = (m[1] ?? m[2] ?? "").toUpperCase(); if (s && !ipc.includes(s)) ipc.push(s); }
   CRPC_RE.lastIndex = 0;
-  while ((m = CRPC_RE.exec(text)) !== null) { const s = m[1].toUpperCase(); if (!crpc.includes(s)) crpc.push(s); }
+  while ((m = CRPC_RE.exec(text)) !== null) { const s = (m[1] ?? m[2] ?? "").toUpperCase(); if (s && !crpc.includes(s)) crpc.push(s); }
   OTHER_RE.lastIndex = 0;
   while ((m = OTHER_RE.exec(text)) !== null) { const e = `${m[1]} of ${m[2].trim()}`; if (!other.includes(e)) other.push(e); }
   return { ipc, crpc, other };

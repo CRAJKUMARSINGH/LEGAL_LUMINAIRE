@@ -2,7 +2,7 @@
 
 ## VERSION 2.0.0 - APRIL 29, 2026 - LEGAL INTELLIGENCE HYBRID INTEGRATION
 
-### 🚀 MAJOR RELEASE: Zero-Loss Precision Hybridization
+### ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â€šÂ¬ MAJOR RELEASE: Zero-Loss Precision Hybridization
 
 This release represents a comprehensive upgrade transforming Legal Luminaire from a legal research tool into a **Unified Indian Legal Intelligence Platform** by integrating:
 - **Legal-Luminary-Search**: Advanced search engine with query expansion
@@ -13,7 +13,7 @@ This release represents a comprehensive upgrade transforming Legal Luminaire fro
 
 ---
 
-### 📊 PHASE 1: FOUNDATION & AUDIT (COMPLETE)
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â  PHASE 1: FOUNDATION & AUDIT (COMPLETE)
 
 #### ADDED
 - **Comprehensive Feature Audit Matrix** (`docs/PHASE1_FEATURE_AUDIT_MATRIX.md`)
@@ -35,16 +35,16 @@ This release represents a comprehensive upgrade transforming Legal Luminaire fro
   - All new features disabled by default (safe deployment)
 
 #### PROTECTED (Zero-Loss Guarantee)
-- ✅ App Shell & Navigation (`App.tsx`, `main.tsx`)
-- ✅ Case Management (`CaseContext.tsx`, `case-store.ts`)
-- ✅ Citation Gate System (`citation-gate.ts`, `CitationGatePanel.tsx`)
-- ✅ Safe Draft Editor (`SafeDraftEditor.tsx`, `SafeDraftPage.tsx`)
-- ✅ Verification Engine (`verification-engine.ts`, `case01-data.ts`)
-- ✅ All existing routes and features
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ App Shell & Navigation (`App.tsx`, `main.tsx`)
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Case Management (`CaseContext.tsx`, `case-store.ts`)
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Citation Gate System (`citation-gate.ts`, `CitationGatePanel.tsx`)
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Safe Draft Editor (`SafeDraftEditor.tsx`, `SafeDraftPage.tsx`)
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Verification Engine (`verification-engine.ts`, `case01-data.ts`)
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ All existing routes and features
 
 ---
 
-### 🔍 PHASE 2: SEARCH ENGINE V2 (PLANNED)
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â PHASE 2: SEARCH ENGINE V2 (PLANNED)
 
 #### TO BE ADDED
 - **Enhanced Search Layer**
@@ -67,7 +67,7 @@ This release represents a comprehensive upgrade transforming Legal Luminaire fro
 
 ---
 
-### 🔗 PHASE 3: CITATION INTELLIGENCE (PLANNED)
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â€ PHASE 3: CITATION INTELLIGENCE (PLANNED)
 
 #### TO BE ADDED
 - **Citation Extraction Engine**
@@ -101,7 +101,7 @@ This release represents a comprehensive upgrade transforming Legal Luminaire fro
 
 ---
 
-### 🧠 PHASE 4: AI REASONING LAYER (PLANNED)
+### ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â  PHASE 4: AI REASONING LAYER (PLANNED)
 
 #### TO BE ADDED
 - **Case Similarity Engine**
@@ -140,7 +140,7 @@ This release represents a comprehensive upgrade transforming Legal Luminaire fro
 
 ---
 
-### 📈 PHASE 5: ANALYTICS LAYER (PLANNED)
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‹â€  PHASE 5: ANALYTICS LAYER (PLANNED)
 
 #### TO BE ADDED
 - **Judge Analytics System**
@@ -186,7 +186,7 @@ This release represents a comprehensive upgrade transforming Legal Luminaire fro
 
 ---
 
-### 🎨 PHASE 6: GRAPH VISUALIZATION (PLANNED)
+### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¨ PHASE 6: GRAPH VISUALIZATION (PLANNED)
 
 #### TO BE ADDED
 - **Interactive Citation Graph**
@@ -235,28 +235,28 @@ This release represents a comprehensive upgrade transforming Legal Luminaire fro
 
 ---
 
-### 🎯 SUCCESS CRITERIA
+### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¯ SUCCESS CRITERIA
 
 #### KPI Targets
 | Metric | Baseline | Target | Status |
 |--------|----------|--------|--------|
-| Search Accuracy | Current | ≥ Current | 🟡 Pending |
-| Response Time | Current | ≤ Current OR Improved | 🟡 Pending |
-| Citation Accuracy | 95% | ≥ 98% | 🟡 Pending |
-| Feature Completeness | 100% | 100% | ✅ Achieved |
-| Test Coverage | Current | ≥ Current + 20% | 🟡 Pending |
+| Search Accuracy | Current | ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥ Current | ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¡ Pending |
+| Response Time | Current | ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤ Current OR Improved | ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¡ Pending |
+| Citation Accuracy | 95% | ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥ 98% | ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¡ Pending |
+| Feature Completeness | 100% | 100% | ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Achieved |
+| Test Coverage | Current | ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥ Current + 20% | ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¡ Pending |
 
 #### Acceptance Criteria
-- ✅ Zero feature loss from LEGAL_LUMINAIRE
-- ✅ All protected files unchanged or improved only
-- ✅ Citation gate system fully functional
-- ✅ All existing routes working
-- 🟡 No regression in legal query accuracy (testing pending)
-- 🟡 All tests passing (testing pending)
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Zero feature loss from LEGAL_LUMINAIRE
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ All protected files unchanged or improved only
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Citation gate system fully functional
+- ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ All existing routes working
+- ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¡ No regression in legal query accuracy (testing pending)
+- ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¡ All tests passing (testing pending)
 
 ---
 
-### 🔒 PROTECTED FILES (NEVER CHANGE ADVERSELY)
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â„¢ PROTECTED FILES (NEVER CHANGE ADVERSELY)
 
 These files are the stable, working foundation and MUST NOT be broken:
 
@@ -282,7 +282,7 @@ These files are the stable, working foundation and MUST NOT be broken:
 
 ---
 
-### 📚 DOCUMENTATION
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â¡ DOCUMENTATION
 
 #### New Documents
 - `docs/PHASE1_FEATURE_AUDIT_MATRIX.md` - Comprehensive feature comparison
@@ -296,7 +296,7 @@ These files are the stable, working foundation and MUST NOT be broken:
 
 ---
 
-### 🚦 DEPLOYMENT STRATEGY
+### ÃƒÂ°Ã…Â¸Ã…Â¡Ã‚Â¦ DEPLOYMENT STRATEGY
 
 #### Rollout Plan
 1. **Phase 1** (Complete): Foundation & audit
@@ -315,22 +315,22 @@ These files are the stable, working foundation and MUST NOT be broken:
 
 ---
 
-### ⚠️ BREAKING CHANGES
+### ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â BREAKING CHANGES
 **NONE** - This is a zero-loss upgrade. All existing features preserved.
 
 ---
 
-### 🔄 MIGRATION GUIDE
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬Å¾ MIGRATION GUIDE
 **NOT REQUIRED** - Backward compatible. No migration needed.
 
 ---
 
-### 🐛 BUG FIXES
+### ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Âº BUG FIXES
 - None in this phase (foundation only)
 
 ---
 
-### 🔧 TECHNICAL IMPROVEMENTS
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â§ TECHNICAL IMPROVEMENTS
 - Enhanced feature flag system with 30+ granular controls
 - Modular architecture for new intelligence layers
 - Comprehensive documentation and rollback procedures
@@ -338,14 +338,14 @@ These files are the stable, working foundation and MUST NOT be broken:
 
 ---
 
-### 👥 CONTRIBUTORS
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â¥ CONTRIBUTORS
 - System Architect: AI Agent (Kiro)
 - Legal Expert: [To be added]
 - QA Engineer: [To be added]
 
 ---
 
-### 📝 NOTES
+### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â NOTES
 - This is Phase 1 of an 8-phase rollout
 - All new features are disabled by default
 - No user-facing changes in this release
@@ -356,8 +356,8 @@ These files are the stable, working foundation and MUST NOT be broken:
 ## UNRELEASED - HYBRID MERGE (REFERENCE-APP00 WAVE 1)
 
 ### ADDED
-- Hemraj discharge — advanced `.lex` bundle: `public/case-assets/TC-01/` (SUPERIOR full, SUPERIOR v2, DISCHARGE v4); `DischargeApplication` panel with preview/download; `uploaded_cases/TC-01` synced (non-empty `DISCHARGE_APPLICATION_UPDATED_v2.lex` from v4; added v4 + SUPERIOR v2); `preload_case01.py` priority updated; `DISCHARGE_APPLICATION_UPDATED_v4.lex` copied to root `CASE01_HEMRAJ_STATE_2025/` for RAG preload.
-- `artifacts/legal-luminaire/src/components/create-case-quick-dialog.tsx` — port of REFERENCE `create-session-dialog`, wired to `CaseContext.addCase` and dashboard navigation; flag `VITE_FF_REFERENCE_QUICK_CASE_DIALOG`.
+- Hemraj discharge ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â advanced `.lex` bundle: `public/case-assets/TC-01/` (SUPERIOR full, SUPERIOR v2, DISCHARGE v4); `DischargeApplication` panel with preview/download; `uploaded_cases/TC-01` synced (non-empty `DISCHARGE_APPLICATION_UPDATED_v2.lex` from v4; added v4 + SUPERIOR v2); `preload_case01.py` priority updated; `DISCHARGE_APPLICATION_UPDATED_v4.lex` copied to root `CASE01_HEMRAJ_STATE_2025/` for RAG preload.
+- `artifacts/legal-luminaire/src/components/create-case-quick-dialog.tsx` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â port of REFERENCE `create-session-dialog`, wired to `CaseContext.addCase` and dashboard navigation; flag `VITE_FF_REFERENCE_QUICK_CASE_DIALOG`.
 - Hybrid comparison deliverable: `docs/HYBRID_FEATURE_COMPARISON_MATRIX.md`
 - Merge governance deliverable: `docs/HYBRID_MERGE_AUDIT_AND_ROLLBACK_PLAN.md`
 - New hybrid UI modules integrated in app:
@@ -386,14 +386,14 @@ These files are the stable, working foundation and MUST NOT be broken:
 - Cleared all `__pycache__/`, `.pytest_cache/`, `*.tsbuildinfo`, `dist/` build artifacts
 
 ### MERGED / CONSOLIDATED
-- Combined `docs/VIDEO_GUIDE_SCRIPT.md` + `docs/VIDEO_MANUAL_SCRIPT.md` → single `docs/VIDEO_MANUAL_SCRIPT.md` (8-scene record-ready script)
+- Combined `docs/VIDEO_GUIDE_SCRIPT.md` + `docs/VIDEO_MANUAL_SCRIPT.md` ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ single `docs/VIDEO_MANUAL_SCRIPT.md` (8-scene record-ready script)
 - Single canonical accuracy rules file: `docs/accuracy-governance/ACCURACY_RULES.md`
 - `docs/INDEX.md` updated to reflect cleaned structure
 
 ### IMPROVED
-- `README.md` — complete rewrite with GitHub attraction notes, Streamlit badge, 21-case table, architecture overview, accuracy rules summary
-- `streamlit_app.py` — full rewrite: 4-tab UI (User Manual, Upload, Research/Draft, Demo Case), embedded video script, download button, metrics display, demo case file browser
-- `docs/VIDEO_MANUAL_SCRIPT.md` — merged + expanded to 8 scenes with recording notes and deploy instructions
+- `README.md` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â complete rewrite with GitHub attraction notes, Streamlit badge, 21-case table, architecture overview, accuracy rules summary
+- `streamlit_app.py` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â full rewrite: 4-tab UI (User Manual, Upload, Research/Draft, Demo Case), embedded video script, download button, metrics display, demo case file browser
+- `docs/VIDEO_MANUAL_SCRIPT.md` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â merged + expanded to 8 scenes with recording notes and deploy instructions
 
 ---
 
