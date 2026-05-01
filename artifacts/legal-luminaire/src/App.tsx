@@ -42,6 +42,10 @@ const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
 const CaseSimilarityPage = lazy(() => import("@/pages/CaseSimilarityPage"));
 const JudgeAnalyticsPage = lazy(() => import("@/pages/JudgeAnalyticsPage"));
 
+// Citation-Explorer merge
+const CitationSearchPage = lazy(() => import("@/pages/CitationSearchPage"));
+const CitationAuthorityPage = lazy(() => import("@/pages/CitationAuthorityPage"));
+
 // Lazy load heavy view components
 const DynamicDashboardView = lazy(() => import("@/components/views/DynamicDashboardView").then(module => ({ default: module.DynamicDashboardView })));
 const CaseSelector = lazy(() => import("@/components/case-selector").then(module => ({ default: module.CaseSelector })));
@@ -145,6 +149,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { path: "/forensic-faq", label: "à¤«à¥‹à¤°à¥‡à¤‚à¤¸à¤¿à¤• FAQ", labelEn: "Forensic FAQ", icon: FlaskConical, caseScoped: false },
       { path: "/infra-arb", label: "à¤‡à¤¨à¥à¤«à¥à¤°à¤¾ à¤†à¤°à¥à¤¬à¤¿à¤Ÿà¥à¤°à¥‡à¤¶à¤¨", labelEn: "Infra Arbitration", icon: Scale, caseScoped: false, badge: "NEW" },
+      { path: "/citation-search", label: "Citation Explorer", labelEn: "25+ Authorities", icon: BookOpen, caseScoped: false, badge: "NEW" as const },
     ],
   },
 ];
@@ -288,6 +293,8 @@ function Router() {
         <Route path="/forensic-faq" component={() => <Suspense fallback={<LoadingFallback />}><ForensicFAQ /></Suspense>} />
         <Route path="/infra-arb" component={() => <Suspense fallback={<LoadingFallback />}><InfraArbBrowser /></Suspense>} />
         <Route path="/demo-browser" component={() => <Suspense fallback={<LoadingFallback />}><DemoCaseBrowser /></Suspense>} />
+        <Route path="/citation-search" component={() => <Suspense fallback={<LoadingFallback />}><CitationSearchPage /></Suspense>} />
+        <Route path="/authority/:id" component={() => <Suspense fallback={<LoadingFallback />}><CitationAuthorityPage /></Suspense>} />
 
         {/* Case-scoped routes */}
         <Route path="/case/:id/dashboard"             component={() => <div className="p-6"><Suspense fallback={<LoadingFallback />}><DynamicDashboardView /></Suspense></div>} />

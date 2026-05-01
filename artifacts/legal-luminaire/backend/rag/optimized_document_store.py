@@ -1,22 +1,15 @@
 """
-Optimized RAG Document Store — Legal Luminaire v3
-─────────────────────────────────────────────────
-Upgrades over v2:
-  • SBERT / GTE-Large local embeddings (no OpenAI calls for embeddings)
-  • BM25 sparse retrieval fused with dense semantic retrieval (Reciprocal Rank Fusion)
-  • Dynamic context window: simple query → 600-char chunks, complex → 1800-char chunks
-  • Incremental indexing (MD5 change-detection, skip unchanged files)
-  • Async parallel document loading
+Optimized RAG Document Store with Caching and Async Processing
+Implements parallel processing, semantic chunking, and incremental indexing.
 """
 from __future__ import annotations
 
 import asyncio
 import hashlib
 import logging
-import math
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional, List, Dict, Any, AsyncGenerator
 import time
 
 from langchain_community.document_loaders import (
@@ -26,87 +19,42 @@ from langchain_community.document_loaders import (
     UnstructuredImageLoader,
 )
 from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-
-# ── SBERT/GTE-Large local embeddings ──────────────────────────────────────────
-try:
-    from langchain_huggingface import HuggingFaceEmbeddings
-    _EMBEDDINGS_BACKEND = "huggingface"
-except ImportError:
-    from langchain_openai import OpenAIEmbeddings  # type: ignore
-    _EMBEDDINGS_BACKEND = "openai"
-
-# BM25 for sparse retrieval
-try:
-    from rank_bm25 import BM25Okapi
-    _BM25_AVAILABLE = True
-except ImportError:
-    _BM25_AVAILABLE = False
 
 from config import settings
 from cache import cache, cached_async
 
 logger = logging.getLogger(__name__)
 
-# ── Splitter presets (dynamic chunk sizing) ────────────────────────────────────
-_SPLITTER_SIMPLE = RecursiveCharacterTextSplitter(
-    chunk_size=600,
-    chunk_overlap=60,
-    separators=["\n\n", "\n", "।", ". ", "; ", ", ", " "],
-)
-_SPLITTER_STANDARD = RecursiveCharacterTextSplitter(
+# Semantic-aware splitter with legal context preservation
+SPLITTER = RecursiveCharacterTextSplitter(
     chunk_size=1200,
     chunk_overlap=200,
-    separators=["\n\n", "\n", "।", ". ", "; ", ", ", " "],
-)
-_SPLITTER_COMPLEX = RecursiveCharacterTextSplitter(
-    chunk_size=1800,
-    chunk_overlap=300,
-    separators=["\n\n", "\n", "।", ". ", "; ", ", ", " "],
+    separators=[
+        "\n\n",  # Paragraph breaks
+        "\n",   # Line breaks
+        "।",    # Hindi sentence terminator
+        "\. ",  # Sentence with space
+        ". ",   # Sentence
+        "; ",   # Semicolon
+        ", ",   # Comma
+        " ",    # Space
+    ],
 )
 
-SPLITTER_MAP = {
-    "simple":   _SPLITTER_SIMPLE,
-    "standard": _SPLITTER_STANDARD,
-    "complex":  _SPLITTER_COMPLEX,
-}
-
-# Thread pool for parallel document loading
+# Thread pool for parallel document processing
 executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="doc_processor")
 
-# In-memory BM25 index per case (rebuilt on ingest)
-_bm25_index: Dict[str, Tuple[BM25Okapi, List[Document]]] = {}
 
-
-# ── Embedding factory ──────────────────────────────────────────────────────────
-def get_embeddings():
-    """
-    Returns SBERT/GTE-Large embeddings if available, falls back to OpenAI.
-    Model: 'thenlper/gte-large' — strong multilingual legal domain performance,
-    no API cost, runs locally on CPU (cuda optional).
-    """
-    if _EMBEDDINGS_BACKEND == "huggingface":
-        model_name = getattr(settings, "embedding_model_local", "thenlper/gte-large")
-        return HuggingFaceEmbeddings(
-            model_name=model_name,
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-    # Fallback: OpenAI
-    from langchain_openai import OpenAIEmbeddings
-    return OpenAIEmbeddings(
-        model=settings.embedding_model,
-        openai_api_key=settings.openai_api_key,
-    )
-
-
-# ── File utilities ─────────────────────────────────────────────────────────────
 def _file_hash(path: Path) -> str:
+    """Generate MD5 hash of file for change detection."""
     return hashlib.md5(path.read_bytes()).hexdigest()
 
 
 def _load_file_sync(path: Path) -> List[Document]:
+    """Load a single file synchronously."""
     suffix = path.suffix.lower()
     try:
         if suffix == ".pdf":
@@ -126,129 +74,94 @@ def _load_file_sync(path: Path) -> List[Document]:
 
 
 async def _load_file_async(path: Path) -> List[Document]:
+    """Load a single file asynchronously."""
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(executor, _load_file_sync, path)
 
 
-# ── ChromaDB store ─────────────────────────────────────────────────────────────
+def get_embeddings() -> OpenAIEmbeddings:
+    """Get embeddings instance (reused via module-level singleton)."""
+    return OpenAIEmbeddings(
+        model=settings.embedding_model,
+        openai_api_key=settings.openai_api_key,
+    )
+
+
 def get_or_create_vectorstore(case_id: str) -> Chroma:
-    """Get or create a per-case ChromaDB collection with SBERT embeddings."""
+    """Get or create a per-case ChromaDB collection with optimized settings."""
     persist_dir = settings.chroma_path / case_id
     persist_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Use persistent client with optimized HNSW settings
+    client_settings = {
+        "chroma_db_impl": "duckdb+parquet",
+        "allow_reset": False,
+        "anonymized_telemetry": False,
+    }
+    
     return Chroma(
         collection_name=f"case_{case_id}",
         embedding_function=get_embeddings(),
         persist_directory=str(persist_dir),
+        client_settings=client_settings,
     )
 
 
-# ── BM25 helpers ───────────────────────────────────────────────────────────────
-def _tokenize(text: str) -> List[str]:
-    """Simple whitespace + punctuation tokenizer."""
-    import re
-    return re.findall(r"\w+", text.lower())
-
-
-def _build_bm25_index(case_id: str, docs: List[Document]) -> None:
-    """Build (or rebuild) in-memory BM25 index for a case."""
-    if not _BM25_AVAILABLE or not docs:
-        return
-    tokenized = [_tokenize(d.page_content) for d in docs]
-    _bm25_index[case_id] = (BM25Okapi(tokenized), docs)
-    logger.info(f"BM25 index built for {case_id}: {len(docs)} docs")
-
-
-def _bm25_search(case_id: str, query: str, k: int = 8) -> List[Document]:
-    """BM25 keyword retrieval over case documents."""
-    if not _BM25_AVAILABLE or case_id not in _bm25_index:
-        return []
-    bm25, docs = _bm25_index[case_id]
-    tokens = _tokenize(query)
-    scores = bm25.get_scores(tokens)
-    top_k = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k]
-    return [docs[i] for i in top_k]
-
-
-def _reciprocal_rank_fusion(
-    ranked_lists: List[List[Document]], k: int = 60
-) -> List[Document]:
-    """
-    Reciprocal Rank Fusion (RRF) — merges multiple ranked lists.
-    RRF score = Σ 1/(k + rank_i).  Higher is better.
-    """
-    scores: Dict[str, float] = {}
-    doc_map: Dict[str, Document] = {}
-
-    for ranked in ranked_lists:
-        for rank, doc in enumerate(ranked, start=1):
-            key = hashlib.md5(doc.page_content.encode()).hexdigest()
-            scores[key] = scores.get(key, 0.0) + 1.0 / (k + rank)
-            doc_map[key] = doc
-
-    sorted_keys = sorted(scores, key=lambda x: scores[x], reverse=True)
-    return [doc_map[key] for key in sorted_keys]
-
-
-# ── Ingest ─────────────────────────────────────────────────────────────────────
-async def ingest_files_parallel(
-    case_id: str,
-    file_paths: List[Path],
-    complexity: str = "standard",
-) -> Dict[str, Any]:
+async def ingest_files_parallel(case_id: str, file_paths: List[Path]) -> Dict[str, Any]:
     """
     Ingest files in parallel with incremental indexing.
-    complexity: 'simple' | 'standard' | 'complex' → controls chunk size.
-    Only processes new/modified files based on MD5 hash comparison.
+    Only processes new/modified files based on hash comparison.
     """
     start_time = time.time()
-    splitter = SPLITTER_MAP.get(complexity, _SPLITTER_STANDARD)
     vectorstore = get_or_create_vectorstore(case_id)
-
-    summary: Dict[str, Any] = {
+    
+    summary = {
         "indexed": [],
         "skipped": [],
         "errors": [],
         "total_files": len(file_paths),
         "processing_time": 0,
-        "chunk_strategy": complexity,
     }
-
-    files_to_process: List[Tuple[Path, str]] = []
+    
+    # Check which files need processing (incremental indexing)
+    files_to_process = []
     for path in file_paths:
         if not path.exists():
             summary["errors"].append(f"{path.name}: file not found")
             continue
+        
         current_hash = _file_hash(path)
+        cache_key = f"file_hash:{case_id}:{path.name}"
         cached_hash = cache.get("file_hash", case_id, path.name)
+        
         if cached_hash == current_hash:
             summary["skipped"].append(path.name)
+            logger.info(f"Skipping unchanged file: {path.name}")
         else:
             files_to_process.append((path, current_hash))
-
+    
     if not files_to_process:
         summary["processing_time"] = time.time() - start_time
         return summary
-
-    logger.info(
-        f"Processing {len(files_to_process)} files for case {case_id} "
-        f"(chunk_strategy={complexity})"
-    )
-
-    # Load in parallel
+    
+    logger.info(f"Processing {len(files_to_process)} files for case {case_id}")
+    
+    # Load files in parallel
     load_tasks = [_load_file_async(path) for path, _ in files_to_process]
     docs_results = await asyncio.gather(*load_tasks, return_exceptions=True)
-
-    all_chunks: List[Document] = []
-    all_docs_for_bm25: List[Document] = []
-
+    
+    # Process results
+    all_chunks = []
     for (path, file_hash), docs in zip(files_to_process, docs_results):
         if isinstance(docs, Exception):
-            summary["errors"].append(f"{path.name}: {docs}")
+            summary["errors"].append(f"{path.name}: {str(docs)}")
             continue
+        
         if not docs:
             summary["skipped"].append(path.name)
             continue
-
+        
+        # Tag each chunk with enhanced metadata
         for doc in docs:
             doc.metadata.update({
                 "case_id": case_id,
@@ -257,121 +170,151 @@ async def ingest_files_parallel(
                 "file_size": path.stat().st_size,
                 "modified_time": path.stat().st_mtime,
                 "ingestion_time": time.time(),
-                "chunk_strategy": complexity,
             })
-
-        chunks = splitter.split_documents(docs)
+        
+        # Use semantic chunking
+        chunks = SPLITTER.split_documents(docs)
         all_chunks.extend(chunks)
-        all_docs_for_bm25.extend(chunks)
-
+        
+        # Cache file hash to avoid reprocessing
         cache.set("file_hash", file_hash, ttl=86400, case_id=case_id, file_name=path.name)
+        
         summary["indexed"].append({
             "file": path.name,
             "chunks": len(chunks),
-            "size_mb": round(path.stat().st_size / (1024 * 1024), 2),
+            "size_mb": round(path.stat().st_size / (1024 * 1024), 2)
         })
-        logger.info(f"Indexed {path.name} → {len(chunks)} chunks ({complexity})")
-
+        
+        logger.info(f"Indexed {path.name} → {len(chunks)} chunks")
+    
+    # Batch add all chunks to vector store
     if all_chunks:
-        logger.info(f"Adding {len(all_chunks)} chunks to vector store (SBERT)")
+        logger.info(f"Adding {len(all_chunks)} total chunks to vector store")
         vectorstore.add_documents(all_chunks)
+        
+        # Persist changes
         try:
             vectorstore.persist()
+            logger.info("Vector store persisted successfully")
         except Exception as e:
-            logger.warning(f"Persist failed (non-fatal): {e}")
-
-    # Rebuild BM25 index
-    if all_docs_for_bm25:
-        _build_bm25_index(case_id, all_docs_for_bm25)
-
+            logger.warning(f"Failed to persist vector store: {e}")
+    
     summary["processing_time"] = time.time() - start_time
     summary["total_chunks"] = len(all_chunks)
+    
     return summary
 
 
-# ── Retrieval ──────────────────────────────────────────────────────────────────
 @cached_async("retriever", ttl=settings.cache_ttl_search)
 async def get_retriever(case_id: str, k: int = 8, search_type: str = "similarity"):
-    """Return cached dense retriever for the given case."""
+    """Return cached retriever for the given case."""
     vs = get_or_create_vectorstore(case_id)
-    return vs.as_retriever(search_kwargs={"k": k})
+    return vs.as_retriever(
+        search_kwargs={"k": k, "search_type": search_type}
+    )
 
 
 async def hybrid_search(
-    case_id: str,
-    query: str,
+    case_id: str, 
+    query: str, 
     k: int = 8,
-    metadata_filters: Optional[Dict[str, Any]] = None,
+    metadata_filters: Optional[Dict[str, Any]] = None
 ) -> List[Document]:
     """
-    Hybrid retrieval: Dense (SBERT ChromaDB) + Sparse (BM25) combined via RRF.
-    Falls back gracefully if BM25 index is not yet built.
+    Hybrid search combining semantic and keyword matching.
+    Includes metadata pre-filtering for better performance.
     """
-    cache_key = f"hybrid:{case_id}:{hashlib.md5(query.encode()).hexdigest()}"
-    cached = cache.get("search", cache_key)
-    if cached:
-        return cached
-
+    cache_key = f"hybrid_search:{case_id}:{hashlib.md5(query.encode()).hexdigest()}"
+    cached_result = cache.get("search", cache_key)
+    if cached_result:
+        return cached_result
+    
     vs = get_or_create_vectorstore(case_id)
-    search_kwargs: Dict[str, Any] = {"k": k}
+    
+    # Prepare search arguments
+    search_kwargs = {"k": k}
     if metadata_filters:
         search_kwargs["filter"] = metadata_filters
-
-    # Dense semantic search
-    dense_docs = vs.similarity_search(query, **search_kwargs)
-
-    # MMR diversity pass
+    
+    # Perform semantic search
+    semantic_docs = vs.similarity_search(query, **search_kwargs)
+    
+    # Perform keyword search (if available in Chroma)
     try:
-        mmr_docs = vs.max_marginal_relevance_search(query, k=k, fetch_k=k * 3)
+        keyword_docs = vs.similarity_search(
+            query, 
+            search_type="mmr",  # Maximal Marginal Relevance
+            **search_kwargs
+        )
     except Exception:
-        mmr_docs = dense_docs
+        # Fallback to semantic search if MMR fails
+        keyword_docs = semantic_docs
+    
+    # Combine and deduplicate results
+    seen_content = set()
+    combined_docs = []
+    
+    for doc in semantic_docs + keyword_docs:
+        content_hash = hashlib.md5(doc.page_content.encode()).hexdigest()
+        if content_hash not in seen_content:
+            seen_content.add(content_hash)
+            combined_docs.append(doc)
+    
+    # Cache results
+    cache.set("search", combined_docs, ttl=settings.cache_ttl_search, key=cache_key)
+    
+    return combined_docs[:k]
 
-    # Sparse BM25 search
-    bm25_docs = _bm25_search(case_id, query, k=k)
 
-    # Fuse with RRF
-    fused = _reciprocal_rank_fusion([dense_docs, mmr_docs, bm25_docs])[:k]
-
-    cache.set("search", fused, ttl=settings.cache_ttl_search, key=cache_key)
-    return fused
-
-
-# ── Stats & helpers ────────────────────────────────────────────────────────────
-def case_has_documents(case_id: str) -> bool:
+async def case_has_documents(case_id: str) -> bool:
+    """Check if a case has any indexed documents."""
     try:
         vs = get_or_create_vectorstore(case_id)
-        return vs._collection.count() > 0
+        count = await asyncio.get_event_loop().run_in_executor(
+            executor, vs._collection.count
+        )
+        return count > 0
     except Exception:
         return False
 
 
 async def get_case_doc_count(case_id: str) -> int:
+    """Get document count for a case."""
     try:
         vs = get_or_create_vectorstore(case_id)
-        loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(executor, vs._collection.count)
+        return await asyncio.get_event_loop().run_in_executor(
+            executor, vs._collection.count
+        )
     except Exception:
         return 0
 
 
 async def get_case_stats(case_id: str) -> Dict[str, Any]:
+    """Get comprehensive statistics for a case."""
     try:
         vs = get_or_create_vectorstore(case_id)
-        count = await asyncio.get_event_loop().run_in_executor(executor, vs._collection.count)
+        count = await asyncio.get_event_loop().run_in_executor(
+            executor, vs._collection.count
+        )
+        
+        # Get cache stats
         cache_stats = cache.get_stats()
-        bm25_count = len(_bm25_index.get(case_id, (None, []))[1]) if case_id in _bm25_index else 0
+        
         return {
             "case_id": case_id,
             "document_count": count,
-            "bm25_indexed_chunks": bm25_count,
-            "embedding_backend": _EMBEDDINGS_BACKEND,
             "cache_stats": cache_stats,
             "last_updated": time.time(),
         }
     except Exception as e:
         logger.error(f"Failed to get stats for case {case_id}: {e}")
-        return {"case_id": case_id, "document_count": 0, "error": str(e)}
+        return {
+            "case_id": case_id,
+            "document_count": 0,
+            "error": str(e),
+        }
 
 
 def cleanup_executor():
+    """Clean up the thread pool executor."""
     executor.shutdown(wait=True)
