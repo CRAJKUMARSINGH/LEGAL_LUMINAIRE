@@ -1,6 +1,9 @@
+# Use repository-root netlify.toml for Netlify Connect (pnpm workspace).
+# Vite outDir is dist/public — see vite.config.ts.
+
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "pnpm run build"
+  publish = "dist/public"
 
 [[redirects]]
   from = "/*"

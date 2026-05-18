@@ -7,6 +7,11 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     tavily_api_key: str = ""
     serper_api_key: str = ""
+    
+    # Harvey.ai configuration
+    harvey_api_key: str = ""
+    harvey_region: str = "us"
+    harvey_enabled: bool = False
 
     chroma_persist_dir: str = "./chroma_db"
     case_docs_dir: str = "./uploaded_cases"
@@ -20,6 +25,10 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    
+    # Harvey model settings
+    harvey_model: str = "gpt-5"
+    harvey_include_citations: bool = True
 
     llm_model: str = "gpt-4o"
     llm_temperature_research: float = 0.0

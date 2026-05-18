@@ -8,14 +8,14 @@ status: DEFINED
 
 # TC-01 — Building Collapse — Forensic Defence
 
-> [SYNTHETIC TEST CASE — references real case structure from CASE01_HEMRAJ_STATE_2025]
+> [SYNTHETIC TEST CASE — references real case structure from `real_cases/CASE01_HEMRAJ_STATE_2025`]
 
 ## Purpose
 Validate the complete discharge application workflow including IS/ASTM standards
 enforcement, Fact-Fit Gate scoring, chain-of-custody precedents, and Hindi draft output.
 
 ## Input Files Used
-- `test-cases/CASE01_HEMRAJ_STATE_2025/input-documents/` (real case data)
+- `real_cases/CASE01_HEMRAJ_STATE_2025/` (full Hemraj document pack)
 - `artifacts/legal-luminaire/src/lib/case01-data.ts` (pre-loaded data)
 
 ## Expected Behaviour

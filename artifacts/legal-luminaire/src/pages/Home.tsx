@@ -7,8 +7,10 @@ import {
   Scale, FileText, BookOpen, FlaskConical, Clock,
   AlertTriangle, CheckCircle2, Info, ArrowRight,
   MessageSquare, LayoutDashboard, Files, Upload, PlayCircle,
-  Zap, Target,
+  Zap, Target, Printer, ShieldCheck,
 } from "lucide-react";
+import { CreateCaseQuickDialog } from "@/components/create-case-quick-dialog";
+import { featureFlags } from "@/config/featureFlags";
 import {
   caseInfo, caseLawMatrix, standardsMatrix,
   timelineEvents, caseDocuments,
@@ -35,15 +37,16 @@ const StatusBadge = ({ status }: { status: VS }) => {
 
 // ── Quick-access nav (same tools as sidebar) ──────────────────────────────
 const QUICK_LINKS = [
-  { href: "/case/case01/dashboard",             label: "Dashboard",            icon: LayoutDashboard },
-  { href: "/case/case01/chat",                  label: "AI Drafter",           icon: MessageSquare },
-  { href: "/case/case01/timeline",              label: "Case Timeline",        icon: Clock },
-  { href: "/case/case01/case-law",              label: "Case Law Matrix",      icon: BookOpen },
-  { href: "/case/case01/standards",             label: "Standards Matrix",     icon: FlaskConical },
-  { href: "/case/case01/documents",             label: "Documents",            icon: Files },
-  { href: "/case/case01/upload",                label: "Upload Files",         icon: Upload },
-  { href: "/case/case01/discharge-application", label: "Discharge App",        icon: Scale },
-  { href: "/case/case01/defence-reply",         label: "Defence Reply v4",     icon: FileText },
+  { href: "/case/case-01/dashboard",             label: "Dashboard",            icon: LayoutDashboard },
+  { href: "/case/case-01/chat",                  label: "AI Drafter",           icon: MessageSquare },
+  { href: "/case/case-01/timeline",              label: "Case Timeline",        icon: Clock },
+  { href: "/case/case-01/case-law",              label: "Case Law Matrix",      icon: BookOpen },
+  { href: "/case/case-01/standards",             label: "Standards Matrix",     icon: FlaskConical },
+  { href: "/case/case-01/documents",             label: "Documents",            icon: Files },
+  { href: "/case/case-01/upload",                label: "Upload Files",         icon: Upload },
+  { href: "/case/case-01/discharge-application", label: "Discharge App",        icon: Scale },
+  { href: "/case/case-01/discharge-print",      label: "Discharge PDF v6",     icon: Printer },
+  { href: "/infra-arb",                         label: "Infra Arbitration",    icon: Scale },
 ];
 
 const STRATEGY_PILLARS = [
@@ -96,20 +99,55 @@ export default function Home() {
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
 
+      {/* ── Discharge Application Hero Card ─────────────────────────────── */}
+      <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-5 flex items-center gap-4 hover-elevate transition-all">
+        <div className="rounded-xl bg-primary/15 p-3 shrink-0">
+          <Printer className="h-8 w-8 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-bold text-foreground">उन्मोचन प्रार्थना-पत्र v6 — हेमराज वर्दार</p>
+            <Badge className="bg-primary/10 text-primary border-primary/30 text-[10px] font-black">UNIQUE SYNERGY</Badge>
+            <Badge className="bg-emerald-500/10 text-emerald-700 border-emerald-500/20 text-[10px]">
+              <ShieldCheck className="h-3 w-3 mr-1" />Inline Citations
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            प्रत्येक निर्णय के साथ inline citation block — पूर्ण holding + annexure PDF नाम + verification badge सीधे draft body में।
+            A4 print-ready | 23 named annexures | 12 grounds | Artemis-II Accuracy
+          </p>
+        </div>
+        <Link href="/case/case-01/discharge-print">
+          <Button className="gap-1.5 shrink-0 bg-primary">
+            <Printer className="h-3.5 w-3.5" /> Generate PDF
+          </Button>
+        </Link>
+      </div>
+
       {/* ── Demo CTA Banner ──────────────────────────────────────────────── */}
       <div className="rounded-xl border border-amber-300 bg-amber-50/80 backdrop-blur-md p-4 flex items-center gap-4 hover-elevate transition-colors">
         <PlayCircle className="h-8 w-8 text-amber-500 shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-amber-900 text-sm">Try the Demo — No API key needed</p>
           <p className="text-xs text-amber-700 mt-0.5">
-            Explore 21 pre-loaded case types: forensic defence, NDPS bail, writ petitions, consumer complaints and more.
+            Explore 26 pre-loaded case types: forensic defence, NDPS bail, writ petitions, consumer complaints, and 5 full-lifecycle infrastructure arbitration cases (NHAI, CPWD, FIDIC).
           </p>
         </div>
-        <Link href="/case/case01/dashboard">
-          <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white shrink-0 gap-1.5">
-            <PlayCircle className="h-3.5 w-3.5" /> Try Demo
-          </Button>
-        </Link>
+        <div className="flex flex-wrap gap-2 shrink-0 justify-end">
+          {featureFlags.referenceQuickCaseDialog && (
+            <CreateCaseQuickDialog triggerClassName="bg-background border border-amber-400 text-amber-900 hover:bg-amber-100 text-sm h-9" />
+          )}
+          <Link href="/demo-browser">
+            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white gap-1.5">
+              <PlayCircle className="h-3.5 w-3.5" /> 26 Demo Cases
+            </Button>
+          </Link>
+          <Link href="/infra-arb">
+            <Button size="sm" variant="outline" className="border-amber-400 text-amber-700 hover:bg-amber-100 gap-1.5">
+              Infra Arb →
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* ── Bento grid (2025 layout) ─────────────────────────────────────── */}
@@ -129,7 +167,7 @@ export default function Home() {
                 <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">{caseInfo.status}</Badge>
               </div>
             </div>
-            <Link href="/case/case01/dashboard">
+            <Link href="/case/case-01/dashboard">
               <Button size="sm" className="gap-1.5 shrink-0 hidden sm:flex">
                 Open Case <ArrowRight className="h-3.5 w-3.5" />
               </Button>
@@ -154,7 +192,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-3 pt-3 border-t border-border/60">
-            <Link href="/case/case01/upload">
+            <Link href="/case/case-01/upload">
               <Button variant="outline" size="sm" className="w-full gap-1.5">
                 <Upload className="h-3.5 w-3.5" /> Upload documents
               </Button>
@@ -273,7 +311,7 @@ export default function Home() {
               </div>
             ))}
             <div className="pt-1">
-              <Link href="/case/case01/case-law">
+              <Link href="/case/case-01/case-law">
                 <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
                   <BookOpen className="h-3 w-3" /> View Full Case Law Matrix
                 </Button>
@@ -320,7 +358,7 @@ export default function Home() {
                 </div>
               ))}
               {caseLawMatrix.length > 4 && (
-                <Link href="/case/case01/case-law">
+                <Link href="/case/case-01/case-law">
                   <span className="text-xs text-primary hover:underline cursor-pointer">
                     +{caseLawMatrix.length - 4} more →
                   </span>
@@ -345,7 +383,7 @@ export default function Home() {
               ))}
             </ul>
             <div className="mt-4 pt-4 border-t border-border">
-              <Link href="/case/case01/discharge-application">
+              <Link href="/case/case-01/discharge-application">
                 <Button variant="outline" size="sm" className="w-full gap-1.5">
                   <Scale className="h-3.5 w-3.5" /> View Discharge Application
                 </Button>
@@ -386,7 +424,7 @@ export default function Home() {
         <CardHeader>
           <CardTitle className="text-base flex items-center justify-between">
             Key Precedents
-            <Link href="/case/case01/case-law">
+            <Link href="/case/case-01/case-law">
               <Button variant="ghost" size="sm" className="text-xs gap-1 h-7">
                 View all <ArrowRight className="h-3 w-3" />
               </Button>

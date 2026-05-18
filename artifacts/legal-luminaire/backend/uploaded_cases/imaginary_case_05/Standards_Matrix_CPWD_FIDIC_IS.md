@@ -1,0 +1,6 @@
+- IS 6512:1987 (Criteria for Design of Dams)
+- IS 1893 (Earthquake resistant design)
+- CPWD Specifications for Hydraulic Works
+- FIDIC Clause 4.12: Unforeseeable Physical Conditions
+- FIDIC Clause 13.1: Right to Vary
+- FIDIC Clause 19.1: Force Majeure

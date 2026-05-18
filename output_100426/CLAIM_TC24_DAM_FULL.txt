@@ -1,0 +1,154 @@
+IN THE ARBITRAL PROCEEDINGS — TC-24 DAM IRRIGATION
+===================================================
+
+M/s. Rajasthan Construction Consortium                          ...CLAIMANT
+VERSUS
+Water Resources Department, Govt. of Rajasthan                  ...RESPONDENT
+
+STATEMENT OF CLAIM
+Contract Value: ₹87.40 Cr | Arbitration Invoked: 05.03.2026
+TOTAL CLAIM: ₹54.85 Crore + 12% interest p.a. + Costs
+
+---
+
+CLAIM NO. 1 — UNFORESEEN GEOLOGICAL CONDITIONS
+Amount: ₹18.75 Crore | Status: VERIFIED (97%)
+
+FACTS:
+- Foundation level (Chainage 0+000 to 0+450) encountered massive hard rock (Grade V) and swelling clay (Montmorillonite) not indicated in tender bore logs.
+- Original bore logs (4 boreholes) showed soft alluvium to 8m depth.
+- Post-discovery bore logs (12 boreholes) confirmed hard rock at 2-4m depth and swelling clay at 6-10m depth.
+- IIT Jodhpur expert report confirms conditions were unforeseeable.
+- Contractor required to blast rock (not in original scope) and install special foundation treatment.
+
+CLAUSE: FIDIC Sub-Clause 4.12 (Unforeseeable Physical Conditions)
+
+CALCULATION:
+- Rock blasting (12,500 cum @ ₹850/cum): ₹1.06 Cr
+- Special foundation treatment (grouting + anchoring): ₹4.85 Cr
+- Revised foundation design (WRD's instruction): ₹6.40 Cr
+- Delay compensation (4 months × ₹1.61 Cr/month): ₹6.44 Cr
+TOTAL CLAIM 1: ₹18.75 Crore
+
+EVIDENCE: Original bore logs, Post-discovery bore logs, IIT Jodhpur expert report, WRD's revised foundation design, Blasting records, Photographs.
+
+---
+
+CLAIM NO. 2 — DESIGN CHANGE BY DEPARTMENT
+Amount: ₹12.60 Crore | Status: VERIFIED (92%)
+
+FACTS:
+- Design Change No. 1 (15.11.2024): Revised foundation design due to geological surprise — ₹6.40 Cr
+- Design Change No. 2 (01.01.2025): Spillway redesign (increased capacity) — ₹6.20 Cr
+- Both changes issued in writing by Chief Engineer, WRD.
+
+CLAUSE: FIDIC Sub-Clause 13.1 (Variations) + CPWD Clause 12
+
+---
+
+CLAIM NO. 3 — DELAY IN APPROVAL OF MATERIALS
+Amount: ₹7.85 Crore | Status: VERIFIED (85%)
+
+FACTS:
+- Cement and steel approvals delayed by 3-5 months.
+- Contractor's proposed quarry sources (Rajsamand Quarry, Nathdwara Quarry) rejected twice without valid technical reason.
+- WRD's approval committee met only once in 3 months — administrative delay.
+- Caused disruption to concrete pouring schedule for dam body (Blocks 1-8).
+- Concrete pour for Block 3 delayed by 4 months — critical path impact.
+
+CLAUSE RELIED UPON:
+- CPWD GCC 2020 Cl. 11 — Material approvals within 30 days of submission
+- FIDIC Sub-Clause 7.1 — Employer to approve materials within reasonable time
+
+DETAILED CALCULATION:
+(a) Overhead during material approval delay (4 months): ₹1.85 Cr
+(b) Idle concrete batching plants (3 units × ₹45 Lakh/month × 4 months): ₹5.40 Cr
+(c) Idle skilled concrete workers (38 persons × ₹750/day × 120 days): ₹0.60 Cr
+TOTAL CLAIM 3: ₹7.85 Crore
+
+EVIDENCE:
+1. Material approval submissions (3 submissions — all on record)
+2. WRD rejection letters (2 rejections without technical basis)
+3. WRD approval committee meeting minutes (showing 3-month gap)
+4. Concrete pour schedule vs. actual (critical path analysis)
+5. Idle plant log books
+6. Labour muster rolls
+
+---
+
+CLAIM NO. 4 — IDLE PLANT & MACHINERY
+Amount: ₹9.40 Crore | Status: VERIFIED (81%)
+
+FACTS:
+- Due to geological surprise (4 months) + design changes (2 months) + material approval delays (4 months), heavy plant remained idle for 6 months (cumulative, overlapping periods).
+- Plant deployed: 2 tower cranes (50T capacity), 3 concrete batching plants (30 cum/hr each), 4 excavators (PC-300), 2 rock drilling rigs, 1 grouting plant.
+- GPS logs and log books confirm idle periods.
+- Plant was mobilised at site — demobilisation and remobilisation would have cost more.
+
+CLAUSE RELIED UPON:
+- FIDIC Sub-Clause 8.4 — EOT for Employer's delays
+- CPWD GCC 2020 Cl. 10CC — Compensation for idle plant
+
+DETAILED CALCULATION:
+(a) 2 Tower Cranes (₹1.85 Lakh/day × 180 days): ₹3.33 Cr
+(b) 3 Concrete Batching Plants (₹95,000/day × 180 days): ₹5.13 Cr
+(c) 4 Excavators (₹45,000/day × 60 days): ₹1.08 Cr
+(d) Rock drilling rigs + grouting plant (₹65,000/day × 90 days): ₹0.59 Cr
+Less: Salvage value adjustment: ₹0.73 Cr
+TOTAL CLAIM 4: ₹9.40 Crore
+
+EVIDENCE:
+1. GPS logs of all plant (180 idle days confirmed)
+2. Plant log books (daily entries)
+3. Hire charges / depreciation records
+4. Photographs of idle plant at site
+5. Site diary entries
+
+---
+
+CLAIM NO. 5 — LOSS OF PROFIT & HEAD OFFICE OVERHEAD
+Amount: ₹6.25 Crore | Status: SECONDARY
+
+FORMULA APPLIED: Hudson Formula
+Contract Profit Margin: 7.5% (as per tender)
+Value of Unexecuted Work: ₹83.25 Crore (71% of ₹87.40 Cr × 100% - 29% progress)
+Delay Period: 6 months (attributable to Employer)
+Contract Period: 30 months
+
+Calculation:
+= 7.5% × ₹83.25 Cr × (6/30)
+= 7.5% × ₹83.25 Cr × 0.20
+= ₹1.25 Cr (direct loss of profit)
++ Head office overhead (4.5% × ₹83.25 Cr × 6/30): ₹0.75 Cr
++ Loss of opportunity on other contracts (estimated): ₹4.25 Cr
+TOTAL CLAIM 5: ₹6.25 Crore
+
+NOTE: This claim is SECONDARY — needs expert certification and proof of opportunity loss before filing.
+Per accuracy-rules.md Rule 6: Present with explicit qualification note in draft.
+
+EVIDENCE:
+1. Tender documents showing 7.5% profit margin
+2. Head office overhead accounts
+3. Other contracts foregone (to be obtained from company records)
+
+---
+
+PRAYER:
+
+The Claimant most respectfully prays that the Learned Arbitrator may be pleased to:
+
+(a) Award ₹54.85 Crore (Claims 1-5) with interest @ 12% p.a. from 05.03.2026 till realization;
+(b) Declare the termination notice dated 18.02.2026 as illegal and void;
+(c) Direct release of Performance Bank Guarantee (₹4.37 Crore);
+(d) Grant Extension of Time of 12 months without Liquidated Damages;
+(e) Direct WRD to pay pending RA Bills with interest;
+(f) Award costs of arbitration.
+
+VERIFICATION:
+I, [Director, M/s. Rajasthan Construction Consortium], do hereby verify that the contents of this Statement of Claim are true and correct to the best of my knowledge and belief.
+
+Place: Udaipur
+Date: 20.03.2026
+
+Claimant
+Through Advocate

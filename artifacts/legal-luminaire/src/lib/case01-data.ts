@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Case 01 â€” Hemraj Vardar, Director, M/s Praman Construction Pvt. Ltd.
  * Special Session Case No. 1/2025 | FIR No. 496/2011 | Udaipur
  * Charges: IPC Â§304A + Prevention of Corruption Act
@@ -549,9 +549,6 @@ export const FORENSIC_CHECKLIST = {
 // FIR No. 496/2011 | Incident: 28-12-2011 | Accused: Hemraj Vardar
 
 export const ANNEXURE_DEMAND_LIST = [
-  "FIR No. 496/2011 dated 28-12-2011 â€” certified copy",
-  "Complete charge sheet with all annexures â€” certified copy",
-  "Spot inspection memo / panchnama at sampling site â€” original",
   "FIR No. 496/2011 dated 28-12-2011 — certified copy",
   "Complete charge sheet with all annexures — certified copy",
   "Spot inspection memo / panchnama at sampling site — original",
@@ -618,7 +615,7 @@ export const CASE01_ARGUMENT_PARAGRAPHS = [
     para: "It is further submitted that the prosecution has not established an unbroken chain of custody for the impugned mortar samples from collection to laboratory analysis. In absence of documentary continuity regarding sealing, transit, custody transfer, and laboratory receipt, the forensic opinion cannot be treated as a reliable incriminating foundation at the stage of charge. The Hon'ble Supreme Court in Kattavellai @ Devakar v. State of Tamil Nadu (2025 INSC 845) has laid down binding nationwide guidelines requiring a Chain of Custody Register to be maintained from collection to the logical end of the proceedings.",
   },
   {
-    id: "arg2",
+    id: "arg2b",
     ground: "Non-Representative Sampling",
     para: "The record indicates collection in adverse rainy conditions and by non-systematic method. Such collection does not satisfy representative sampling logic for cementitious material and materially increases the risk of contamination and distortion, thereby weakening the probative value of test outcomes. ASTM C780 Â§6.1 states in terms: 'Samples must be protected from rain and moisture; otherwise sample is invalid.'",
   },

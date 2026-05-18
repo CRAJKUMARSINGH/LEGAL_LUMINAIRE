@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CitationGatePanel — Legal Luminaire
  * ─────────────────────────────────────────────────────────────────────────────
  * Sidebar panel that shows live citation verification results while the lawyer
@@ -8,7 +8,6 @@
 
 import { ShieldCheck, ShieldAlert, ShieldX, ExternalLink, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import type { GateResult, CitationMatch } from "@/lib/citation-gate";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 // ─── Status colour helpers ────────────────────────────────────────────────────

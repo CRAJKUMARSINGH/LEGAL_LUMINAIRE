@@ -1,0 +1,189 @@
+# ETERNAL_RESEARCH_CHILD — Legal Luminaire Research Findings Log
+# Daemon synchronized for: artifacts/legal-luminaire
+# Started: 2026-04-30
+# Format: [ISO timestamp] APPROVED|SKIPPED  Category  Source  Target
+# ─────────────────────────────────────────────────────────────────────
+
+[2026-05-17T16:08:59.235Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/grok.md
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-17T16:24:00.457Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/OPENAI AND TAVILY KEY.MD
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-17T16:39:01.667Z] APPROVED
+  Category : CITATION_GATE_RULE
+  Source   : Attached_Assets/CITATION_RISK_REDUCTION_PLAN_v1.md
+  Target   : citation-gate.ts
+  Protected: true
+  Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
+
+
+[2026-05-17T16:54:02.894Z] APPROVED
+  Category : CITATION_GATE_RULE
+  Source   : Attached_Assets/CITATION_RISK_REDUCTION_PLAN_v1.md
+  Target   : citation-gate.ts
+  Protected: true
+  Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
+
+
+[2026-05-17T17:09:04.124Z] APPROVED
+  Category : ROADMAP_ITEM
+  Source   : Attached_Assets/Antigravity Logbook.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract unchecked action items from logbook / action plan
+
+
+[2026-05-17T17:24:05.352Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/OPENAI AND TAVILY KEY.MD
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-17T17:39:06.577Z] APPROVED
+  Category : ACCURACY_RULE
+  Source   : Attached_Assets/PROMPT FOR YOUR SENIOR SOFTWARE ENGINEER.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract accuracy / drafting rules from prompt document
+
+
+[2026-05-17T17:54:07.805Z] APPROVED
+  Category : CITATION_GATE_RULE
+  Source   : Attached_Assets/CITATION_ACCURACY_AND_6MONTH_ROADMAP.md
+  Target   : citation-gate.ts
+  Protected: true
+  Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
+
+
+[2026-05-17T18:09:09.042Z] APPROVED
+  Category : CITATION_GATE_RULE
+  Source   : Attached_Assets/CITATION_RISK_REDUCTION_PLAN_v1.md
+  Target   : citation-gate.ts
+  Protected: true
+  Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
+
+
+[2026-05-17T18:24:10.265Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/grok.md
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-17T18:39:11.498Z] APPROVED
+  Category : CITATION_GATE_RULE
+  Source   : Attached_Assets/CITATION_ACCURACY_AND_6MONTH_ROADMAP.md
+  Target   : citation-gate.ts
+  Protected: true
+  Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
+
+
+[2026-05-17T18:54:12.724Z] APPROVED
+  Category : CITATION_GATE_RULE
+  Source   : Attached_Assets/CITATION_ACCURACY_AND_6MONTH_ROADMAP.md
+  Target   : citation-gate.ts
+  Protected: true
+  Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
+
+
+[2026-05-17T19:09:13.979Z] APPROVED
+  Category : ACCURACY_RULE
+  Source   : Attached_Assets/MASTER COMBINED PROMPT.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract accuracy / drafting rules from prompt document
+
+
+[2026-05-17T19:24:15.485Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/land aq dig deeper thrice and get more bett.txt
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-17T19:39:16.745Z] APPROVED
+  Category : ROADMAP_ITEM
+  Source   : Attached_Assets/AntigravityLogbook.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract unchecked action items from logbook / action plan
+
+
+[2026-05-17T19:54:17.961Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/OPENAI AND TAVILY KEY.MD
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-17T20:09:19.189Z] APPROVED
+  Category : DEMO_CASE_ENRICHMENT
+  Source   : Attached_Assets/ARBITRATE.MD
+  Target   : infra-arb-cases.ts
+  Protected: false
+  Summary  : Enrich TC-22..TC-26 infra arbitration data from source document
+
+
+[2026-05-17T20:24:20.426Z] APPROVED
+  Category : ROADMAP_ITEM
+  Source   : Attached_Assets/AntigravityLogbook.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract unchecked action items from logbook / action plan
+
+
+[2026-05-17T20:39:21.638Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/land aq dig deeper thrice and get more bett.txt
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-18T02:54:42.115Z] APPROVED
+  Category : ROADMAP_ITEM
+  Source   : Attached_Assets/Antigravity Logbook.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract unchecked action items from logbook / action plan
+
+
+[2026-05-18T03:09:43.421Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/OPENAI AND TAVILY KEY.MD
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-18T03:24:44.696Z] APPROVED
+  Category : ROADMAP_ITEM
+  Source   : Attached_Assets/AntigravityLogbook.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract unchecked action items from logbook / action plan
+
+
+[2026-05-18T03:39:46.070Z] APPROVED
+  Category : CITATION_GATE_RULE
+  Source   : Attached_Assets/CITATION_RISK_REDUCTION_PLAN_v1.md
+  Target   : citation-gate.ts
+  Protected: true
+  Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
+

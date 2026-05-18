@@ -1,0 +1,4 @@
+- IEC 61869, IS 2026 (Power Transformers)
+- IEEMA Price Variation Formula
+- CEA Guidelines for Transmission Lines
+- FIDIC Clause 8.4 (EOT), 13.1 (Variations), 20.1 (Claims)

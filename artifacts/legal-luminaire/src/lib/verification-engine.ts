@@ -1,4 +1,4 @@
-/**
+﻿/**
  * VERIFICATION ENGINE — Legal Luminaire
  * ─────────────────────────────────────────────────────────────────────────────
  * Single source of truth for citation accuracy.
@@ -63,7 +63,8 @@ export type StandardAccuracy = {
   // What the app currently states about this standard
   appStatement: string;
   // Is the app statement accurate vs the official text?
-  statementAccurate: boolean;
+  // null = cannot confirm without official text
+  statementAccurate: boolean | null;
 
   applicability: "correct" | "wrong" | "partial";
   applicabilityReason: string;
@@ -413,7 +414,7 @@ export const STANDARDS_ACCURACY: StandardAccuracy[] = [
     clauseRef: "Clause 4.1, 5.1, 6.2",
     appStatement:
       "IS 3535:1986 Clause 4.1 mandates contractor representative presence. Clause 6.2 requires 5 representative locations.",
-    statementAccurate: null as unknown as boolean, // cannot confirm without official text
+    statementAccurate: null, // cannot confirm without official text
     applicability: "correct",
     applicabilityReason:
       "Applies to hydraulic cement sampling — relevant to the sampling protocol challenge.",
@@ -443,7 +444,7 @@ export const STANDARDS_ACCURACY: StandardAccuracy[] = [
     clauseRef: "Section 7-8 (Sampling Procedure)",
     appStatement:
       "ASTM C1324 Sections 7-8 require removal of carbonated outer layer before sampling hardened masonry mortar.",
-    statementAccurate: null as unknown as boolean,
+    statementAccurate: null,
     applicability: "correct",
     applicabilityReason:
       "This is the correct international standard for forensic examination of hardened masonry mortar — exactly the material in this case.",
@@ -471,7 +472,7 @@ export const STANDARDS_ACCURACY: StandardAccuracy[] = [
     clauseRef: "Section 3.7.4 & 12.2.1",
     appStatement:
       "CPWD Manual 2023 Sections 3.7.4 and 12.2.1 mandate joint sampling by Engineer-in-Charge and Contractor.",
-    statementAccurate: null as unknown as boolean,
+    statementAccurate: null,
     applicability: "correct",
     applicabilityReason:
       "CPWD Manual governs public works construction in India. Directly applicable to stadium construction/repair contracts.",

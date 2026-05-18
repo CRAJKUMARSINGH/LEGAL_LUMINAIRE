@@ -6,9 +6,11 @@ import { Badge } from "@/components/ui/badge";
 
 export const UploadView = () => {
   const [files, setFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(false);
     const dropped = Array.from(e.dataTransfer.files);
     setFiles((prev) => [...prev, ...dropped]);
   };
@@ -30,9 +32,15 @@ export const UploadView = () => {
 
       {/* Drop zone */}
       <div
-        onDragOver={(e) => e.preventDefault()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className="border-2 border-dashed border-border rounded-xl p-12 text-center hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
+        className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${
+          isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-primary/5"
+        }`}
         onClick={() => document.getElementById("file-input")?.click()}
       >
         <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

@@ -27,6 +27,11 @@ node_modules
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Python / duty-scan output
+__pycache__/
+*.py[cod]
+scripts/reports/
+
 # misc
 /.sass-cache
 /connect.lock
@@ -50,3 +55,22 @@ Thumbs.db
 
 # Unrelated projects in workspace root
 moonshot-muse-main/
+
+# Secrets — never commit API keys or local env files
+.env
+.env.local
+.env.*.local
+Attached_Assets/OPENAI AND TAVILY KEY.MD
+.streamlit/secrets.toml
+
+# ChromaDB vector stores — environment-specific, never commit
+**/chroma_db/
+chroma_db/
+
+# Test font artifacts
+test_font.pdf
+
+# Harvey AI (unfinished integration)
+artifacts/legal-luminaire/backend/agents/harvey_client.py
+artifacts/legal-luminaire/backend/api/routes_harvey.py
+test-assets/harvey-samples/

@@ -1,5 +1,5 @@
 """
-Pre-load CASE01_HEMRAJ_STATE_2025 documents into ChromaDB on startup.
+Pre-load CASE01 (Hemraj) documents from real_cases/ into ChromaDB on startup.
 Run: python preload_case01.py
 Or called automatically from main.py lifespan.
 """
@@ -13,32 +13,25 @@ logger = logging.getLogger(__name__)
 
 def preload_hemraj_case(workspace_root: Path | None = None) -> dict:
     """Index all CASE01_HEMRAJ_STATE_2025 documents into ChromaDB for case01."""
-    from config import settings
-    from rag.document_store import ingest_files, case_has_documents, get_case_doc_count
+    from rag.document_store import ingest_files
+
+    from repo_paths import hemraj_case_dir, workspace_root as repo_root
 
     case_id = "case01"
 
-    # Find the case directory
-    if workspace_root is None:
-        # Try relative paths from backend/
-        candidates = [
-            Path("../../CASE01_HEMRAJ_STATE_2025"),
-            Path("../../../CASE01_HEMRAJ_STATE_2025"),
-            Path("CASE01_HEMRAJ_STATE_2025"),
-        ]
-        for c in candidates:
-            if c.exists():
-                workspace_root = c.parent
-                break
-
-    if workspace_root is None:
-        logger.warning("Could not find CASE01_HEMRAJ_STATE_2025 directory. Skipping preload.")
-        return {"success": False, "error": "Directory not found"}
-
-    case_dir = workspace_root / "CASE01_HEMRAJ_STATE_2025"
+    if workspace_root is not None:
+        case_dir = workspace_root / "real_cases" / "CASE01_HEMRAJ_STATE_2025"
+        if not case_dir.exists():
+            case_dir = workspace_root / "CASE01_HEMRAJ_STATE_2025"
+    else:
+        case_dir = hemraj_case_dir()
+        if not case_dir.exists():
+            legacy = repo_root() / "CASE01_HEMRAJ_STATE_2025"
+            if legacy.exists():
+                case_dir = legacy
     if not case_dir.exists():
-        logger.warning(f"CASE01_HEMRAJ_STATE_2025 not found at {case_dir}")
-        return {"success": False, "error": str(case_dir)}
+        logger.warning("Could not find CASE01_HEMRAJ_STATE_2025 (expected real_cases/CASE01_HEMRAJ_STATE_2025). Skipping preload.")
+        return {"success": False, "error": "Directory not found"}
 
     # If both v3 and v4 artefacts exist, we want retrieval to prefer the latest.
     # Exclude old v3 defence reply from indexing to avoid conflicting content in RAG.
@@ -65,7 +58,9 @@ def preload_hemraj_case(workspace_root: Path | None = None) -> dict:
         "Legal_Case_References_Brief_Notes.md",
         "DEEPsEARCH.md",
         "SUPERIOR_HINDI_DISCHARGE_APPLICATION_FULL.lex",
+        "SUPERIOR_HINDI_DISCHARGE_APPLICATION_FULL_v2.lex",
         "Stadium_Collapse_Defence_Hindi.lex",
+        "DISCHARGE_APPLICATION_UPDATED_v4.lex",
         "DISCHARGE_APPLICATION_UPDATED_v2.lex",
         "DEFENCE_REPLY_UPDATED_v2.lex",
     ]

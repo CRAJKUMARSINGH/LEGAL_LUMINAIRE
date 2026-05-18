@@ -54,9 +54,9 @@ async function main() {
 
   // Case 01 — Building Collapse (primary demo case)
   const case01Result = await seedCase("case01", [
-    "CASE01_HEMRAJ_STATE_2025/FIR_456_2025.md",
-    "CASE01_HEMRAJ_STATE_2025/Charge_Sheet.md",
-    "CASE01_HEMRAJ_STATE_2025/FSL_Report.md",
+    "real_cases/CASE01_HEMRAJ_STATE_2025/FIR_456_2025.md",
+    "real_cases/CASE01_HEMRAJ_STATE_2025/Charge_Sheet.md",
+    "real_cases/CASE01_HEMRAJ_STATE_2025/FSL_Report.md",
   ]);
   console.log(`Case 01: ${case01Result.status} — ${case01Result.message}`);
 

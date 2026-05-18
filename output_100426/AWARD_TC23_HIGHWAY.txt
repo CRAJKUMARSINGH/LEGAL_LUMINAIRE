@@ -1,0 +1,62 @@
+ARBITRAL AWARD
+==============
+
+IN THE ARBITRAL PROCEEDINGS
+UNDER THE ARBITRATION AND CONCILIATION ACT, 1996
+
+BETWEEN:
+M/s. Rajputana Infra Projects Pvt. Ltd.                         ...CLAIMANT
+VERSUS
+National Highways Authority of India (NHAI)                     ...RESPONDENT
+
+AWARD DATED: 20.12.2026
+
+ARBITRAL TRIBUNAL: [Three-Member Tribunal — Retired HC Judge (Presiding) + Technical Expert + Legal Expert]
+
+---
+
+FINDINGS:
+
+1. CLAIM NO. 1 (Site Possession Delay — ₹14.85 Cr): ALLOWED IN FULL.
+   NHAI failed to obtain forest clearance and resolve land acquisition before issuing LOA. The 78-day delay is established by documentary evidence including Forest Dept. letters and Revenue records. NHAI is liable for full compensation.
+
+2. CLAIM NO. 2 (Price Escalation — ₹9.75 Cr): ALLOWED IN FULL.
+   NHAI GCC Clause 10CC entitles the Claimant to price escalation. WPI indices verified from official sources.
+
+3. CLAIM NO. 3 (Variation Orders — ₹11.40 Cr): ALLOWED IN FULL.
+   Both VOs were issued in writing by the EE. Joint measurements confirm execution. NHAI is liable.
+
+4. CLAIM NO. 4 (Idle Machinery & Labour — ₹6.25 Cr): ALLOWED IN PART (₹5.65 Cr).
+   GPS logs and muster rolls support the claim. Minor deduction for unverified periods.
+
+5. CLAIM NO. 5 (Loss of Profit — ₹8.90 Cr): ALLOWED IN PART (₹4.00 Cr).
+   Hudson Formula accepted in principle. Reduced to account for contractor's own contribution to delay.
+
+6. TERMINATION: DECLARED ILLEGAL.
+   The termination notice dated 20.02.2026 is set aside. Valid EOT was in force.
+
+7. BLACKLISTING: SET ASIDE.
+   The blacklisting recommendation is disproportionate and set aside.
+
+8. COUNTER CLAIMS: DISMISSED.
+   LD cannot be levied when delay is caused by NHAI's own defaults.
+
+---
+
+AWARD:
+
+The Claimant is awarded:
+- Principal Amount: ₹41.65 Crore (Claims 1+2+3+4 partial+5 partial)
+- Interest @ 8.5% p.a. from 05.03.2026 till date of award: ₹3.54 Cr
+- Post-award interest @ 8.5% p.a. till realization
+- Costs of arbitration: ₹25 Lakh (to be borne by Respondent)
+
+TOTAL AWARD: ₹45.44 Crore + post-award interest
+
+The Performance Bank Guarantee (₹5.63 Cr) shall be released to the Claimant within 30 days.
+Counter claim of Respondent rejected except ₹2.15 Cr towards LD for contractor's own delay.
+
+Place: Udaipur
+Date: 20.12.2026
+
+Presiding Arbitrator

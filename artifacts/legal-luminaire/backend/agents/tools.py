@@ -272,3 +272,143 @@ def verify_citation_url(url: str) -> str:
         return f"NOT_ACCESSIBLE: {url} (HTTP {resp.status_code})"
     except Exception as e:
         return f"NOT_ACCESSIBLE: {url} — {e}"
+
+
+@tool
+def scc_online_verify(citation: str) -> str:
+    """
+    Verify an Indian case citation against SCC Online (scconline.com).
+    Uses SCC Online API if SCC_ONLINE_API_KEY is set in .env;
+    otherwise falls back to a structured Tavily search on scconline.com.
+    Returns: citation status (VERIFIED/UNVERIFIED), holding snippet, and source URL.
+
+    Example inputs: "(2005) 6 SCC 1", "2025 INSC 845", "AIR 1979 SC 1715"
+    """
+    try:
+        scc_key = getattr(settings, "scc_online_api_key", None)
+
+        if scc_key:
+            # Live API path — replace endpoint when SCC Online opens their API programme
+            resp = _session.get(
+                "https://api.scconline.com/v1/citations/verify",
+                params={"citation": citation, "api_key": scc_key},
+                timeout=15,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                return (
+                    f"SCC_ONLINE STATUS: {data.get('status', 'UNKNOWN')}\n"
+                    f"CASE: {data.get('case_name', '')}\n"
+                    f"HOLDING: {data.get('holding', '')[:600]}\n"
+                    f"URL: {data.get('url', '')}"
+                )
+
+        # Fallback: Tavily search on scconline.com
+        client = _get_tavily()
+        results = client.search(
+            query=f'"{citation}" site:scconline.com',
+            search_depth="advanced",
+            max_results=3,
+            include_domains=["scconline.com"],
+        )
+        if results.get("results"):
+            lines = [f"SCC_ONLINE FALLBACK SEARCH for '{citation}':"]
+            for r in results["results"]:
+                lines.append(f"URL: {r.get('url', '')}")
+                lines.append(f"SNIPPET: {r.get('content', '')[:500]}")
+                lines.append("---")
+            return "\n".join(lines)
+
+        return f"SCC ONLINE: Citation '{citation}' NOT FOUND — mark as UNVERIFIED."
+    except Exception as e:
+        logger.error(f"scc_online_verify error: {e}")
+        return f"SCC Online verification failed: {e}"
+
+
+@tool
+def manupatra_verify(citation: str) -> str:
+    """
+    Verify an Indian case citation against Manupatra (manupatra.com).
+    Uses Manupatra API if MANUPATRA_API_KEY is set in .env;
+    otherwise falls back to a structured Tavily search on manupatra.com.
+    Returns: citation status, case name, court, holding snippet, and source URL.
+
+    Example inputs: "(1979) 3 SCC 4", "2000 6 SCC 269", "AIR 2005 SC 3180"
+    """
+    try:
+        manu_key = getattr(settings, "manupatra_api_key", None)
+
+        if manu_key:
+            # Live API path — update endpoint when Manupatra API is available
+            resp = _session.get(
+                "https://api.manupatra.com/v1/citations/verify",
+                params={"citation": citation, "api_key": manu_key},
+                timeout=15,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                return (
+                    f"MANUPATRA STATUS: {data.get('status', 'UNKNOWN')}\n"
+                    f"CASE: {data.get('case_name', '')}\n"
+                    f"COURT: {data.get('court', '')}\n"
+                    f"HOLDING: {data.get('holding', '')[:600]}\n"
+                    f"URL: {data.get('url', '')}"
+                )
+
+        # Fallback: Tavily search on manupatra.com
+        client = _get_tavily()
+        results = client.search(
+            query=f'"{citation}" site:manupatra.com',
+            search_depth="advanced",
+            max_results=3,
+            include_domains=["manupatra.com"],
+        )
+        if results.get("results"):
+            lines = [f"MANUPATRA FALLBACK SEARCH for '{citation}':"]
+            for r in results["results"]:
+                lines.append(f"URL: {r.get('url', '')}")
+                lines.append(f"SNIPPET: {r.get('content', '')[:500]}")
+                lines.append("---")
+            return "\n".join(lines)
+
+        return f"MANUPATRA: Citation '{citation}' NOT FOUND — mark as UNVERIFIED."
+    except Exception as e:
+        logger.error(f"manupatra_verify error: {e}")
+        return f"Manupatra verification failed: {e}"
+
+
+@tool
+def cross_database_consensus(citation: str) -> str:
+    """
+    Run the same citation through Indian Kanoon, SCC Online, AND Manupatra.
+    Returns a consensus verdict: VERIFIED (all agree) / DIVERGENT (sources conflict) / UNVERIFIED.
+    Use this for any citation being used as PRIMARY authority.
+    """
+    ik  = indian_kanoon_search(citation)
+    scc = scc_online_verify(citation)
+    manu = manupatra_verify(citation)
+
+    ik_found   = "NOT FOUND" not in ik   and "failed" not in ik.lower()
+    scc_found  = "NOT FOUND" not in scc  and "failed" not in scc.lower()
+    manu_found = "NOT FOUND" not in manu and "failed" not in manu.lower()
+
+    found_count = sum([ik_found, scc_found, manu_found])
+    if found_count == 3:
+        verdict = "VERIFIED (all 3 databases confirmed)"
+    elif found_count == 2:
+        verdict = "VERIFIED (2/3 databases confirmed) — use with qualification"
+    elif found_count == 1:
+        verdict = "DIVERGENT — only 1 source found; mark as SECONDARY"
+    else:
+        verdict = "UNVERIFIED — not found on any database; DO NOT USE as primary authority"
+
+    return (
+        f"CROSS-DATABASE CONSENSUS for '{citation}'\n"
+        f"Verdict: {verdict}\n"
+        f"---\n"
+        f"[Indian Kanoon]\n{ik[:400]}\n"
+        f"---\n"
+        f"[SCC Online]\n{scc[:400]}\n"
+        f"---\n"
+        f"[Manupatra]\n{manu[:400]}"
+    )

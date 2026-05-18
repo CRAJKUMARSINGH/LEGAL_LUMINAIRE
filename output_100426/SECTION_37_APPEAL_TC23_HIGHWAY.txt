@@ -1,0 +1,75 @@
+IN THE HIGH COURT OF RAJASTHAN AT JODHPUR
+==========================================
+
+ARBITRATION APPEAL NO. _____ / 2027
+
+UNDER SECTION 37(1)(c) OF THE ARBITRATION AND CONCILIATION ACT, 1996
+
+IN THE MATTER OF:
+
+National Highways Authority of India (NHAI),
+PIU-Udaipur, Rajasthan                                          ...APPELLANT
+
+VERSUS
+
+M/s. Rajputana Infra Projects Pvt. Ltd.,
+Udaipur, Rajasthan                                              ...RESPONDENT
+
+APPEAL AGAINST ARBITRAL AWARD DATED 20.12.2026
+(Challenging Award on Loss of Profit — Hudson Formula)
+
+---
+
+GROUNDS OF APPEAL (NHAI's Perspective — for Respondent's preparation)
+
+GROUND 1 — LOSS OF PROFIT CLAIM (₹4.00 Cr AWARDED) — CHALLENGEABLE:
+The Tribunal awarded ₹4.00 Crore towards loss of profit applying the Hudson Formula. NHAI will argue:
+(a) Hudson Formula requires proof of actual opportunity loss — no such proof was led.
+(b) The Contractor did not demonstrate that it had other contracts available which it could not execute due to this delay.
+(c) The Supreme Court in McDermott International Inc. v. Burn Standard Co. Ltd. (2006) 11 SCC 181 has held that loss of profit must be proved by evidence, not merely by formula.
+(d) The Hudson Formula is a rule of thumb, not a substitute for evidence.
+
+RESPONDENT'S REPLY TO GROUND 1:
+(a) The Tribunal correctly applied the Hudson Formula as a reasonable estimate of loss of profit.
+(b) The Supreme Court in Alstom Ltd. v. Zillion Infraprojects Pvt. Ltd. (2023) has upheld Hudson Formula awards where the contractor demonstrates the formula's applicability.
+(c) The Contractor's head office overhead records and turnover data were placed on record.
+(d) Section 37 appeal is not a re-hearing — the Tribunal's finding on quantum is a finding of fact, not law.
+(e) The award is not "patently illegal" or "against public policy" — the only grounds for interference under Section 37.
+
+GROUND 2 — INTEREST RATE (8.5% p.a.) — CHALLENGEABLE:
+NHAI will argue that 8.5% interest is excessive. Respondent's reply: The Tribunal has discretion on interest rate. 8.5% is reasonable and within the range consistently awarded by Indian arbitral tribunals.
+
+GROUND 3 — BLACKLISTING SET ASIDE — NOT CHALLENGEABLE UNDER SEC 37:
+The setting aside of the blacklisting recommendation is a finding of fact and law. Section 37 does not permit re-examination of findings of fact.
+
+---
+
+RESPONDENT'S PRAYER IN SECTION 37 APPEAL:
+
+(a) Dismiss the appeal with costs;
+(b) Confirm the Award dated 20.12.2026 in its entirety;
+(c) Direct NHAI to pay the awarded amount with post-award interest pending appeal;
+(d) Direct NHAI to release the Performance Bank Guarantee of ₹5.63 Crore.
+
+---
+
+LEGAL FRAMEWORK — SECTION 37 APPEAL:
+
+Section 37(1)(c) A&C Act 1996: Appeal lies against an order refusing to set aside an award under Section 34.
+Grounds for interference: Patent illegality, Conflict with public policy, Fraud/corruption.
+NOT grounds: Error of fact, Disagreement with quantum, Re-appreciation of evidence.
+
+KEY PRECEDENTS ON SECTION 37 SCOPE:
+1. ONGC Ltd. v. Saw Pipes Ltd. (2003) 5 SCC 705 — Patent illegality standard.
+2. Associate Builders v. DDA (2015) 3 SCC 49 — Arbitral award not to be interfered with unless perverse.
+3. Ssangyong Engineering v. NHAI (2019) 15 SCC 131 — Narrow scope of Section 37 appeal.
+4. Delhi Airport Metro Express v. DMRC (2022) 1 SCC 131 — Court cannot substitute its view for arbitrator's.
+
+STATUS: SECONDARY — verify exact para numbers from SCC Online before filing.
+
+---
+
+ACCURACY GATE:
+- All precedents cited above: SECONDARY — obtain certified copies before filing.
+- Hudson Formula challenge: PENDING — obtain expert opinion on applicability before filing.
+- Section 37 scope precedents: SECONDARY — verify from SCC Online.

@@ -42,8 +42,8 @@ class PreviewResponse(BaseModel):
     success: bool
     file_id: str
     metadata: ExtractionMetadata | None = None
-    chunks: list[PageChunk] = []
-    errors: list[str] = []
+    chunks: list[PageChunk] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
 
 class NewCaseExtraction(BaseModel):
     incident_type: str = Field(description="e.g. Building Collapse, Check Bounce")
@@ -51,14 +51,14 @@ class NewCaseExtraction(BaseModel):
     accused_names: list[str] = Field(description="List of accused individuals")
     timeline_events: list[dict] = Field(description="Chronological events with dates. Include 'grounding' key if it relates to a standard violation.")
     statutes_involved: list[str] = Field(description="IPC/BNS or standard codes mentioned")
-    forensic_grounding: list[dict] = Field(default=[], description="List of matched standards or procedural gaps")
+    forensic_grounding: list[dict] = Field(default_factory=list, description="List of matched standards or procedural gaps")
 
 class OmniIngestResponse(BaseModel):
     success: bool
     case_id: str
     extraction: NewCaseExtraction | None = None
     metadata: ExtractionMetadata | None = None
-    errors: list[str] = []
+    errors: list[str] = Field(default_factory=list)
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────

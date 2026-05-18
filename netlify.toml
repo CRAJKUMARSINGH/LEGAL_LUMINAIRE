@@ -1,10 +1,15 @@
+# Legal Luminaire SPA — build from monorepo root (pnpm workspace + catalog deps).
+# Netlify: connect this repo; do not override base directory in the UI.
+
 [build]
-  base = "artifacts/legal-luminaire"
-  command = "npm install --ignore-scripts && npm run build"
-  publish = "artifacts/legal-luminaire/dist"
+  command = "pnpm install --frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
+  publish = "artifacts/legal-luminaire/dist/public"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_VERSION = "10"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-

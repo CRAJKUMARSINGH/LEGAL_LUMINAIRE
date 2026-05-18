@@ -1,2 +1,0 @@
-Scope: all 9 workspace projects
-Progress: resolved 0, reused 1, downloaded 0, added 0

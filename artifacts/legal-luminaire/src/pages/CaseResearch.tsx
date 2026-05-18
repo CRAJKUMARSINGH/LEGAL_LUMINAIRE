@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ExternalLink, Scale, BookOpen, Globe, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 import { CASE01_PRECEDENTS, CASE01_STANDARDS, type VerificationStatus } from "@/lib/case01-data";
+import SmartCitationSearch from "@/components/SmartCitationSearch";
 
 const statusConfig: Record<VerificationStatus, { label: string; color: string; icon: React.ElementType }> = {
   VERIFIED:   { label: "VERIFIED",   color: "bg-green-100 text-green-800 border-green-300",  icon: CheckCircle2 },
@@ -44,6 +45,9 @@ export default function CaseResearch() {
           Legal Research — Case 01 · Hemraj Vardar · Stadium Collapse
         </p>
       </div>
+
+      {/* Smart Citation Search — from Legal-Luminary-Search merge */}
+      <SmartCitationSearch />
 
       {/* Verification legend */}
       <div className="flex flex-wrap gap-2 text-xs">

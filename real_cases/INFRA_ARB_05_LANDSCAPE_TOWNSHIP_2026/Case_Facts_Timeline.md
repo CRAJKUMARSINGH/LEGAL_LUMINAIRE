@@ -1,0 +1,9 @@
+- Tender Date: 10.11.2023
+- Work Order Issued: 05.03.2024 (₹34.80 Cr, 18 months)
+- Site Handover: 20.03.2024
+- Scope: 185 Acres landscaping, 28 km internal roads, lakefront development, plantation of 85,000 trees/shrubs
+- Major Issues: Massive scope creep + delayed payment + poor survival rate due to water shortage
+- Scheduled Completion: 04.09.2025
+- Progress as on 31.03.2026: 64%
+- Termination Notice: 12.02.2026
+- Arbitration Invoked: 28.02.2026

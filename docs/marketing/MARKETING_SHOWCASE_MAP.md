@@ -201,3 +201,31 @@ filing. Citations must be independently verified before use in court.
 
 Note: "Minutes" claim is [ASSUMPTION] — actual time depends on API response
 and case complexity. Demo mode (static data) loads instantly.
+
+---
+
+## Infrastructure & Construction Arbitration Cases (New Series - TC-22 to TC-26)
+
+These 5 new full-lifecycle cases demonstrate Legal Luminaire's strength in high-value infrastructure disputes under CPWD, NHAI, FIDIC, and Rajasthan Government contracts.
+
+| Case ID | Project Type | Contract Value | Key Claims | Fact-Fit Gate Strength | Best For |
+|---------|--------------|----------------|------------|------------------------|----------|
+| **TC-22** | 300-Bed Hospital Building | ₹48.75 Cr | Delay in site handover, Variations, Idle resources | 91% Verified | Building contractors, RMSCL disputes |
+| **TC-23** | 45 km NH Highway | ₹112.65 Cr | Site possession delay (78 days), Price escalation, RoW issues | 94% Verified | NHAI / Highway contractors |
+| **TC-24** | Medium Irrigation Dam | ₹87.40 Cr | Geological surprises, Design changes | 93% Verified | Water Resources & Irrigation Dept. cases |
+| **TC-25** | 220 kV GIS Substation + Transmission Line | ₹68.25 Cr | Employer-supplied material delay, RoW clearance | 92% Verified | Power & Transmission projects |
+| **TC-26** | 185 Acres Township Landscaping & Internal Roads | ₹34.80 Cr | Scope creep, Delayed payments, Plantation failure | 90% Verified | Smart City, Urban Development & Landscape contracts |
+
+### Why These Cases Matter (Marketing Message)
+- Full lifecycle from **Work Order → Disputes → Notices → Standing Committee → Arbitration → Award → Execution**
+- Every stage has **Hindi + English** drafts
+- Real-time **Fact-Fit Gate**, Verified/Pending citations, and Contradiction Radar
+- Perfect for demonstrating to contractors, arbitration lawyers, and government department advocates
+
+**Demo Flow Recommendation:**
+1. Start with **TC-23 (Highway)** — Highest value & most relatable
+2. Show **Claim Matrix → Contradiction Finder → Draft Award** in one click
+3. End with watermarked PDF download + "Start Your Own Case" CTA
+
+**Tagline for this series:**
+**"From Work Order to Arbitral Award — One Tool, Complete Infrastructure Justice."**

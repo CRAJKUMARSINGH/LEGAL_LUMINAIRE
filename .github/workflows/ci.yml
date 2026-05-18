@@ -31,6 +31,9 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: Run Vitest suite
+        run: pnpm --filter @workspace/legal-luminaire run test
+
       - name: Build frontend (Vite)
         run: pnpm --filter @workspace/legal-luminaire run build
 

@@ -1,0 +1,166 @@
+IN THE ARBITRAL PROCEEDINGS — TC-26 LANDSCAPE TOWNSHIP
+=======================================================
+
+M/s. Rajputana Greentech Landscapes Pvt. Ltd.                   ...CLAIMANT
+VERSUS
+Udaipur Smart City Ltd. (USCL)                                  ...RESPONDENT
+
+STATEMENT OF CLAIM
+Contract Value: ₹34.80 Cr | Arbitration Invoked: 28.02.2026
+TOTAL CLAIM: ₹20.75 Crore + 12% interest p.a. + Costs
+
+---
+
+CLAIM NO. 1 — SCOPE CREEP & VARIATION ORDERS
+Amount: ₹6.85 Crore | Status: VERIFIED (94%)
+
+FACTS:
+- Original scope: 85,000 plants + 28 km internal roads + basic landscaping.
+- Additional works ordered by USCL:
+  * 42,000 extra plants (written instructions)
+  * 6.5 km additional roads (written instructions)
+  * Fountain & lakefront development (written instructions)
+  * 19 Variation Orders issued in total.
+- All extra works executed on written instructions of Engineer-in-Charge.
+
+CLAUSE: CPWD Clause 12 + FIDIC Sub-Clause 13.1 (Variations)
+
+CALCULATION:
+- Extra earthwork & grading: ₹2.85 Cr
+- Additional plantation (42,000 plants): ₹2.40 Cr
+- Road pavement layers (6.5 km): ₹1.60 Cr
+TOTAL CLAIM 1: ₹6.85 Crore
+
+EVIDENCE: 19 Variation Orders, Joint Measurements, Photographs before & after.
+
+---
+
+CLAIM NO. 2 — DELAYED PAYMENT OF RUNNING BILLS
+Amount: ₹4.25 Crore | Status: VERIFIED (96%)
+
+FACTS:
+- 7 RA Bills pending for 4-11 months without valid reason.
+- Non-payment caused severe cash-flow crisis.
+- Contractor unable to purchase plants and materials.
+
+CLAUSE: CPWD Clause 7 + Interest on Delayed Payment
+
+CALCULATION:
+- Principal of unpaid bills: ₹3.85 Cr
+- Interest @ 12% p.a. on delayed payments: ₹0.40 Cr
+TOTAL CLAIM 2: ₹4.25 Crore
+
+---
+
+CLAIM NO. 3 — PLANTATION REPLACEMENT DUE TO WATER SHORTAGE
+Amount: ₹3.15 Crore | Status: VERIFIED (89%)
+
+FACTS:
+- Tender specified that USCL would supply treated water for irrigation.
+- USCL failed to supply treated water from September 2024 onwards.
+- Survival rate dropped to 43% (should be 85% per contract).
+- Contractor forced to replace 38,000 plants twice at own cost.
+
+CLAUSE: Special Conditions Clause 15 (Employer-supplied utilities)
+
+CALCULATION:
+- 38,000 plants × ₹450/plant × 2 replacements: ₹3.42 Cr
+- Less: Contractor's own contribution (10%): ₹0.27 Cr
+TOTAL CLAIM 3: ₹3.15 Crore
+
+EVIDENCE: Survival Survey Reports, Irrigation Log, Letters dated 10.06.2024 onwards, Photographs.
+
+---
+
+CLAIM NO. 4 — IDLE MACHINERY & LABOUR
+Amount: ₹2.45 Crore | Status: VERIFIED (85%)
+
+FACTS:
+- Due to scope creep disruption (19 VOs requiring replanning) and payment delays (cash flow crisis), machinery and labour remained idle for 85 days (cumulative).
+- Plant deployed: 3 JCBs, 2 tractor-trailers, 1 water tanker, 4 plantation teams (12 persons each).
+- Log books confirm idle periods.
+
+CLAUSE RELIED UPON:
+- CPWD GCC 2020 Cl. 10CC — Compensation for idle plant caused by Employer
+
+DETAILED CALCULATION:
+(a) 3 JCBs (₹8,500/day × 85 days): ₹0.22 Cr
+(b) 2 Tractor-trailers (₹6,500/day × 85 days): ₹0.11 Cr
+(c) 1 Water tanker (₹4,500/day × 85 days): ₹0.04 Cr
+(d) 4 Plantation teams (48 persons × ₹650/day × 85 days): ₹0.27 Cr
+(e) Supervisory staff overhead: ₹0.45 Cr
+(f) Camp establishment overhead: ₹1.36 Cr
+TOTAL CLAIM 4: ₹2.45 Crore
+
+EVIDENCE:
+1. Machinery log books (85 idle days)
+2. Labour muster rolls
+3. Site diary entries
+4. Photographs of idle machinery
+
+---
+
+CLAIM NO. 5 — PRICE ESCALATION (CPWD CLAUSE 10CC)
+Amount: ₹1.95 Crore | Status: VERIFIED (91%)
+
+FACTS:
+- Contract period extended due to USCL's scope creep and payment delays.
+- WPI indices for plants, soil, fertilisers, and labour have increased from base date (March 2024) to February 2026.
+
+CLAUSE RELIED UPON:
+- CPWD GCC 2020 Cl. 10CC — WPI-based escalation mandatory
+
+DETAILED CALCULATION:
+(a) Horticulture materials (plants, soil, fertilisers): WPI +16.8% on ₹6.85 Cr = ₹1.15 Cr
+(b) Labour (CPI-IW): +22.1% on ₹3.65 Cr = ₹0.80 Cr
+TOTAL CLAIM 5: ₹1.95 Crore
+
+EVIDENCE:
+1. CPWD WPI indices (Office of Economic Adviser)
+2. CPI-IW indices (Labour Bureau)
+3. Base date calculation sheet
+4. Material procurement invoices
+
+---
+
+CLAIM NO. 6 — LOSS OF PROFIT & HEAD OFFICE OVERHEAD
+Amount: ₹2.10 Crore | Status: SECONDARY
+
+FORMULA APPLIED: Hudson Formula
+Contract Profit Margin: 7% (as per tender)
+Value of Unexecuted Work: ₹12.55 Crore (36% unexecuted × ₹34.80 Cr)
+Delay Period: 6 months (attributable to USCL)
+Contract Period: 18 months
+
+Calculation:
+= 7% × ₹12.55 Cr × (6/18)
+= 7% × ₹12.55 Cr × 0.333
+= ₹0.29 Cr (direct loss of profit)
++ Head office overhead (4% × ₹12.55 Cr × 6/18): ₹0.17 Cr
++ Loss of opportunity on other contracts: ₹1.64 Cr
+TOTAL CLAIM 6: ₹2.10 Crore
+
+NOTE: This claim is SECONDARY — needs expert certification and proof of opportunity loss before filing.
+Per accuracy-rules.md Rule 6: Present with explicit qualification note in draft.
+
+---
+
+PRAYER:
+
+The Claimant most respectfully prays that the Learned Arbitrator may be pleased to:
+
+(a) Award ₹20.75 Crore (Claims 1-6) with interest @ 12% p.a. from 28.02.2026 till realization;
+(b) Declare the termination notice dated 12.02.2026 as illegal and void;
+(c) Direct release of Performance Bank Guarantee;
+(d) Grant Extension of Time of 8 months without Liquidated Damages;
+(e) Direct USCL to pay pending RA Bills with interest;
+(f) Award costs of arbitration.
+
+VERIFICATION:
+I, [Director, M/s. Rajputana Greentech Landscapes Pvt. Ltd.], do hereby verify that the contents of this Statement of Claim are true and correct to the best of my knowledge and belief.
+
+Place: Udaipur
+Date: 15.03.2026
+
+Claimant
+Through Advocate

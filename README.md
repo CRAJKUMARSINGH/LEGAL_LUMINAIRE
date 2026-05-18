@@ -32,6 +32,7 @@ That's not a feature. That's a weapon.
   - Written submissions
   - Oral argument notes
 - Every draft includes a **Verification Report** and **Pre-Filing Checklist**
+- **NEW**: Harvey.ai integration for legal-grade AI responses with citations
 
 ---
 
@@ -90,7 +91,7 @@ python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env
-# Edit .env: set OPENAI_API_KEY and TAVILY_API_KEY
+# Edit .env: set OPENAI_API_KEY, TAVILY_API_KEY, and optionally HARVEY_API_KEY
 uvicorn main:app --reload
 ```
 
@@ -178,6 +179,7 @@ Deploy    →  Streamlit Cloud / Netlify / Vercel / Docker Compose
 ## Documentation
 
 - [User Manual](docs/USER_MANUAL.md) — local run guide
+- [Harvey.ai Integration Guide](docs/HARVEY_AI_INTEGRATION.md) — Harvey.ai setup and usage
 - [Video Script](docs/VIDEO_MANUAL_SCRIPT.md) — record your own 8-minute demo
 - [Accuracy Rules](docs/accuracy-governance/ACCURACY_RULES.md) — mandatory governance
 - [Test Case Matrix](docs/testing/TEST_CASE_MATRIX_21.md) — 21 test cases

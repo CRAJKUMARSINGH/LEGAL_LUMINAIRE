@@ -75,7 +75,8 @@ def _run_crew_job(job_id: str, req: ResearchRequest, case_context: str) -> None:
     """Executed in a background thread — runs the crew and stores result."""
     _jobs[job_id]["status"] = "running"
     try:
-        result = run_legal_crew(
+        # Use standard CrewAI pipeline
+        crew_result = run_legal_crew(
             query=req.query,
             case_context=case_context,
             incident_type=req.incident_type,
@@ -83,20 +84,96 @@ def _run_crew_job(job_id: str, req: ResearchRequest, case_context: str) -> None:
             procedural_defects=req.procedural_defects,
             mode=req.mode,
         )
+        
         # Server-side citation gate enforcement to prevent UI bypass.
-        citation_gate = _evaluate_citation_gate(result.get("draft", ""))
-        result["citation_gate"] = citation_gate
+        citation_gate = _evaluate_citation_gate(crew_result.get("draft", ""))
+        crew_result["citation_gate"] = citation_gate
         if citation_gate["must_block"]:
-            result["success"] = False
-            result["draft"] = ""
+            crew_result["success"] = False
+            crew_result["draft"] = ""
             block_msg = (
                 "Citation gate blocked output due to unresolved "
                 f"PENDING={citation_gate['statuses']['PENDING']} or "
                 f"FATAL_ERROR={citation_gate['statuses']['FATAL_ERROR']}."
             )
-            result["error"] = f"{result.get('error', '')} {block_msg}".strip()
+            crew_result["error"] = f"{crew_result.get('error', '')} {block_msg}".strip()
         _jobs[job_id]["status"] = "done"
-        _jobs[job_id]["result"] = result
+        _jobs[job_id]["result"] = crew_result
+    except Exception as e:
+        logger.error(f"Crew job {job_id} failed: {e}", exc_info=True)
+        _jobs[job_id]["status"] = "error"
+        _jobs[job_id]["result"] = {"success": False, "draft": "", "tasks_output": [], "error": str(e)}
+
+
+async def _run_crew_job_async(job_id: str, req: ResearchRequest, case_context: str) -> None:
+    """Async version for Harvey.ai integration."""
+    _jobs[job_id]["status"] = "running"
+    try:
+        # Use Harvey.ai if enabled and configured
+        if req.use_harvey and settings.harvey_enabled and settings.harvey_api_key:
+            logger.info(f"Using Harvey.ai for job {job_id}")
+            from agents.harvey_client import HarveyClient
+            harvey_client = HarveyClient(
+                api_key=settings.harvey_api_key,
+                region=settings.harvey_region
+            )
+            
+            # Build Harvey prompt from request parameters
+            harvey_prompt = f"""
+            Case Context: {case_context}
+            
+            Query: {req.query}
+            Incident Type: {req.incident_type}
+            Evidence Type: {req.evidence_type}
+            Procedural Defects: {', '.join(req.procedural_defects)}
+            Mode: {req.mode}
+            Expertise Level: {req.expertise_hint}
+            
+            Please provide a legal-grade response with citations for Indian courts.
+            """
+            
+            result = await harvey_client.completion(
+                prompt=harvey_prompt,
+                model=settings.harvey_model,
+                include_citations=settings.harvey_include_citations,
+                mode="draft" if req.mode == "draft" else "assist"
+            )
+            
+            # Format Harvey response to match crew response structure
+            crew_result = {
+                "success": True,
+                "draft": result.get("response", ""),
+                "tasks_output": [
+                    {"agent": "Harvey.ai", "output": result.get("response", "")}
+                ],
+                "citations": result.get("citations", []),
+                "source": "harvey"
+            }
+        else:
+            # Fallback to standard CrewAI pipeline
+            crew_result = run_legal_crew(
+                query=req.query,
+                case_context=case_context,
+                incident_type=req.incident_type,
+                evidence_type=req.evidence_type,
+                procedural_defects=req.procedural_defects,
+                mode=req.mode,
+            )
+        
+        # Server-side citation gate enforcement to prevent UI bypass.
+        citation_gate = _evaluate_citation_gate(crew_result.get("draft", ""))
+        crew_result["citation_gate"] = citation_gate
+        if citation_gate["must_block"]:
+            crew_result["success"] = False
+            crew_result["draft"] = ""
+            block_msg = (
+                "Citation gate blocked output due to unresolved "
+                f"PENDING={citation_gate['statuses']['PENDING']} or "
+                f"FATAL_ERROR={citation_gate['statuses']['FATAL_ERROR']}."
+            )
+            crew_result["error"] = f"{crew_result.get('error', '')} {block_msg}".strip()
+        _jobs[job_id]["status"] = "done"
+        _jobs[job_id]["result"] = crew_result
     except Exception as e:
         logger.error(f"Crew job {job_id} failed: {e}", exc_info=True)
         _jobs[job_id]["status"] = "error"
@@ -194,6 +271,51 @@ async def run_research(case_id: str, req: ResearchRequest, background_tasks: Bac
     mode='research' → precedent search + verification only
     mode='draft'    → full discharge application generation
     """
+    if req.offline_mock:
+        job_id = str(uuid.uuid4())
+        _jobs[job_id] = {"status": "done", "result": None, "case_id": case_id, "mode": req.mode}
+
+        if req.mode == "draft":
+            draft = (
+                "[MOCK_DRAFT — OFFLINE]\n\n"
+                "IN THE COURT OF THE LEARNED SESSIONS JUDGE, UDAIPUR\n\n"
+                "Application for Discharge (Mock)\n\n"
+                "GROUND 1: Foundational Scientific Error\n"
+                "The FSL report relies on IS 1199:2018 for hardened masonry mortar, which is inapplicable. "
+                "Correct reference: IS 2250:1981 for masonry mortar. [PENDING]\n\n"
+                "GROUND 2: Sampling Protocol Breach\n"
+                "No panchnama and no sealing record were produced. Chain-of-custody is unproven. [SECONDARY]\n\n"
+                "PRAYER\n"
+                "In view of the above defects, the accused prays for discharge.\n"
+            )
+        else:
+            draft = (
+                "[MOCK_RESEARCH — OFFLINE]\n\n"
+                "1) Standard mismatch identified: IS 1199:2018 vs IS 2250:1981. [PENDING]\n"
+                "2) Sampling protocol concerns: panchnama / sealing / custody. [SECONDARY]\n"
+            )
+
+        citation_gate = _evaluate_citation_gate(draft)
+        result = {
+            "success": not citation_gate["must_block"],
+            "draft": "" if citation_gate["must_block"] else draft,
+            "tasks_output": [
+                {"agent": "OFFLINE_MOCK", "output": draft}
+            ],
+            "error": (
+                "Offline mock produced blocked markers (PENDING/FATAL_ERROR)." if citation_gate["must_block"] else None
+            ),
+            "citation_gate": citation_gate,
+        }
+        _jobs[job_id]["result"] = result
+        return {
+            "job_id": job_id,
+            "status": "done",
+            "case_id": case_id,
+            "mode": req.mode,
+            "poll_url": f"/api/v1/cases/{case_id}/research/{job_id}",
+        }
+
     if not settings.openai_api_key:
         raise HTTPException(
             status_code=503,
@@ -220,7 +342,11 @@ async def run_research(case_id: str, req: ResearchRequest, background_tasks: Bac
     _jobs[job_id] = {"status": "pending", "result": None, "case_id": case_id, "mode": req.mode}
 
     # Run crew in background — does not block the response
-    background_tasks.add_task(_run_crew_job, job_id, req, case_context)
+    # Use asyncio.create_task for async Harvey support
+    if req.use_harvey:
+        asyncio.create_task(_run_crew_job_async(job_id, req, case_context))
+    else:
+        background_tasks.add_task(_run_crew_job, job_id, req, case_context)
 
     return {
         "job_id": job_id,
@@ -397,15 +523,14 @@ async def preload_case01():
     Pre-load all CASE01_HEMRAJ_STATE_2025 documents into ChromaDB.
     Indexes: defence reports, discharge applications, standards matrices, etc.
     """
-    from pathlib import Path as _Path
-    case_id = "case01"
-    case_dir = _Path("../../CASE01_HEMRAJ_STATE_2025")  # relative to backend/
+    from repo_paths import hemraj_case_dir, workspace_root
 
+    case_id = "case01"
+    case_dir = hemraj_case_dir()
     if not case_dir.exists():
-        # Try absolute path from workspace root
-        import os
-        workspace = _Path(os.getcwd()).parent.parent
-        case_dir = workspace / "CASE01_HEMRAJ_STATE_2025"
+        legacy = workspace_root() / "CASE01_HEMRAJ_STATE_2025"
+        if legacy.exists():
+            case_dir = legacy
 
     if not case_dir.exists():
         return {"success": False, "error": f"CASE01_HEMRAJ_STATE_2025 directory not found at {case_dir}"}

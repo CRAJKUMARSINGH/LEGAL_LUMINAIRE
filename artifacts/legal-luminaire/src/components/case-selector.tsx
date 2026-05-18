@@ -13,6 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Copy, Trash2, FileText, Scale, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CreateCaseQuickDialog } from '@/components/create-case-quick-dialog';
+import { featureFlags } from '@/config/featureFlags';
 
 interface CaseSelectorProps {
   onCreateCase?: () => void;
@@ -152,7 +154,10 @@ export function CaseSelector({ onCreateCase, showStats = false }: CaseSelectorPr
           </Select>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {featureFlags.referenceQuickCaseDialog && (
+            <CreateCaseQuickDialog triggerClassName="text-sm h-9" />
+          )}
           <Dialog open={isManageOpen} onOpenChange={setIsManageOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">

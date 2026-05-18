@@ -15,6 +15,10 @@ class ResearchRequest(BaseModel):
         default="research",
         description="'research' = precedent search only; 'draft' = full discharge application",
     )
+    use_harvey: bool = Field(default=False, description="Use Harvey.ai for legal-grade AI responses")
+    expertise_hint: str = Field(default="senior", description="Expertise level: junior, senior, layperson")
+    offline_mock: bool = Field(default=False, description="Run offline mock pipeline (no API keys required)")
+    mock_scenario: str = Field(default="TC-01", description="Offline mock scenario selector")
 
 
 class TaskOutput(BaseModel):

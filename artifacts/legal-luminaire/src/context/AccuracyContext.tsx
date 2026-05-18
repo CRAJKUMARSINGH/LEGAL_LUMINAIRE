@@ -30,8 +30,13 @@ export function AccuracyProvider({ children }: { children: ReactNode }) {
   const updateMetric = (metric: keyof AccuracyMetrics, value: number) => {
     setMetrics(prev => {
       const newMetrics = { ...prev, [metric]: value };
-      const overall = Object.values(newMetrics).reduce((sum, val, idx) => 
-        idx < 4 ? sum + val : sum, 0) / 4;
+      // Sum only the four named sub-metrics, never overallScore itself
+      const overall = (
+        newMetrics.legalCitations +
+        newMetrics.technicalStandards +
+        newMetrics.factualClaims +
+        newMetrics.proceduralReferences
+      ) / 4;
       return { ...newMetrics, overallScore: overall };
     });
   };

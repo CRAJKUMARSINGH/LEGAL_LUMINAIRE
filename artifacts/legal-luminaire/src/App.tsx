@@ -6,11 +6,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Scale, BookOpen, CheckSquare, Mic,
   Home as HomeIcon, Menu, FilePlus, X, FileText,
-  LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe,
+  LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
+  FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare,
 } from "lucide-react";
 import { useState } from "react";
 import { CaseProvider, useCaseContext } from "@/context/CaseContext";
 import { AccuracyProvider } from "@/context/AccuracyContext";
+import { featureFlags } from "@/config/featureFlags";
 
 // Lazy load components for code splitting
 const NotFound = lazy(() => import("@/pages/not-found"));
@@ -29,6 +31,46 @@ const ForensicFAQ = lazy(() => import("@/pages/ForensicFAQ"));
 const SafeDraftPage = lazy(() => import("@/pages/SafeDraftPage"));
 const NoticeReplyPage = lazy(() => import("@/pages/NoticeReplyPage"));
 const DischargeApplicationPrint = lazy(() => import("@/pages/DischargeApplicationPrint"));
+const InfraArbBrowser = lazy(() => import("@/pages/InfraArbBrowser"));
+const DemoCaseBrowser = lazy(() => import("@/pages/DemoCaseBrowser"));
+const StandardsValidity = lazy(() => import("@/pages/StandardsValidity"));
+const SessionWorkspace = lazy(() => import("@/pages/session-workspace"));
+const DraftViewer = lazy(() => import("@/pages/draft-viewer"));
+
+// Phase 3-6 Intelligence Pages
+const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
+const CaseSimilarityPage = lazy(() => import("@/pages/CaseSimilarityPage"));
+const JudgeAnalyticsPage = lazy(() => import("@/pages/JudgeAnalyticsPage"));
+
+// Citation-Explorer merge
+const CitationSearchPage = lazy(() => import("@/pages/CitationSearchPage"));
+const CitationAuthorityPage = lazy(() => import("@/pages/CitationAuthorityPage"));
+
+// Defense Master Pages
+const CrossCheckReport = lazy(() => import("@/pages/CrossCheckReport"));
+const DefenseBrief = lazy(() => import("@/pages/DefenseBrief"));
+const FslAnalysis = lazy(() => import("@/pages/FslAnalysis"));
+const StandardsIndex = lazy(() => import("@/pages/StandardsIndex"));
+
+// Document Review Pages
+const LDR_ComparisonPage = lazy(() => import("@/pages/LDR_ComparisonPage"));
+const LDR_HomePage = lazy(() => import("@/pages/LDR_HomePage"));
+const LDR_MotionPage = lazy(() => import("@/pages/LDR_MotionPage"));
+const LDR_PacketPage = lazy(() => import("@/pages/LDR_PacketPage"));
+const LDR_PrecedentsPage = lazy(() => import("@/pages/LDR_PrecedentsPage"));
+const LDR_PrintPage = lazy(() => import("@/pages/LDR_PrintPage"));
+const LDR_ReplyPage = lazy(() => import("@/pages/LDR_ReplyPage"));
+const LDR_StandardsPage = lazy(() => import("@/pages/LDR_StandardsPage"));
+const LDR_TimelinePage = lazy(() => import("@/pages/LDR_TimelinePage"));
+const LDR_VerificationPage = lazy(() => import("@/pages/LDR_VerificationPage"));
+
+// Precedent Search Pages
+const LPS_DefencePage = lazy(() => import("@/pages/LPS_DefencePage"));
+const LPS_HomePage = lazy(() => import("@/pages/LPS_HomePage"));
+const LPS_PrecedentsPage = lazy(() => import("@/pages/LPS_PrecedentsPage"));
+const LPS_PrintLetterPage = lazy(() => import("@/pages/LPS_PrintLetterPage"));
+const LPS_SampleAnalysisPage = lazy(() => import("@/pages/LPS_SampleAnalysisPage"));
+const LPS_StandardsPage = lazy(() => import("@/pages/LPS_StandardsPage"));
 
 // Lazy load heavy view components
 const DynamicDashboardView = lazy(() => import("@/components/views/DynamicDashboardView").then(module => ({ default: module.DynamicDashboardView })));
@@ -64,49 +106,80 @@ type NavGroup = { groupLabel: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    groupLabel: "शुरुआत / Setup",
+    groupLabel: "शुरुआत / Setup & Intake",
     items: [
       { path: "/",        label: "मुख्य पृष्ठ",    labelEn: "Home",            icon: HomeIcon,        caseScoped: false },
       { path: "/cases",   label: "सभी केस",         labelEn: "All Cases",       icon: Files,           caseScoped: false },
-      { path: "/intake",  label: "नया केस इंटेक",   labelEn: "New Case Intake", icon: FilePlus,        caseScoped: false },
+      { path: "/demo-browser", label: "26 डेमो केस", labelEn: "26 Demo Cases",  icon: Globe,           caseScoped: false, badge: "26" },
+      { path: "/intake",  label: "नया केस इनटेक",   labelEn: "New Case Intake", icon: FilePlus,        caseScoped: false },
       { path: "/new-case-ingest", label: "AI केस इंजेस्ट", labelEn: "AI Case Ingest", icon: Upload,   caseScoped: false },
+      { path: "/review-queue", label: "चेंबर समीक्षा", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
     ],
   },
   {
-    groupLabel: "कार्यस्थान / Case Workspace",
+    groupLabel: "विधिक अनुसंधान / RAG Research",
     items: [
-      { path: "/dashboard",   label: "डैशबोर्ड",       labelEn: "Dashboard",          icon: LayoutDashboard, caseScoped: true },
       { path: "/case-law",    label: "कानून खोज",      labelEn: "Case Law Research",  icon: BookOpen,        caseScoped: true },
+      { path: "/case-research", label: "विधिक शोध", labelEn: "Case Research", icon: FileSearch, caseScoped: true },
+      { path: "/cross-reference", label: "क्रॉस-रेफ मैट्रिक्स", labelEn: "Cross-Ref Matrix", icon: Table2, caseScoped: true },
+      { path: "/ai-research", label: "AI शोध इंजन", labelEn: "AI Research Engine", icon: Brain, caseScoped: true },
       { path: "/standards",   label: "मानक / Lab",     labelEn: "Forensic Standards", icon: FlaskConical,    caseScoped: true },
       { path: "/chat",        label: "AI चैट",         labelEn: "AI Chat",            icon: MessageSquare,   caseScoped: true },
+      { path: "/citation-search", label: "Citation Explorer", labelEn: "25+ Authorities", icon: BookOpen, caseScoped: false, badge: "NEW" },
+      { path: "/lps-home", label: "Precedent Search", labelEn: "Precedent Search", icon: FileSearch, caseScoped: false, badge: "LPS" },
+      { path: "/lps-defence", label: "LPS Defence", labelEn: "LPS Defence", icon: ShieldCheck, caseScoped: false, badge: "LPS" },
+      { path: "/lps-sample-analysis", label: "नमूना विश्लेषण", labelEn: "Sample Analysis", icon: FlaskConical, caseScoped: false, badge: "LPS" },
+      ...(featureFlags.enableCitationGraph || featureFlags.enableCitationExtraction ? [
+        { path: "/citation-graph", label: "Citation Graph", labelEn: "Citation Graph", icon: Network, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+      ...(featureFlags.enableCaseSimilarity || featureFlags.enableQueryUnderstanding ? [
+        { path: "/case-similarity", label: "Case Similarity", labelEn: "Case Similarity", icon: GitCompare, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+      ...(featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics ? [
+        { path: "/judge-analytics", label: "Judge Analytics", labelEn: "Judge Analytics", icon: BarChart3, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+    ],
+  },
+  {
+    groupLabel: "विधिक प्रारूपण / Drafting Suite",
+    items: [
+      { path: "/ai-draft-engine", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine", icon: Sparkles, caseScoped: true },
       { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale,    caseScoped: true },
       { path: "/defence-reply", label: "डिफेंस रिप्लाई", labelEn: "Defence Reply",   icon: FileText,        caseScoped: true },
       { path: "/safe-draft",  label: "सेफ ड्राफ्ट",   labelEn: "Safe Draft Editor",  icon: ShieldCheck,     caseScoped: true, badge: "NEW" },
       { path: "/notice-reply", label: "नोटिस रिप्लाई", labelEn: "Notice Reply",       icon: FileText,        caseScoped: true, badge: "NEW" },
       { path: "/discharge-print", label: "डिस्चार्ज PDF", labelEn: "Discharge PDF v5",  icon: Scale,           caseScoped: true, badge: "NEW" },
-      { path: "/oral-arguments", label: "मौखिक तर्क", labelEn: "Oral Arguments",     icon: Mic,             caseScoped: true },
+      { path: "/ldr-motion", label: "Draft Motion", labelEn: "Draft Motion", icon: FilePlus, caseScoped: false, badge: "LDR" },
+      { path: "/defense-brief", label: "Defense Brief", labelEn: "Defense Brief", icon: ShieldCheck, caseScoped: false, badge: "LDM" },
     ],
   },
   {
-    groupLabel: "समीक्षा / Review",
+    groupLabel: "मामला समीक्षा / Case Review",
     items: [
+      { path: "/dashboard",   label: "डैशबोर्ड",       labelEn: "Dashboard",          icon: LayoutDashboard, caseScoped: true },
       { path: "/verification",     label: "सत्यापन",    labelEn: "Verification",     icon: ShieldCheck, caseScoped: true },
       { path: "/filing-checklist", label: "चेकलिस्ट",  labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
       { path: "/timeline",         label: "टाइमलाइन",  labelEn: "Timeline",         icon: Clock,       caseScoped: true },
       { path: "/documents",        label: "दस्तावेज़",  labelEn: "Documents",        icon: Files,       caseScoped: true },
       { path: "/upload",           label: "अपलोड",      labelEn: "Upload",           icon: Upload,      caseScoped: true },
+      { path: "/cross-check-report", label: "Cross Check", labelEn: "Cross Check", icon: CheckSquare, caseScoped: false, badge: "LDM" },
+      { path: "/fsl-analysis", label: "FSL Analysis", labelEn: "FSL Analysis", icon: FlaskConical, caseScoped: false, badge: "LDM" },
+      { path: "/ldr-home", label: "Doc Review", labelEn: "Doc Review", icon: Files, caseScoped: false, badge: "LDR" },
+      { path: "/ldr-comparison", label: "Doc Compare", labelEn: "Doc Compare", icon: GitCompare, caseScoped: false, badge: "LDR" },
+      ...(featureFlags.hybridStandardsValidity ? [
+        { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
+      ] : []),
+      ...(featureFlags.hybridSessionWorkspace ? [
+        { path: "/session-workspace", label: "कार्यस्थान", labelEn: "Hybrid Workspace", icon: LayoutDashboard, caseScoped: true, badge: "BETA" as const },
+      ] : []),
     ],
   },
   {
-    groupLabel: "सीनियर रिव्यू / Senior Review",
+    groupLabel: "संदर्भ / Reference & Help",
     items: [
-      { path: "/review-queue", label: "चेंबर रिव्यू", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
-    ],
-  },
-  {
-    groupLabel: "संदर्भ / Reference",
-    items: [
-      { path: "/forensic-faq", label: "फोरेंसिक FAQ", labelEn: "Forensic FAQ", icon: FlaskConical, caseScoped: false },
+      { path: "/forensic-faq", label: "फॉरेन्सिक FAQ", labelEn: "Forensic FAQ", icon: FlaskConical, caseScoped: false },
+      { path: "/infra-arb", label: "इन्फ्रा आर्बिट्रेशन", labelEn: "Infra Arbitration", icon: Scale, caseScoped: false, badge: "NEW" },
+      { path: "/standards-index", label: "Standards Index", labelEn: "Standards Index", icon: BookOpen, caseScoped: false, badge: "LDM" },
     ],
   },
 ];
@@ -239,6 +312,17 @@ function Layout({ children }: { children: React.ReactNode }) {
 
 function Router() {
   const { selectedCase } = useCaseContext();
+  const [, setLocation] = useLocation();
+  const [ldrLang, setLdrLang] = useState<"en" | "hi" | "both">("both");
+
+  const handleLpsNavigate = (route: string) => {
+    if (route === "defence") setLocation("/lps-defence");
+    else if (route === "analysis") setLocation("/lps-sample-analysis");
+    else if (route === "precedents") setLocation("/lps-precedents");
+    else if (route === "standards") setLocation("/lps-standards");
+    else if (route === "print") setLocation("/lps-print");
+  };
+
   return (
     <Layout>
       <Switch>
@@ -248,11 +332,45 @@ function Router() {
         <Route path="/new-case-ingest" component={() => <Suspense fallback={<LoadingFallback />}><OmniDropzone /></Suspense>} />
         <Route path="/review-queue" component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><ReviewQueueView /></Suspense></div>} />
         <Route path="/forensic-faq" component={() => <Suspense fallback={<LoadingFallback />}><ForensicFAQ /></Suspense>} />
+        <Route path="/infra-arb" component={() => <Suspense fallback={<LoadingFallback />}><InfraArbBrowser /></Suspense>} />
+        <Route path="/demo-browser" component={() => <Suspense fallback={<LoadingFallback />}><DemoCaseBrowser /></Suspense>} />
+        <Route path="/citation-search" component={() => <Suspense fallback={<LoadingFallback />}><CitationSearchPage /></Suspense>} />
+        <Route path="/authority/:id" component={() => <Suspense fallback={<LoadingFallback />}><CitationAuthorityPage /></Suspense>} />
+
+        {/* Defense Master Routes */}
+        <Route path="/cross-check-report" component={() => <Suspense fallback={<LoadingFallback />}><CrossCheckReport /></Suspense>} />
+        <Route path="/defense-brief" component={() => <Suspense fallback={<LoadingFallback />}><DefenseBrief /></Suspense>} />
+        <Route path="/fsl-analysis" component={() => <Suspense fallback={<LoadingFallback />}><FslAnalysis /></Suspense>} />
+        <Route path="/standards-index" component={() => <Suspense fallback={<LoadingFallback />}><StandardsIndex /></Suspense>} />
+
+        {/* Document Review Routes */}
+        <Route path="/ldr-home" component={() => <Suspense fallback={<LoadingFallback />}><LDR_HomePage lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-comparison" component={() => <Suspense fallback={<LoadingFallback />}><LDR_ComparisonPage lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-motion" component={() => <Suspense fallback={<LoadingFallback />}><LDR_MotionPage lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-packet" component={() => <Suspense fallback={<LoadingFallback />}><LDR_PacketPage packetId="A" lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-precedents" component={() => <Suspense fallback={<LoadingFallback />}><LDR_PrecedentsPage lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-print" component={() => <Suspense fallback={<LoadingFallback />}><LDR_PrintPage lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-reply" component={() => <Suspense fallback={<LoadingFallback />}><LDR_ReplyPage lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-standards" component={() => <Suspense fallback={<LoadingFallback />}><LDR_StandardsPage /></Suspense>} />
+        <Route path="/ldr-timeline" component={() => <Suspense fallback={<LoadingFallback />}><LDR_TimelinePage lang={ldrLang} /></Suspense>} />
+        <Route path="/ldr-verification" component={() => <Suspense fallback={<LoadingFallback />}><LDR_VerificationPage /></Suspense>} />
+
+        {/* Precedent Search Routes */}
+        <Route path="/lps-home" component={() => <Suspense fallback={<LoadingFallback />}><LPS_HomePage onNavigate={handleLpsNavigate} /></Suspense>} />
+        <Route path="/lps-defence" component={() => <Suspense fallback={<LoadingFallback />}><LPS_DefencePage /></Suspense>} />
+        <Route path="/lps-precedents" component={() => <Suspense fallback={<LoadingFallback />}><LPS_PrecedentsPage /></Suspense>} />
+        <Route path="/lps-print" component={() => <Suspense fallback={<LoadingFallback />}><LPS_PrintLetterPage /></Suspense>} />
+        <Route path="/lps-sample-analysis" component={() => <Suspense fallback={<LoadingFallback />}><LPS_SampleAnalysisPage /></Suspense>} />
+        <Route path="/lps-standards" component={() => <Suspense fallback={<LoadingFallback />}><LPS_StandardsPage /></Suspense>} />
 
         {/* Case-scoped routes */}
         <Route path="/case/:id/dashboard"             component={() => <div className="p-6"><Suspense fallback={<LoadingFallback />}><DynamicDashboardView /></Suspense></div>} />
         <Route path="/case/:id/chat"                  component={() => <div className="flex flex-col h-full"><Suspense fallback={<LoadingFallback />}><ChatView /></Suspense></div>} />
         <Route path="/case/:id/case-law"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><CaseLawView /></Suspense></div>} />
+        <Route path="/case/:id/case-research"         component={() => <Suspense fallback={<LoadingFallback />}><CaseResearch /></Suspense>} />
+        <Route path="/case/:id/cross-reference"       component={() => <Suspense fallback={<LoadingFallback />}><CrossReferenceMatrix /></Suspense>} />
+        <Route path="/case/:id/ai-research"           component={() => <Suspense fallback={<LoadingFallback />}><AIResearchEngine /></Suspense>} />
+        <Route path="/case/:id/ai-draft-engine"       component={() => <Suspense fallback={<LoadingFallback />}><AIDraftEngine /></Suspense>} />
         <Route path="/case/:id/standards"             component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><StandardsView /></Suspense></div>} />
         <Route path="/case/:id/timeline"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><TimelineView /></Suspense></div>} />
         <Route path="/case/:id/documents"             component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><DocumentsView /></Suspense></div>} />
@@ -266,7 +384,24 @@ function Router() {
         <Route path="/case/:id/discharge-application" component={() => <Suspense fallback={<LoadingFallback />}><DischargeApplication /></Suspense>} />
         <Route path="/case/:id/defence-reply"         component={() => <Suspense fallback={<LoadingFallback />}><DefenceReply /></Suspense>} />
         <Route path="/case/:id/oral-arguments"        component={() => <Suspense fallback={<LoadingFallback />}><OralArguments /></Suspense>} />
-
+        {featureFlags.hybridStandardsValidity && (
+          <Route path="/case/:id/standards-validity"  component={() => <Suspense fallback={<LoadingFallback />}><StandardsValidity /></Suspense>} />
+        )}
+        {featureFlags.hybridSessionWorkspace && (
+          <Route path="/case/:id/session-workspace"   component={() => <Suspense fallback={<LoadingFallback />}><SessionWorkspace /></Suspense>} />
+        )}
+        {featureFlags.hybridDraftViewer && (
+          <Route path="/draft/:id"                    component={() => <Suspense fallback={<LoadingFallback />}><DraftViewer /></Suspense>} />
+        )}
+        {(featureFlags.enableCitationGraph || featureFlags.enableCitationExtraction) && (
+          <Route path="/case/:id/citation-graph"    component={() => <Suspense fallback={<LoadingFallback />}><CitationGraphPage /></Suspense>} />
+        )}
+        {(featureFlags.enableCaseSimilarity || featureFlags.enableQueryUnderstanding) && (
+          <Route path="/case/:id/case-similarity"   component={() => <Suspense fallback={<LoadingFallback />}><CaseSimilarityPage /></Suspense>} />
+        )}
+        {(featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics) && (
+          <Route path="/case/:id/judge-analytics"   component={() => <Suspense fallback={<LoadingFallback />}><JudgeAnalyticsPage /></Suspense>} />
+        )}
         <Route component={() => <Suspense fallback={<LoadingFallback />}><NotFound /></Suspense>} />
       </Switch>
     </Layout>

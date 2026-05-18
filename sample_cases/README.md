@@ -9,12 +9,15 @@ All synthetic test cases for robustness testing, self-assessment, and marketing 
 ## Structure
 
 ```
-Sample_cases/
+sample_cases/
 ├── functional/          TC-01 to TC-21  — 21 diverse Indian legal scenarios
 │   └── expected-outputs/               — expected draft outputs for TC-01, 02, 03, E07
 ├── edge/                TC-E01 to TC-E07 — adversarial / quality-gate edge cases
 ├── stress/              TC-E08 to TC-E12 — large bundle / conflicting data stress cases
-└── showcase/            showcase-01 to 04 — polished marketing demo walkthroughs
+├── showcase/            showcase-01 to 04 — polished marketing demo walkthroughs
+├── test-cases/          lightweight fixture briefs + inputs for automation
+├── marketing/           success stories + accuracy benchmarks (ex–MARKETING_TEST_CASES)
+└── misc_documents/      generic legal templates (ex–MISC_CASE_DOCUMENTS)
 ```
 
 ---
