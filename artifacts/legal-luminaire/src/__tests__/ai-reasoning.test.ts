@@ -39,7 +39,7 @@ const QUASHING_QUERY = "Quashing petition under Section 482 CrPC. FIR registered
 
 //  Query Understanding Tests 
 
-describe("Query Understanding â€” understandQuery()", () => {
+describe("Query Understanding — understandQuery()", () => {
   it("detects BAIL issue from bail query", () => {
     const result = understandQuery(BAIL_QUERY);
     expect(result.issues.some(i => i.category === "BAIL")).toBe(true);
@@ -98,7 +98,7 @@ describe("Query Understanding â€” understandQuery()", () => {
   });
 });
 
-describe("Query Understanding â€” getIssueSummary()", () => {
+describe("Query Understanding — getIssueSummary()", () => {
   it("returns general for empty issues", () => {
     expect(getIssueSummary([])).toBe("General legal query");
   });
@@ -113,7 +113,7 @@ describe("Query Understanding â€” getIssueSummary()", () => {
 
 //  Legal Feature Extractor Tests 
 
-describe("Legal Feature Extractor â€” extractCaseFeatures()", () => {
+describe("Legal Feature Extractor — extractCaseFeatures()", () => {
   it("extracts IPC sections from text", () => {
     const features = extractCaseFeatures("c1", "Test Case", "Supreme Court of India", 2020, BAIL_QUERY);
     expect(features.ipcSections).toContain("302");
@@ -160,7 +160,7 @@ describe("Legal Feature Extractor â€” extractCaseFeatures()", () => {
   });
 });
 
-describe("Legal Feature Extractor â€” jaccardSimilarity()", () => {
+describe("Legal Feature Extractor — jaccardSimilarity()", () => {
   it("returns 1 for identical arrays", () => {
     expect(jaccardSimilarity(["a", "b", "c"], ["a", "b", "c"])).toBe(1);
   });
@@ -184,7 +184,7 @@ describe("Legal Feature Extractor â€” jaccardSimilarity()", () => {
   });
 });
 
-describe("Legal Feature Extractor â€” termOverlap()", () => {
+describe("Legal Feature Extractor — termOverlap()", () => {
   it("returns 0 for empty arrays", () => {
     expect(termOverlap([], ["a", "b"])).toBe(0);
     expect(termOverlap(["a", "b"], [])).toBe(0);
@@ -216,7 +216,7 @@ const CORPUS_FEATURES = [
     "Contract dispute. Specific performance. Civil suit. Injunction granted."),
 ];
 
-describe("Case Similarity Engine â€” scoreSimilarity()", () => {
+describe("Case Similarity Engine — scoreSimilarity()", () => {
   it("returns score between 0 and 100", () => {
     const score = scoreSimilarity(QUERY_FEATURES, CORPUS_FEATURES[0]);
     expect(score.totalScore).toBeGreaterThanOrEqual(0);
@@ -248,7 +248,7 @@ describe("Case Similarity Engine â€” scoreSimilarity()", () => {
   });
 });
 
-describe("Case Similarity Engine â€” findSimilarCases()", () => {
+describe("Case Similarity Engine — findSimilarCases()", () => {
   it("returns results sorted by score descending", () => {
     const result = findSimilarCases(QUERY_FEATURES, CORPUS_FEATURES);
     for (let i = 1; i < result.results.length; i++) {
@@ -286,7 +286,7 @@ describe("Case Similarity Engine â€” findSimilarCases()", () => {
   });
 });
 
-describe("Case Similarity Engine â€” getTierLabel()", () => {
+describe("Case Similarity Engine — getTierLabel()", () => {
   it("returns string for all tiers", () => {
     expect(typeof getTierLabel("EXACT")).toBe("string");
     expect(typeof getTierLabel("ANALOGOUS")).toBe("string");
@@ -301,7 +301,7 @@ describe("Case Similarity Engine â€” getTierLabel()", () => {
 
 //  Explanation Generator Tests 
 
-describe("Explanation Generator â€” generateExplanation()", () => {
+describe("Explanation Generator — generateExplanation()", () => {
   it("returns explanation with headline", () => {
     const score = scoreSimilarity(QUERY_FEATURES, CORPUS_FEATURES[0]);
     const explanation = generateExplanation(score, QUERY_FEATURES, CORPUS_FEATURES[0]);

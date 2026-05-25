@@ -201,6 +201,20 @@ The Streamlit app (`streamlit_app.py`) includes:
 
 ## Benefits
 
+## LAB-Inspired Evaluation Guardrails
+
+Harvey's public Legal Agent Benchmark (LAB) describes a client-matter-centric evaluation model for legal agents: each task has an instruction, a closed matter workspace, a reviewable work product, and expert rubric checks. Legal Luminaire should use those ideas as evaluation guardrails, not as permission to provide case-specific legal advice.
+
+Recommended usage inside this app:
+
+- Keep each matter in a closed workspace before research or drafting starts.
+- Require source anchors for every factual conclusion.
+- Surface contradictions and document gaps separately from recommendations.
+- Route drafts through human counsel review before filing or client use.
+- Evaluate outputs against all required criteria: factual accuracy, citation support, completeness, format, privilege-safe wording, and review readiness.
+
+Public source: [Harvey LAB announcement](https://www.harvey.ai/blog/introducing-harveys-legal-agent-benchmark).
+
 ### For Legal Research
 
 - **Citation accuracy**: Harvey provides inline citations with sources

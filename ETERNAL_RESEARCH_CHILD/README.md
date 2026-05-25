@@ -63,11 +63,32 @@ anything is changed.
 # From workspace root — uses tsx (already installed globally)
 tsx ETERNAL_RESEARCH_CHILD/research_daemon.ts
 
+# Phase 2: refresh the app-visible improvement lab
+npm --prefix ETERNAL_RESEARCH_CHILD run sync
+
 # Or from inside the folder
 cd ETERNAL_RESEARCH_CHILD
 npm install
 npm start
 ```
+
+---
+
+## Phase 2: Improvement Lab feed
+
+The daemon is now paired with `phase2_improvement_pipeline.ts`. It scans
+`Attached_Assets/`, `real_cases/`, and `research_findings.log`, classifies
+useful material, and writes a review-only feed to:
+
+`artifacts/legal-luminaire/src/data/researchImprovements.generated.ts`
+
+The React app displays that feed at **Eternal Research Improvement Lab**. The
+feed is deliberately conservative:
+
+- active-matter or privileged signals are blocked for direct drafting;
+- citations and standards stay in `NEEDS_SOURCE_CHECK` until verified;
+- each proposal carries LAB-style pass criteria;
+- the output is a review queue, not automatic legal advice.
 
 ---
 

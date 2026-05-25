@@ -187,3 +187,35 @@
   Protected: true
   Summary  : Add citation allowlist enforcement from Citation Risk Reduction Plan
 
+
+[2026-05-18T03:54:47.382Z] APPROVED
+  Category : DRAFTING_GROUND
+  Source   : Attached_Assets/land aq dig deeper thrice and get more bett.txt
+  Target   : case01-data.ts
+  Protected: true
+  Summary  : Study legal document for new defence grounds or argument paragraphs
+
+
+[2026-05-18T04:09:48.716Z] APPROVED
+  Category : ACCURACY_RULE
+  Source   : Attached_Assets/PROMPT FOR YOUR SENIOR SOFTWARE ENGINEER.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract accuracy / drafting rules from prompt document
+
+
+[2026-05-18T04:24:49.961Z] APPROVED
+  Category : ACCURACY_RULE
+  Source   : Attached_Assets/MASTER COMBINED PROMPT.md
+  Target   : ROADMAP.md
+  Protected: false
+  Summary  : Extract accuracy / drafting rules from prompt document
+
+
+[2026-05-18T04:39:51.246Z] APPROVED
+  Category : DEMO_CASE_ENRICHMENT
+  Source   : Attached_Assets/ARBITRATE.MD
+  Target   : infra-arb-cases.ts
+  Protected: false
+  Summary  : Enrich TC-22..TC-26 infra arbitration data from source document
+

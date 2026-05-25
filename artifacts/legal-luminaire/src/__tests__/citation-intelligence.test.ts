@@ -52,7 +52,7 @@ const SAMPLE_TEXT_MULTI = `
 
 //  Citation Extraction Tests 
 
-describe("Citation Extraction â€” extractCitations()", () => {
+describe("Citation Extraction — extractCitations()", () => {
   it("extracts SCC citations", () => {
     const result = extractCitations(SAMPLE_TEXT_SCC);
     expect(result.citations.length).toBeGreaterThanOrEqual(1);
@@ -127,7 +127,7 @@ describe("Citation Extraction â€” extractCitations()", () => {
   });
 });
 
-describe("Citation Extraction â€” validateCitation()", () => {
+describe("Citation Extraction — validateCitation()", () => {
   it("flags missing case name", () => {
     const c: ExtractedCitation = {
       id: "SCC_2020_50", raw: "(2020) 3 SCC 50", year: 2020,
@@ -160,7 +160,7 @@ describe("Citation Extraction â€” validateCitation()", () => {
   });
 });
 
-describe("Citation Extraction â€” formatCitation()", () => {
+describe("Citation Extraction — formatCitation()", () => {
   it("formats citation with case name and para", () => {
     const c: ExtractedCitation = {
       id: "SCC_2020_50", raw: "(2020) 3 SCC 50", caseName: "State v. Ramesh",
@@ -176,7 +176,7 @@ describe("Citation Extraction â€” formatCitation()", () => {
   });
 });
 
-describe("Citation Extraction â€” deduplicateCitations()", () => {
+describe("Citation Extraction — deduplicateCitations()", () => {
   it("removes duplicate citations by id", () => {
     const c: ExtractedCitation = {
       id: "SCC_2020_50", raw: "(2020) 3 SCC 50", year: 2020,
@@ -189,7 +189,7 @@ describe("Citation Extraction â€” deduplicateCitations()", () => {
 
 //  Citation Graph Engine Tests 
 
-describe("Citation Graph Engine â€” buildCitationGraph()", () => {
+describe("Citation Graph Engine — buildCitationGraph()", () => {
   it("creates nodes for all citations", () => {
     const result = extractCitations(SAMPLE_TEXT_MULTI);
     const graph = buildCitationGraph(result.citations, "doc-1");
@@ -215,7 +215,7 @@ describe("Citation Graph Engine â€” buildCitationGraph()", () => {
   });
 });
 
-describe("Citation Graph Engine â€” computePageRank()", () => {
+describe("Citation Graph Engine — computePageRank()", () => {
   it("returns ranks for all nodes", () => {
     const result = extractCitations(SAMPLE_TEXT_MULTI);
     const graph = buildCitationGraph(result.citations, "doc-1");
@@ -240,7 +240,7 @@ describe("Citation Graph Engine â€” computePageRank()", () => {
   });
 });
 
-describe("Citation Graph Engine â€” detectClusters()", () => {
+describe("Citation Graph Engine — detectClusters()", () => {
   it("returns at least one cluster for connected graph", () => {
     const result = extractCitations(SAMPLE_TEXT_MULTI);
     const graph = buildCitationGraph(result.citations, "doc-1");
@@ -249,7 +249,7 @@ describe("Citation Graph Engine â€” detectClusters()", () => {
   });
 });
 
-describe("Citation Graph Engine â€” analyzeGraph()", () => {
+describe("Citation Graph Engine — analyzeGraph()", () => {
   it("returns analysis with pageRanks", () => {
     const result = extractCitations(SAMPLE_TEXT_MULTI);
     const graph = buildCitationGraph(result.citations, "doc-1");
@@ -265,7 +265,7 @@ describe("Citation Graph Engine â€” analyzeGraph()", () => {
   });
 });
 
-describe("Citation Graph Engine â€” serializeGraph()", () => {
+describe("Citation Graph Engine — serializeGraph()", () => {
   it("returns nodes and edges arrays", () => {
     const result = extractCitations(SAMPLE_TEXT_MULTI);
     const graph = buildCitationGraph(result.citations, "doc-1");
@@ -277,7 +277,7 @@ describe("Citation Graph Engine â€” serializeGraph()", () => {
 
 //  Authority Ranking Tests 
 
-describe("Authority Ranking â€” rankByAuthority()", () => {
+describe("Authority Ranking — rankByAuthority()", () => {
   it("returns ranked array sorted descending", () => {
     const result = extractCitations(SAMPLE_TEXT_MULTI);
     const ranking = rankByAuthority(result.citations);

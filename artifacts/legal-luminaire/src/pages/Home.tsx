@@ -10,6 +10,7 @@ import {
   Zap, Target, Printer, ShieldCheck,
 } from "lucide-react";
 import { CreateCaseQuickDialog } from "@/components/create-case-quick-dialog";
+import { HarveyEvaluationPanel } from "@/components/HarveyEvaluationPanel";
 import { featureFlags } from "@/config/featureFlags";
 import {
   caseInfo, caseLawMatrix, standardsMatrix,
@@ -200,6 +201,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <HarveyEvaluationPanel />
 
       {/* ── Stat Cards ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

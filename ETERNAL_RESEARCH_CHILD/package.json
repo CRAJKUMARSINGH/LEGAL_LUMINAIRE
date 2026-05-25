@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "tsx research_daemon.ts",
-    "dev":   "tsx watch research_daemon.ts"
+    "dev":   "tsx watch research_daemon.ts",
+    "sync":  "node ../node_modules/typescript/bin/tsc -p tsconfig.phase2.json && node dist/phase2_improvement_pipeline.js"
   },
   "dependencies": {},
   "devDependencies": {
