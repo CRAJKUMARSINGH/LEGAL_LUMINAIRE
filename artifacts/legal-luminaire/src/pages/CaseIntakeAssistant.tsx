@@ -7,6 +7,7 @@ import { buildResearchPrompt, type ResearchQuery } from "@/lib/ai-research";
 import { checkInputQuality, inputQualityWarning } from "@/lib/input-quality";
 import { validateCaseDates, formatDateConflicts } from "@/lib/date-validator";
 import { detectDuplicates, hashContent, type DocumentEntry } from "@/lib/document-dedup";
+import { validateIntake, type CaseIntakeField, type FieldErrors } from "@/lib/intake-schema";
 
 type ParsedFile = CaseFile & { category: "fir" | "chargesheet" | "lab" | "draft" | "other" };
 
@@ -34,6 +35,18 @@ const catColor: Record<ParsedFile["category"], string> = {
   other: "bg-gray-100 text-gray-700",
 };
 
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+  return (
+    <p id={id} role="alert" className="text-[11px] text-rose-700 mt-1 flex items-start gap-1">
+      <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" aria-hidden="true" /> {message}
+    </p>
+  );
+}
+
+const inputCls = (err?: string) =>
+  `border rounded-lg px-3 py-2 text-sm w-full ${err ? "border-rose-500 focus:ring-rose-500" : ""}`;
+
 export default function CaseIntakeAssistant() {
   const { addCase } = useCaseContext();
   const [, setLocation] = useLocation();
@@ -59,6 +72,8 @@ export default function CaseIntakeAssistant() {
   const [ackDateOverride, setAckDateOverride] = useState(false);
   const [copied, setCopied] = useState(false);
   const [created, setCreated] = useState(false);
+  const [touched, setTouched] = useState<Partial<Record<CaseIntakeField, boolean>>>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const query: ResearchQuery = useMemo(
     () => ({
@@ -126,13 +141,21 @@ export default function CaseIntakeAssistant() {
   );
   const dateMsg = useMemo(() => formatDateConflicts(dateResult), [dateResult]);
 
+  const fieldErrors: FieldErrors = useMemo(
+    () => validateIntake({ title, caseNo, court, caseType: caseType ?? "other", accusedName, incidentDate, firDate, arrestDate, remandDate, chargeSheetDate, brief }),
+    [title, caseNo, court, caseType, accusedName, incidentDate, firDate, arrestDate, remandDate, chargeSheetDate, brief]
+  );
+  const schemaValid = Object.keys(fieldErrors).length === 0;
+  const showError = (f: CaseIntakeField) => (submitAttempted || touched[f]) ? fieldErrors[f] : undefined;
+  const touch = (f: CaseIntakeField) => setTouched((t) => (t[f] ? t : { ...t, [f]: true }));
+
   const isValid =
-    title.trim().length > 0 &&
-    brief.trim().length > 0 &&
+    schemaValid &&
     (!quality.blockDraft || ackQualityOverride) &&
     (dateResult.valid || ackDateOverride);
 
   const createCase = () => {
+    setSubmitAttempted(true);
     if (!isValid) return;
     const id = slugifyCase(`${title}-${caseNo || Date.now()}`);
     const record: CaseRecord = {
@@ -175,24 +198,48 @@ export default function CaseIntakeAssistant() {
       <div className="bg-card border border-border rounded-xl p-4 space-y-3">
         <h2 className="text-sm font-semibold">केस विवरण (Case Details)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Case title *"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Case number"
-            value={caseNo}
-            onChange={(e) => setCaseNo(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm md:col-span-2"
-            placeholder="Court name"
-            value={court}
-            onChange={(e) => setCourt(e.target.value)}
-          />
+          <div className="">
+            <label htmlFor="intake-title" className="sr-only">Case title *</label>
+            <input
+              id="intake-title"
+              className={inputCls(showError("title"))}
+              placeholder="Case title * / केस शीर्षक"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={() => touch("title")}
+              aria-invalid={Boolean(showError("title"))}
+              aria-describedby={showError("title") ? "intake-title-err" : undefined}
+            />
+            <FieldError id="intake-title-err" message={showError("title")} />
+          </div>
+          <div className="">
+            <label htmlFor="intake-caseNo" className="sr-only">Case number</label>
+            <input
+              id="intake-caseNo"
+              className={inputCls(showError("caseNo"))}
+              placeholder="Case number"
+              value={caseNo}
+              onChange={(e) => setCaseNo(e.target.value)}
+              onBlur={() => touch("caseNo")}
+              aria-invalid={Boolean(showError("caseNo"))}
+              aria-describedby={showError("caseNo") ? "intake-caseNo-err" : undefined}
+            />
+            <FieldError id="intake-caseNo-err" message={showError("caseNo")} />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="intake-court" className="sr-only">Court name *</label>
+            <input
+              id="intake-court"
+              className={inputCls(showError("court"))}
+              placeholder="Court name * / न्यायालय"
+              value={court}
+              onChange={(e) => setCourt(e.target.value)}
+              onBlur={() => touch("court")}
+              aria-invalid={Boolean(showError("court"))}
+              aria-describedby={showError("court") ? "intake-court-err" : undefined}
+            />
+            <FieldError id="intake-court-err" message={showError("court")} />
+          </div>
           <select
             className="border rounded-lg px-3 py-2 text-sm bg-background"
             value={caseType}
@@ -206,51 +253,107 @@ export default function CaseIntakeAssistant() {
             <option value="revision">Revision</option>
             <option value="other">Other</option>
           </select>
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Accused / Petitioner name"
-            value={accusedName}
-            onChange={(e) => setAccusedName(e.target.value)}
-          />
+          <div className="">
+            <label htmlFor="intake-accusedName" className="sr-only">Accused / Petitioner name</label>
+            <input
+              id="intake-accusedName"
+              className={inputCls(showError("accusedName"))}
+              placeholder="Accused / Petitioner name"
+              value={accusedName}
+              onChange={(e) => setAccusedName(e.target.value)}
+              onBlur={() => touch("accusedName")}
+              aria-invalid={Boolean(showError("accusedName"))}
+              aria-describedby={showError("accusedName") ? "intake-accusedName-err" : undefined}
+            />
+            <FieldError id="intake-accusedName-err" message={showError("accusedName")} />
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Incident date (DD-MM-YYYY)"
-            value={incidentDate}
-            onChange={(e) => setIncidentDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="FIR date (DD-MM-YYYY)"
-            value={firDate}
-            onChange={(e) => setFirDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Arrest date (DD-MM-YYYY)"
-            value={arrestDate}
-            onChange={(e) => setArrestDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Remand date (DD-MM-YYYY)"
-            value={remandDate}
-            onChange={(e) => setRemandDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm md:col-span-2"
-            placeholder="Charge sheet date (DD-MM-YYYY)"
-            value={chargeSheetDate}
-            onChange={(e) => setChargeSheetDate(e.target.value)}
-          />
+          <div className="">
+            <label htmlFor="intake-incidentDate" className="sr-only">Incident date (DD-MM-YYYY)</label>
+            <input
+              id="intake-incidentDate"
+              className={inputCls(showError("incidentDate"))}
+              placeholder="Incident date (DD-MM-YYYY)"
+              value={incidentDate}
+              onChange={(e) => setIncidentDate(e.target.value)}
+              onBlur={() => touch("incidentDate")}
+              aria-invalid={Boolean(showError("incidentDate"))}
+              aria-describedby={showError("incidentDate") ? "intake-incidentDate-err" : undefined}
+            />
+            <FieldError id="intake-incidentDate-err" message={showError("incidentDate")} />
+          </div>
+          <div className="">
+            <label htmlFor="intake-firDate" className="sr-only">FIR date (DD-MM-YYYY)</label>
+            <input
+              id="intake-firDate"
+              className={inputCls(showError("firDate"))}
+              placeholder="FIR date (DD-MM-YYYY)"
+              value={firDate}
+              onChange={(e) => setFirDate(e.target.value)}
+              onBlur={() => touch("firDate")}
+              aria-invalid={Boolean(showError("firDate"))}
+              aria-describedby={showError("firDate") ? "intake-firDate-err" : undefined}
+            />
+            <FieldError id="intake-firDate-err" message={showError("firDate")} />
+          </div>
+          <div className="">
+            <label htmlFor="intake-arrestDate" className="sr-only">Arrest date (DD-MM-YYYY)</label>
+            <input
+              id="intake-arrestDate"
+              className={inputCls(showError("arrestDate"))}
+              placeholder="Arrest date (DD-MM-YYYY)"
+              value={arrestDate}
+              onChange={(e) => setArrestDate(e.target.value)}
+              onBlur={() => touch("arrestDate")}
+              aria-invalid={Boolean(showError("arrestDate"))}
+              aria-describedby={showError("arrestDate") ? "intake-arrestDate-err" : undefined}
+            />
+            <FieldError id="intake-arrestDate-err" message={showError("arrestDate")} />
+          </div>
+          <div className="">
+            <label htmlFor="intake-remandDate" className="sr-only">Remand date (DD-MM-YYYY)</label>
+            <input
+              id="intake-remandDate"
+              className={inputCls(showError("remandDate"))}
+              placeholder="Remand date (DD-MM-YYYY)"
+              value={remandDate}
+              onChange={(e) => setRemandDate(e.target.value)}
+              onBlur={() => touch("remandDate")}
+              aria-invalid={Boolean(showError("remandDate"))}
+              aria-describedby={showError("remandDate") ? "intake-remandDate-err" : undefined}
+            />
+            <FieldError id="intake-remandDate-err" message={showError("remandDate")} />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="intake-chargeSheetDate" className="sr-only">Charge sheet date (DD-MM-YYYY)</label>
+            <input
+              id="intake-chargeSheetDate"
+              className={inputCls(showError("chargeSheetDate"))}
+              placeholder="Charge sheet date (DD-MM-YYYY)"
+              value={chargeSheetDate}
+              onChange={(e) => setChargeSheetDate(e.target.value)}
+              onBlur={() => touch("chargeSheetDate")}
+              aria-invalid={Boolean(showError("chargeSheetDate"))}
+              aria-describedby={showError("chargeSheetDate") ? "intake-chargeSheetDate-err" : undefined}
+            />
+            <FieldError id="intake-chargeSheetDate-err" message={showError("chargeSheetDate")} />
+          </div>
         </div>
-        <textarea
-          className="w-full border rounded-lg p-3 text-sm min-h-24"
-          placeholder="Brief user statement — facts, allegations, current stage * (mandatory)"
-          value={brief}
-          onChange={(e) => setBrief(e.target.value)}
-        />
+        <div>
+          <label htmlFor="intake-brief" className="sr-only">Brief statement *</label>
+          <textarea
+            id="intake-brief"
+            className={`w-full border rounded-lg p-3 text-sm min-h-24 ${showError("brief") ? "border-rose-500" : ""}`}
+            placeholder="Brief user statement — facts, allegations, current stage * (mandatory) / संक्षिप्त विवरण"
+            value={brief}
+            onChange={(e) => setBrief(e.target.value)}
+            onBlur={() => touch("brief")}
+            aria-invalid={Boolean(showError("brief"))}
+            aria-describedby={showError("brief") ? "intake-brief-err" : undefined}
+          />
+          <FieldError id="intake-brief-err" message={showError("brief")} />
+        </div>
       </div>
 
       {/* Input Quality Gate */}
@@ -392,9 +495,12 @@ export default function CaseIntakeAssistant() {
       {/* Actions */}
       <div className="flex flex-wrap gap-3">
         <button
+          type="button"
           onClick={createCase}
-          disabled={!isValid || created}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+          disabled={created}
+          aria-disabled={!isValid || created}
+          data-testid="intake-create"
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 ${!isValid ? "opacity-60" : ""}`}
         >
           {created ? <CheckCircle2 className="w-4 h-4" /> : <Wand2 className="w-4 h-4" />}
           {created ? "Created! Redirecting..." : "Create case workspace"}
@@ -409,7 +515,11 @@ export default function CaseIntakeAssistant() {
       </div>
 
       {!isValid && (
-        <p className="text-xs text-muted-foreground">* Case title and brief statement are required to create workspace.</p>
+        <p className="text-xs text-muted-foreground" role="status">
+          {submitAttempted && !schemaValid
+            ? `${Object.keys(fieldErrors).length} फ़ील्ड सुधारें / field(s) need attention — see messages beside each field.`
+            : "* शीर्षक, न्यायालय और विवरण आवश्यक हैं · Case title, court and brief statement are required to create the workspace."}
+        </p>
       )}
     </div>
   );

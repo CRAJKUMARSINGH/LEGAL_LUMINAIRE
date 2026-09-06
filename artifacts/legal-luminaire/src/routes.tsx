@@ -1,7 +1,8 @@
 import { Suspense, lazy, useState } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useCaseContext } from "@/context/CaseContext";
 import { featureFlags } from "@/config/featureFlags";
+import { LEGACY_FLAT_PATHS } from "@/config/navigation";
 import { Layout } from "@/components/layout/Layout";
 
 // Lazy load components for code splitting
@@ -116,6 +117,11 @@ export function Router() {
         <Route path="/defense-brief" component={() => <Suspense fallback={<LoadingFallback />}><DefenseBrief /></Suspense>} />
         <Route path="/fsl-analysis" component={() => <Suspense fallback={<LoadingFallback />}><FslAnalysis /></Suspense>} />
         <Route path="/standards-index" component={() => <Suspense fallback={<LoadingFallback />}><StandardsIndex /></Suspense>} />
+
+        {/* Legacy flat case routes (e.g. /dashboard) → redirect into the active case. Redirect-only; no page is mounted here. */}
+        {LEGACY_FLAT_PATHS.map((p) => (
+          <Route key={p} path={p} component={() => <Redirect to={`/case/${selectedCase.id}${p}`} replace />} />
+        ))}
 
         {/* Document Review Routes */}
         <Route path="/ldr-home" component={() => <Suspense fallback={<LoadingFallback />}><LDR_HomePage lang={ldrLang} /></Suspense>} />

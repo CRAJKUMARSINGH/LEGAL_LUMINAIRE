@@ -6,16 +6,14 @@ import { Button } from "@/components/ui/button";
 import {
   Scale, FileText, BookOpen, FlaskConical, Clock,
   AlertTriangle, CheckCircle2, Info, ArrowRight,
-  MessageSquare, LayoutDashboard, Files, Upload, PlayCircle,
+  MessageSquare, LayoutDashboard, Files, Upload,
   Zap, Target, Printer, ShieldCheck,
 } from "lucide-react";
-import { CreateCaseQuickDialog } from "@/components/create-case-quick-dialog";
 import { HarveyEvaluationPanel } from "@/components/HarveyEvaluationPanel";
-import { featureFlags } from "@/config/featureFlags";
-import {
-  caseInfo, caseLawMatrix, standardsMatrix,
-  timelineEvents, caseDocuments,
-} from "@/data/caseData";
+import { DemoModeCard } from "@/components/home/DemoModeCard";
+import { RecentCasesWidget } from "@/components/home/RecentCasesWidget";
+import { useCaseContext } from "@/context/CaseContext";
+import { DEFAULT_CASE_ID, getChargesArray } from "@/lib/case-store";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip,
 } from "recharts";
@@ -37,30 +35,21 @@ const StatusBadge = ({ status }: { status: VS }) => {
 };
 
 // ── Quick-access nav (same tools as sidebar) ──────────────────────────────
-const QUICK_LINKS = [
-  { href: "/case/case-01/dashboard",             label: "Dashboard",            icon: LayoutDashboard },
-  { href: "/case/case-01/chat",                  label: "AI Drafter",           icon: MessageSquare },
-  { href: "/case/case-01/timeline",              label: "Case Timeline",        icon: Clock },
-  { href: "/case/case-01/case-law",              label: "Case Law Matrix",      icon: BookOpen },
-  { href: "/case/case-01/standards",             label: "Standards Matrix",     icon: FlaskConical },
-  { href: "/case/case-01/documents",             label: "Documents",            icon: Files },
-  { href: "/case/case-01/upload",                label: "Upload Files",         icon: Upload },
-  { href: "/case/case-01/discharge-application", label: "Discharge App",        icon: Scale },
-  { href: "/case/case-01/discharge-print",      label: "Discharge PDF v6",     icon: Printer },
-  { href: "/infra-arb",                         label: "Infra Arbitration",    icon: Scale },
+const quickLinksFor = (caseId: string) => [
+  { href: `/case/${caseId}/dashboard`,             label: "Dashboard",            icon: LayoutDashboard },
+  { href: `/case/${caseId}/chat`,                  label: "AI Drafter",           icon: MessageSquare },
+  { href: `/case/${caseId}/timeline`,              label: "Case Timeline",        icon: Clock },
+  { href: `/case/${caseId}/case-law`,              label: "Case Law Matrix",      icon: BookOpen },
+  { href: `/case/${caseId}/standards`,             label: "Standards Matrix",     icon: FlaskConical },
+  { href: `/case/${caseId}/documents`,             label: "Documents",            icon: Files },
+  { href: `/case/${caseId}/upload`,                label: "Upload Files",         icon: Upload },
+  { href: `/case/${caseId}/discharge-application`, label: "Discharge App",        icon: Scale },
+  { href: `/case/${caseId}/discharge-print`,       label: "Discharge PDF v6",     icon: Printer },
+  { href: "/infra-arb",                            label: "Infra Arbitration",    icon: Scale },
 ];
 
-const STRATEGY_PILLARS = [
-  "Chain-of-custody gaps in forensic sampling",
-  "Weather contamination during sample collection",
-  "Absence of contractor representation",
-  "Non-representative / haphazard sampling method",
-  "FSL report foundation challenge",
-  "BIS/IS procedural non-compliance",
-];
-
-// ── Defence Strength Radar data (derived from case evidence) ──────────────
-const RADAR_DATA = [
+// ── Defence Strength Radar data — CASE_01 (Hemraj) evidence only ──────────
+const HEMRAJ_RADAR_DATA = [
   { pillar: "Chain of Custody",   score: 72, fullMark: 100 },
   { pillar: "Sampling Method",    score: 80, fullMark: 100 },
   { pillar: "Weather Evidence",   score: 58, fullMark: 100 },
@@ -70,38 +59,51 @@ const RADAR_DATA = [
 ];
 
 const overallStrength = Math.round(
-  RADAR_DATA.reduce((sum, d) => sum + d.score, 0) / RADAR_DATA.length
+  HEMRAJ_RADAR_DATA.reduce((sum, d) => sum + d.score, 0) / HEMRAJ_RADAR_DATA.length
 );
 
-// ── Priority Action Items (auto-derived from pending case law) ─────────────
-const PRIORITY_ACTIONS = caseLawMatrix
-  .filter((c) => c.status === "PENDING")
-  .map((c) => ({ task: c.action, citation: c.case.split(",")[0], court: c.court }))
-  .concat(
-    timelineEvents
-      .filter((e) => e.note)
-      .map((e) => ({ task: e.note, citation: e.title, court: "Evidence" }))
-  )
-  .slice(0, 5);
-
 export default function Home() {
-  const verifiedCount  = useMemo(() => caseLawMatrix.filter((c) => c.status === "VERIFIED").length, []);
-  const pendingCount   = useMemo(() => caseLawMatrix.filter((c) => c.status === "PENDING").length, []);
-  const secondaryCount = useMemo(() => caseLawMatrix.length - verifiedCount - pendingCount, [verifiedCount, pendingCount]);
-  const total          = caseLawMatrix.length;
+  const { selectedCase, isDemoMode } = useCaseContext();
+  const caseId = selectedCase.id;
+  const isHemraj = caseId === DEFAULT_CASE_ID;
+  const caseLawMatrix  = selectedCase.caseLaw ?? [];
+  const timelineEvents = selectedCase.timeline ?? [];
+  const standardsMatrix = selectedCase.standards ?? [];
+  const caseDocuments  = selectedCase.documents ?? [];
+  const strategyPillars = (selectedCase.strategy ?? []).map((s) => s.title);
+  const charges = getChargesArray(selectedCase);
+  const QUICK_LINKS = useMemo(() => quickLinksFor(caseId), [caseId]);
 
-  const stats = useMemo(() => [
+  const verifiedCount  = caseLawMatrix.filter((c) => c.status === "VERIFIED").length;
+  const pendingCount   = caseLawMatrix.filter((c) => c.status === "PENDING").length;
+  const secondaryCount = caseLawMatrix.length - verifiedCount - pendingCount;
+  const total          = Math.max(caseLawMatrix.length, 1);
+
+  const PRIORITY_ACTIONS = useMemo(() => caseLawMatrix
+    .filter((c) => c.status === "PENDING")
+    .map((c) => ({ task: c.action, citation: c.case.split(",")[0], court: c.court }))
+    .concat(
+      timelineEvents
+        .filter((e) => e.note)
+        .map((e) => ({ task: e.note ?? "", citation: e.title, court: "Evidence" }))
+    )
+    .slice(0, 5), [caseLawMatrix, timelineEvents]);
+
+  const stats = [
     { label: "Case Documents",      value: caseDocuments.length,   icon: FileText,    color: "text-blue-500" },
     { label: "Case Law Citations",  value: caseLawMatrix.length,   icon: BookOpen,    color: "text-emerald-500" },
     { label: "Standards Referenced",value: standardsMatrix.length, icon: FlaskConical,color: "text-violet-500" },
     { label: "Timeline Events",     value: timelineEvents.length,  icon: Clock,       color: "text-amber-500" },
-  ], []);
+  ];
 
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
 
-      {/* ── Discharge Application Hero Card ─────────────────────────────── */}
-      <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-5 flex items-center gap-4 hover-elevate transition-all">
+      {/* ── Demo Mode (1 click) + Recent Cases ──────────────────────────── */}
+      <DemoModeCard />
+
+      {/* ── Discharge Application Hero Card (CASE_01 only — hand-drafted) ── */}
+      {isHemraj && <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-5 flex items-center gap-4 hover-elevate transition-all">
         <div className="rounded-xl bg-primary/15 p-3 shrink-0">
           <Printer className="h-8 w-8 text-primary" />
         </div>
@@ -118,38 +120,12 @@ export default function Home() {
             A4 print-ready | 23 named annexures | 12 grounds | Artemis-II Accuracy
           </p>
         </div>
-        <Link href="/case/case-01/discharge-print">
+        <Link href={`/case/${caseId}/discharge-print`}>
           <Button className="gap-1.5 shrink-0 bg-primary">
             <Printer className="h-3.5 w-3.5" /> Generate PDF
           </Button>
         </Link>
-      </div>
-
-      {/* ── Demo CTA Banner ──────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-amber-300 bg-amber-50/80 backdrop-blur-md p-4 flex items-center gap-4 hover-elevate transition-colors">
-        <PlayCircle className="h-8 w-8 text-amber-500 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-amber-900 text-sm">Try the Demo — No API key needed</p>
-          <p className="text-xs text-amber-700 mt-0.5">
-            Explore 26 pre-loaded case types: forensic defence, NDPS bail, writ petitions, consumer complaints, and 5 full-lifecycle infrastructure arbitration cases (NHAI, CPWD, FIDIC).
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 shrink-0 justify-end">
-          {featureFlags.referenceQuickCaseDialog && (
-            <CreateCaseQuickDialog triggerClassName="bg-background border border-amber-400 text-amber-900 hover:bg-amber-100 text-sm h-9" />
-          )}
-          <Link href="/demo-browser">
-            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white gap-1.5">
-              <PlayCircle className="h-3.5 w-3.5" /> 26 Demo Cases
-            </Button>
-          </Link>
-          <Link href="/infra-arb">
-            <Button size="sm" variant="outline" className="border-amber-400 text-amber-700 hover:bg-amber-100 gap-1.5">
-              Infra Arb →
-            </Button>
-          </Link>
-        </div>
-      </div>
+      </div>}
 
       {/* ── Bento grid (2025 layout) ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -160,15 +136,19 @@ export default function Home() {
               <Scale className="h-8 w-8 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-bold text-foreground">{caseInfo.title}</h2>
-              <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{caseInfo.summary}</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-2xl font-bold text-foreground">{selectedCase.title.replace(/^\[DEMO\]\s*/, "")}</h2>
+                {isDemoMode && <Badge className="bg-amber-500 text-white text-[9px] font-black tracking-widest">SYNTHETIC / DEMO</Badge>}
+              </div>
+              <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{selectedCase.brief}</p>
               <div className="flex flex-wrap gap-2 mt-3">
-                <Badge variant="destructive">{caseInfo.charges}</Badge>
-                <Badge variant="outline">{caseInfo.court}</Badge>
-                <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">{caseInfo.status}</Badge>
+                {charges.length > 0 && <Badge variant="destructive">{charges.join(" + ")}</Badge>}
+                {selectedCase.court && <Badge variant="outline">{selectedCase.court}</Badge>}
+                {selectedCase.caseNo && <Badge variant="outline">{selectedCase.caseNo}</Badge>}
+                {selectedCase.status && <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">{selectedCase.status}</Badge>}
               </div>
             </div>
-            <Link href="/case/case-01/dashboard">
+            <Link href={`/case/${caseId}/dashboard`}>
               <Button size="sm" className="gap-1.5 shrink-0 hidden sm:flex">
                 Open Case <ArrowRight className="h-3.5 w-3.5" />
               </Button>
@@ -193,7 +173,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-3 pt-3 border-t border-border/60">
-            <Link href="/case/case-01/upload">
+            <Link href={`/case/${caseId}/upload`}>
               <Button variant="outline" size="sm" className="w-full gap-1.5">
                 <Upload className="h-3.5 w-3.5" /> Upload documents
               </Button>
@@ -201,6 +181,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <RecentCasesWidget />
 
       <HarveyEvaluationPanel />
 
@@ -224,8 +206,8 @@ export default function Home() {
       {/* ── Gift: Defence Strength Radar + Priority Actions ─────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* Radar Chart */}
-        <Card className="glass-surface hover-elevate">
+        {/* Radar Chart — hand-scored for CASE_01 only; other cases show verification blocks */}
+        {isHemraj ? <Card className="glass-surface hover-elevate">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Target className="h-4 w-4 text-primary" />
@@ -240,7 +222,7 @@ export default function Home() {
           </CardHeader>
           <CardContent className="pt-0">
             <ResponsiveContainer width="100%" height={240}>
-              <RadarChart data={RADAR_DATA} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
+              <RadarChart data={HEMRAJ_RADAR_DATA} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
                 <PolarGrid stroke="hsl(var(--border))" />
                 <PolarAngleAxis
                   dataKey="pillar"
@@ -267,7 +249,7 @@ export default function Home() {
               </RadarChart>
             </ResponsiveContainer>
             <div className="mt-2 grid grid-cols-3 gap-2">
-              {RADAR_DATA.map((d) => (
+              {HEMRAJ_RADAR_DATA.map((d) => (
                 <div key={d.pillar} className="flex flex-col items-center gap-0.5">
                   <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                     <div
@@ -280,7 +262,34 @@ export default function Home() {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> : (
+          <Card className="glass-surface hover-elevate">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                सत्यापन ब्लॉक / Verification Blocks
+                <Badge className="ml-auto bg-primary/10 text-primary border-primary/20 text-xs">
+                  {(selectedCase.verificationBlocks ?? []).length}
+                </Badge>
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">Every claim carries its verification tier — PENDING items are blocked from drafting.</p>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-2">
+              {(selectedCase.verificationBlocks ?? []).length === 0 && (
+                <p className="text-xs text-muted-foreground py-4 text-center" role="status">कोई सत्यापन ब्लॉक नहीं · No verification blocks recorded yet.</p>
+              )}
+              {(selectedCase.verificationBlocks ?? []).map((vb) => (
+                <div key={vb.id} className="flex items-start gap-3 p-3 rounded-lg border border-border/60 bg-muted/30">
+                  <StatusBadge status={(vb.status === "COURT_SAFE" ? "VERIFIED" : vb.status === "FATAL_ERROR" ? "PENDING" : vb.status) as VS} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground leading-snug">{vb.claim}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{vb.evidence}{vb.blockedFromDraft ? " · BLOCKED FROM DRAFT" : ""}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Priority Action Items */}
         <Card className="glass-surface hover-elevate">
@@ -297,6 +306,9 @@ export default function Home() {
             </p>
           </CardHeader>
           <CardContent className="pt-0 space-y-2.5">
+            {PRIORITY_ACTIONS.length === 0 && (
+              <p className="text-xs text-muted-foreground py-4 text-center" role="status">कोई लंबित कार्य नहीं · No pending actions.</p>
+            )}
             {PRIORITY_ACTIONS.map((item, i) => (
               <div
                 key={i}
@@ -314,7 +326,7 @@ export default function Home() {
               </div>
             ))}
             <div className="pt-1">
-              <Link href="/case/case-01/case-law">
+              <Link href={`/case/${caseId}/case-law`}>
                 <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
                   <BookOpen className="h-3 w-3" /> View Full Case Law Matrix
                 </Button>
@@ -361,7 +373,7 @@ export default function Home() {
                 </div>
               ))}
               {caseLawMatrix.length > 4 && (
-                <Link href="/case/case-01/case-law">
+                <Link href={`/case/${caseId}/case-law`}>
                   <span className="text-xs text-primary hover:underline cursor-pointer">
                     +{caseLawMatrix.length - 4} more →
                   </span>
@@ -378,7 +390,10 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2.5">
-              {STRATEGY_PILLARS.map((s, i) => (
+              {strategyPillars.length === 0 && (
+                <li className="text-xs text-muted-foreground" role="status">कोई रणनीति स्तंभ नहीं · No strategy pillars yet.</li>
+              )}
+              {strategyPillars.map((s, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
                   <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                   <span className="text-muted-foreground">{s}</span>
@@ -386,7 +401,7 @@ export default function Home() {
               ))}
             </ul>
             <div className="mt-4 pt-4 border-t border-border">
-              <Link href="/case/case-01/discharge-application">
+              <Link href={`/case/${caseId}/discharge-application`}>
                 <Button variant="outline" size="sm" className="w-full gap-1.5">
                   <Scale className="h-3.5 w-3.5" /> View Discharge Application
                 </Button>
@@ -427,7 +442,7 @@ export default function Home() {
         <CardHeader>
           <CardTitle className="text-base flex items-center justify-between">
             Key Precedents
-            <Link href="/case/case-01/case-law">
+            <Link href={`/case/${caseId}/case-law`}>
               <Button variant="ghost" size="sm" className="text-xs gap-1 h-7">
                 View all <ArrowRight className="h-3 w-3" />
               </Button>
@@ -436,6 +451,9 @@ export default function Home() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
+            {caseLawMatrix.length === 0 && (
+              <p className="text-xs text-muted-foreground py-4 text-center" role="status">कोई नज़ीर दर्ज नहीं · No precedents recorded for this case.</p>
+            )}
             {caseLawMatrix.slice(0, 3).map((c, i) => (
               <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/40 border border-border">
                 <StatusBadge status={c.status as VS} />
