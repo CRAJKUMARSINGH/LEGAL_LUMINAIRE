@@ -11,15 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Copy, Trash2, FileText, Scale, Clock, Users } from 'lucide-react';
+import { Plus, Copy, Trash2, FileText, Scale, Clock, Users, FolderOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CreateCaseQuickDialog } from '@/components/create-case-quick-dialog';
 import { featureFlags } from '@/config/featureFlags';
+import { EmptyState } from '@/components/ui/empty-state';
+import { CaseListSkeleton } from '@/components/ui/skeleton-loaders';
 
-interface CaseSelectorProps {
-  onCreateCase?: () => void;
-  showStats?: boolean;
-}
+import type { CaseSelectorProps } from "@/types";
 
 export function CaseSelector({ onCreateCase, showStats = false }: CaseSelectorProps) {
   const { cases, selectedCaseId, setSelectedCaseId } = useCaseContext();
@@ -116,7 +115,34 @@ export function CaseSelector({ onCreateCase, showStats = false }: CaseSelectorPr
 
   return (
     <div className="space-y-4">
-      {/* Main Case Selector */}
+
+      {/* Empty state — no cases loaded at all */}
+      {cases.length === 0 && (
+        <EmptyState
+          icon={<FolderOpen className="h-8 w-8" />}
+          title="No cases loaded"
+          titleHi="कोई केस लोड नहीं"
+          description="Create a new case or load a demo to get started."
+          descriptionHi="शुरू करने के लिए नया केस बनाएं या डेमो लोड करें।"
+          actions={[
+            {
+              label: "Browse Demo Cases",
+              labelHi: "डेमो केस देखें",
+              href: "/demo-browser",
+            },
+            {
+              label: "New Case",
+              labelHi: "नया केस",
+              href: "/intake",
+              variant: "outline",
+              icon: <Plus className="h-4 w-4" />,
+            },
+          ]}
+        />
+      )}
+
+      {/* Main Case Selector — shown only when cases exist */}
+      {cases.length > 0 && (
       <div className="flex items-center gap-4">
         <div className="flex-1">
           <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
@@ -264,6 +290,7 @@ export function CaseSelector({ onCreateCase, showStats = false }: CaseSelectorPr
           </Button>
         </div>
       </div>
+      )} {/* end cases.length > 0 */}
 
       {/* Case Stats */}
       {showStats && selectedCase && (

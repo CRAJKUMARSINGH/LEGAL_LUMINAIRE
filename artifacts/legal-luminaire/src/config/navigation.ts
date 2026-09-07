@@ -3,7 +3,7 @@ import {
   Scale, BookOpen, CheckSquare,
   Home as HomeIcon, FilePlus, FileText,
   LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
-  FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare,
+  FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare, Mic, Edit3,
 } from "lucide-react";
 import { featureFlags } from "@/config/featureFlags";
 
@@ -41,6 +41,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { path: "/standards",   label: "मानक / Lab",     labelEn: "Forensic Standards", icon: FlaskConical,    caseScoped: true },
       { path: "/chat",        label: "AI चैट",         labelEn: "AI Chat",            icon: MessageSquare,   caseScoped: true },
       { path: "/citation-search", label: "Citation Explorer", labelEn: "25+ Authorities", icon: BookOpen, caseScoped: false, badge: "NEW" },
+      { path: "/ldr-home", label: "डॉक्युमेंट रिव्यू", labelEn: "Document Review", icon: Files, caseScoped: false, badge: "LDR" },
       { path: "/lps-home", label: "Precedent Search", labelEn: "Precedent Search", icon: FileSearch, caseScoped: false, badge: "LPS" },
       { path: "/lps-defence", label: "LPS Defence", labelEn: "LPS Defence", icon: ShieldCheck, caseScoped: false, badge: "LPS" },
       { path: "/lps-sample-analysis", label: "नमूना विश्लेषण", labelEn: "Sample Analysis", icon: FlaskConical, caseScoped: false, badge: "LPS" },
@@ -58,7 +59,9 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     groupLabel: "विधिक प्रारूपण / Drafting Suite",
     items: [
+      { path: "/drafting",            label: "AI प्रारूप",     labelEn: "AI Drafting",         icon: Edit3,   caseScoped: true },
       { path: "/ai-draft-engine", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine", icon: Sparkles, caseScoped: true },
+      { path: "/oral-arguments",   label: "मौखिक बहस",     labelEn: "Oral Arguments",     icon: Mic,          caseScoped: true },
       { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale,    caseScoped: true },
       { path: "/defence-reply", label: "डिफेंस रिप्लाई", labelEn: "Defence Reply",   icon: FileText,        caseScoped: true },
       { path: "/safe-draft",  label: "सेफ ड्राफ्ट",   labelEn: "Safe Draft Editor",  icon: ShieldCheck,     caseScoped: true, badge: "NEW" },
@@ -79,7 +82,6 @@ export const NAV_GROUPS: NavGroup[] = [
       { path: "/upload",           label: "अपलोड",      labelEn: "Upload",           icon: Upload,      caseScoped: true },
       { path: "/cross-check-report", label: "Cross Check", labelEn: "Cross Check", icon: CheckSquare, caseScoped: false, badge: "LDM" },
       { path: "/fsl-analysis", label: "FSL Analysis", labelEn: "FSL Analysis", icon: FlaskConical, caseScoped: false, badge: "LDM" },
-      { path: "/ldr-home", label: "Doc Review", labelEn: "Doc Review", icon: Files, caseScoped: false, badge: "LDR" },
       { path: "/ldr-comparison", label: "Doc Compare", labelEn: "Doc Compare", icon: GitCompare, caseScoped: false, badge: "LDR" },
       ...(featureFlags.hybridStandardsValidity ? [
         { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },

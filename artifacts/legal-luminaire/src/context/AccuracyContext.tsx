@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface AccuracyMetrics {
+export interface AccuracyMetrics {
   legalCitations: number;
   technicalStandards: number;
   factualClaims: number;
@@ -8,12 +8,15 @@ interface AccuracyMetrics {
   overallScore: number;
 }
 
-interface AccuracyContextType {
+/** Accuracy level band — derived from overallScore in AccuracyProvider */
+export type AccuracyLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface AccuracyContextType {
   metrics: AccuracyMetrics;
   updateMetric: (metric: keyof AccuracyMetrics, value: number) => void;
   verifyAccuracy: () => boolean;
   resetMetrics: () => void;
-  accuracyLevel: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  accuracyLevel: AccuracyLevel;
 }
 
 const AccuracyContext = createContext<AccuracyContextType | undefined>(undefined);

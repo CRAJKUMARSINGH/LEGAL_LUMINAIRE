@@ -1,11 +1,21 @@
-# Use repository-root netlify.toml for Netlify Connect (pnpm workspace).
-# Vite outDir is dist/public — see vite.config.ts.
+# ============================================================================
+# Legal Luminaire — Sub-directory netlify.toml
+# Used ONLY when Netlify is connected directly to artifacts/legal-luminaire/
+# (not the monorepo root). Prefer root-level netlify.toml for production.
+# ============================================================================
 
 [build]
-  command = "pnpm run build"
+  # When building from this sub-directory, pnpm workspace context is missing.
+  # Install deps locally then build.
+  # WARNING: keep "scripts.build" in package.json in sync with root netlify.toml
+  # build command. If you update the root, update here too.
+  command = "npm install && npm run build"
   publish = "dist/public"
 
+[build.environment]
+  NODE_VERSION = "22"
+
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from   = "/*"
+  to     = "/index.html"
   status = 200

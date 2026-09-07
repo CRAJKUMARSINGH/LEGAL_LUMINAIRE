@@ -8,7 +8,7 @@ import { CASE_TEMPLATES, generateCaseFromTemplate } from "@/lib/case-templates";
 import type { CaseTemplate } from "@/lib/multi-case-store";
 import { useToast } from "@/hooks/use-toast";
 
-type CaseContextType = {
+export type CaseContextType = {
   cases: CaseRecord[];
   selectedCaseId: string;
   selectedCase: CaseRecord;
@@ -117,13 +117,36 @@ export function CaseProvider({ children }: { children: React.ReactNode }) {
   };
 
   const createFromTemplate = (templateId: string, overrides: Partial<CaseRecord> = {}) => {
-    const generated = generateCaseFromTemplate(templateId, overrides as any);
+    // Map CaseRecord overrides to the MultiCaseData shape that generateCaseFromTemplate expects.
+    // Only the fields that exist on both types are forwarded; extended CaseRecord fields
+    // (parties, citations, forensic_grounding, …) are not part of MultiCaseData and are
+    // applied directly after the case is generated.
+    const templateOverrides: Parameters<typeof generateCaseFromTemplate>[1] = {
+      ...(overrides.title     !== undefined && { title:   overrides.title }),
+      ...(overrides.court     !== undefined && { court:   overrides.court }),
+      ...(overrides.caseNo    !== undefined && { caseNo:  overrides.caseNo }),
+      ...(overrides.brief     !== undefined && { brief:   overrides.brief }),
+      ...(overrides.status    !== undefined && { status:  overrides.status }),
+      // charges: CaseRecord allows string | string[]; MultiCaseData only accepts string
+      ...(overrides.charges   !== undefined && {
+        charges: Array.isArray(overrides.charges)
+          ? overrides.charges.join(", ")
+          : overrides.charges,
+      }),
+    };
+    const generated = generateCaseFromTemplate(templateId, templateOverrides);
     if (!generated) return;
     addCase({
-      id: generated.id, title: generated.title, court: generated.court,
-      caseNo: generated.caseNo, brief: generated.brief, createdAt: generated.createdAt,
-      files: [], status: generated.status, charges: generated.charges,
-      caseLaw: generated.caseLaw as CaseRecord["caseLaw"],
+      id: generated.id,
+      title: generated.title,
+      court: generated.court,
+      caseNo: generated.caseNo,
+      brief: generated.brief,
+      createdAt: generated.createdAt,
+      files: [],
+      status: generated.status,
+      charges: generated.charges,
+      caseLaw:  generated.caseLaw  as CaseRecord["caseLaw"],
       timeline: generated.timeline as CaseRecord["timeline"],
       strategy: generated.strategy as CaseRecord["strategy"],
       standards: generated.standards as CaseRecord["standards"],

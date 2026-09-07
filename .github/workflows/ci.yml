@@ -1,4 +1,4 @@
-name: ci
+﻿name: ci
 
 on:
   pull_request:
@@ -20,12 +20,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Enable Corepack (pnpm)
         run: corepack enable
 
-      - name: Install dependencies
+      - name: Install dependencies (frozen - reproducible)
         run: pnpm install --frozen-lockfile
 
       - name: Typecheck
@@ -36,6 +36,24 @@ jobs:
 
       - name: Build frontend (Vite)
         run: pnpm --filter @workspace/legal-luminaire run build
+
+      - name: Verify publish directory exists
+        run: test -d artifacts/legal-luminaire/dist/public
+
+      - name: Verify SPA index.html present (serves all client-side routes)
+        run: test -f artifacts/legal-luminaire/dist/public/index.html
+
+      - name: Verify _redirects present (SPA catch-all for Netlify)
+        run: test -f artifacts/legal-luminaire/dist/public/_redirects
+
+      - name: Verify _redirects content is correct SPA catch-all
+        run: grep -q "^/\* /index.html 200" artifacts/legal-luminaire/dist/public/_redirects
+
+      - name: Verify JS assets directory present (code-split route chunks)
+        run: test -d artifacts/legal-luminaire/dist/public/assets
+
+      - name: Verify case-selector and new data types compile cleanly
+        run: pnpm --filter @workspace/legal-luminaire run typecheck
 
   backend:
     name: Backend syntax check (Python)
@@ -49,6 +67,5 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Compile backend
+      - name: Compile backend (syntax check)
         run: python -m compileall artifacts/legal-luminaire/backend
-

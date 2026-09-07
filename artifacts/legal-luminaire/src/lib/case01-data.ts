@@ -603,7 +603,14 @@ export const CASE01_META = {
 // Source: VERIFIED_DEEP_RESEARCH_DEFENCE_PACK.md §5 + WRITTEN_SUBMISSION_RHC_FINAL_v3.lex
 // These paragraphs are safe for use in written submissions and oral arguments.
 
-export const CASE01_ARGUMENT_PARAGRAPHS = [
+/** A single ground-and-paragraph pair for use in written submissions / oral arguments. */
+export type ArgumentParagraph = {
+  readonly id: string;
+  readonly ground: string;
+  readonly para: string;
+};
+
+export const CASE01_ARGUMENT_PARAGRAPHS: ArgumentParagraph[] = [
   {
     id: "arg1",
     ground: "Foundational Scientific Error (Wrong Standard)",

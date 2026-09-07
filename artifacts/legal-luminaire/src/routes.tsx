@@ -1,8 +1,9 @@
-import { Suspense, lazy, useState } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useCaseContext } from "@/context/CaseContext";
 import { featureFlags } from "@/config/featureFlags";
 import { Layout } from "@/components/layout/Layout";
+import type { LpsRoute } from "@/types";
 
 // Lazy load components for code splitting
 const NotFound = lazy(() => import("@/pages/not-found"));
@@ -77,7 +78,7 @@ const ReviewQueueView = lazy(() => import("@/components/views/ReviewQueueView").
 const ResearchImprovementView = lazy(() => import("@/components/views/ResearchImprovementView").then(module => ({ default: module.ResearchImprovementView })));
 
 // Loading fallback component
-const LoadingFallback = () => (
+const LoadingFallback = (): React.JSX.Element => (
   <div className="flex items-center justify-center h-64">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
   </div>
@@ -89,11 +90,13 @@ export function Router() {
   const [ldrLang, setLdrLang] = useState<"en" | "hi" | "both">("both");
 
   const handleLpsNavigate = (route: string) => {
-    if (route === "defence") setLocation("/lps-defence");
-    else if (route === "analysis") setLocation("/lps-sample-analysis");
-    else if (route === "precedents") setLocation("/lps-precedents");
-    else if (route === "standards") setLocation("/lps-standards");
-    else if (route === "print") setLocation("/lps-print");
+    // Narrow to the known LPS routes — unknown values are silently ignored
+    const lpsRoute = route as LpsRoute;
+    if (lpsRoute === "defence")    setLocation("/lps-defence");
+    else if (lpsRoute === "analysis")   setLocation("/lps-sample-analysis");
+    else if (lpsRoute === "precedents") setLocation("/lps-precedents");
+    else if (lpsRoute === "standards")  setLocation("/lps-standards");
+    else if (lpsRoute === "print")      setLocation("/lps-print");
   };
 
   return (
