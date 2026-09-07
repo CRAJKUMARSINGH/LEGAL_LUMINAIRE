@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { 
-  CheckCircle2, AlertCircle, Save, ArrowLeft, 
-  Eye, FileText, ChevronRight, Edit3, Trash2
+import {
+  CheckCircle2, AlertCircle, Save, ArrowLeft,
+  Eye, FileText, Edit3, Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { ReviewViewProps, ExtractionData, ExtractionTimelineEvent } from "@/types";
 
-export const ReviewView = ({ extraction, onSave, onBack }: any) => {
-  const [editedData, setEditedData] = useState(extraction);
+export const ReviewView = ({ extraction, onSave, onBack }: ReviewViewProps) => {
+  const [editedData, setEditedData] = useState<ExtractionData>(extraction);
 
   const handleUpdateEvent = (index: number, field: string, value: string) => {
-    const updatedEvents = [...editedData.timeline_events];
+    const updatedEvents = [...(editedData.timeline_events ?? [])];
     updatedEvents[index] = { ...updatedEvents[index], [field]: value };
     setEditedData({ ...editedData, timeline_events: updatedEvents });
   };
@@ -69,11 +69,11 @@ export const ReviewView = ({ extraction, onSave, onBack }: any) => {
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                        <label className="text-[10px] font-bold text-slate-500 uppercase">Incident Type</label>
-                       <Input value={editedData.incident_type} onChange={(e) => setEditedData({...editedData, incident_type: e.target.value})} />
+                       <Input value={editedData.incident_type ?? ""} onChange={(e) => setEditedData({...editedData, incident_type: e.target.value})} />
                     </div>
                     <div className="space-y-1">
                        <label className="text-[10px] font-bold text-slate-500 uppercase">Jurisdiction</label>
-                       <Input value={editedData.jurisdiction} onChange={(e) => setEditedData({...editedData, jurisdiction: e.target.value})} />
+                       <Input value={editedData.jurisdiction ?? ""} onChange={(e) => setEditedData({...editedData, jurisdiction: e.target.value})} />
                     </div>
                  </div>
               </section>
@@ -85,7 +85,7 @@ export const ReviewView = ({ extraction, onSave, onBack }: any) => {
                     <Button variant="ghost" size="sm" className="text-primary text-[10px] font-bold">+ ADD PERSON</Button>
                  </div>
                  <div className="flex flex-wrap gap-2">
-                    {editedData.accused_names.map((name: string, i: number) => (
+                    {(editedData.accused_names ?? []).map((name: string, i: number) => (
                       <Badge key={i} variant="secondary" className="pl-3 pr-1 py-1 gap-2 border-slate-200">
                         {name}
                         <button className="text-slate-400 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
@@ -103,7 +103,7 @@ export const ReviewView = ({ extraction, onSave, onBack }: any) => {
                     </div>
                  </div>
                  <div className="space-y-4 relative pl-4 border-l-2 border-slate-100">
-                    {editedData.timeline_events.map((evt: any, i: number) => (
+                    {(editedData.timeline_events ?? []).map((evt: ExtractionTimelineEvent, i: number) => (
                       <div key={i} className="relative bg-slate-50 p-4 rounded-xl border border-slate-100 group transition-all hover:bg-white hover:shadow-md">
                         <div className="absolute -left-[25px] top-6 w-4 h-4 rounded-full bg-white border-2 border-primary z-10" />
                         <div className="grid grid-cols-4 gap-3">

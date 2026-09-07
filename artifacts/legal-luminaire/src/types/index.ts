@@ -158,6 +158,80 @@ export interface ResultCardProps {
 }
 
 // ── Document ingestion / OmniDropzone types ───────────────────────────────
+
+/**
+ * Upload stage machine for the OmniDropzone component.
+ * idle           — no file selected yet
+ * previewing     — /omni-preview request in flight
+ * preview_ready  — preview returned, awaiting user confirmation
+ * ingesting      — /omni-ingest or final-save in flight
+ * reviewing      — ReviewView (Human-in-the-Loop) open
+ * done           — case created successfully
+ * error          — unrecoverable error; user must reset
+ */
+export type UploadStage =
+  | "idle"
+  | "previewing"
+  | "preview_ready"
+  | "ingesting"
+  | "reviewing"
+  | "done"
+  | "error";
+
+/**
+ * Shape of the /omni-preview backend response.
+ */
+export interface PreviewResponse {
+  success: boolean;
+  metadata?: {
+    filename: string;
+    file_type: string;
+    total_pages: number;
+    total_chars: number;
+    total_chunks: number;
+    preview_text: string;
+  };
+  chunks?: Array<{
+    page_number: number;
+    chunk_index: number;
+    text: string;
+    char_count: number;
+  }>;
+  errors?: string[];
+  message?: string;
+}
+
+/**
+ * Shape of the /omni-ingest backend response.
+ */
+export interface IngestResponse {
+  success: boolean;
+  case_id?: string;
+  extraction?: ExtractionData;
+  message?: string;
+  errors?: string[];
+}
+
+/**
+ * Shape of the /auto-research backend response.
+ */
+export interface AutoResearchResponse {
+  success: boolean;
+  matches: AutoResearchMatch[];
+  message?: string;
+}
+
+/**
+ * Upload progress info shown to the user during multi-step ingestion.
+ */
+export interface UploadProgressState {
+  stage: UploadStage;
+  statusText: string;
+  /** 0–100; undefined when progress is indeterminate */
+  percent?: number;
+  errors: string[];
+}
+
 /**
  * A single timeline event as extracted from the backend AI pipeline.
  * Used by OmniDropzone (extraction state) and ReviewView (editing state).

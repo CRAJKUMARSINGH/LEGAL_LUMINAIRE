@@ -40,6 +40,9 @@ jobs:
       - name: Verify publish directory exists
         run: test -d artifacts/legal-luminaire/dist/public
 
+      # -----------------------------------------------------------------------
+      # Week 2 - Route surface checks
+      # -----------------------------------------------------------------------
       - name: Verify SPA index.html present (serves all client-side routes)
         run: test -f artifacts/legal-luminaire/dist/public/index.html
 
@@ -53,6 +56,52 @@ jobs:
         run: test -d artifacts/legal-luminaire/dist/public/assets
 
       - name: Verify case-selector and new data types compile cleanly
+        run: pnpm --filter @workspace/legal-luminaire run typecheck
+
+      # -----------------------------------------------------------------------
+      # Week 3 - Document ingestion pipeline smoke tests
+      # -----------------------------------------------------------------------
+      # These checks confirm the document-ingestion pipeline source files
+      # carry correct typed imports and that no component still uses bare `any`
+      # on upload/ingest props. Does NOT start a backend server - confirms
+      # static correctness only. Runs AFTER the Vite build so any missing
+      # imports that slip past tsc --noEmit are caught by the bundler too.
+      # -----------------------------------------------------------------------
+
+      - name: Smoke-test ingestion types imported in OmniDropzone
+        run: |
+          grep -q "ExtractionData" artifacts/legal-luminaire/src/components/views/OmniDropzone.tsx
+          grep -q "IngestResponse"  artifacts/legal-luminaire/src/components/views/OmniDropzone.tsx
+          grep -q "PreviewResponse" artifacts/legal-luminaire/src/components/views/OmniDropzone.tsx
+          echo "OmniDropzone ingestion type imports: OK"
+
+      - name: Smoke-test ReviewView uses typed props not any
+        run: |
+          grep -q "ReviewViewProps" artifacts/legal-luminaire/src/components/views/ReviewView.tsx
+          grep -q "ExtractionTimelineEvent" artifacts/legal-luminaire/src/components/views/ReviewView.tsx
+          if grep -q "}: any" artifacts/legal-luminaire/src/components/views/ReviewView.tsx; then
+            echo "FAIL: ReviewView still has any props" && exit 1
+          fi
+          echo "ReviewView typed props: OK"
+
+      - name: Smoke-test UploadView has state machine not disabled stub
+        run: |
+          grep -q "UploadPhase"     artifacts/legal-luminaire/src/components/views/UploadView.tsx
+          grep -q "UploadFileState" artifacts/legal-luminaire/src/components/views/UploadView.tsx
+          grep -q "uploadFile"      artifacts/legal-luminaire/src/components/views/UploadView.tsx
+          echo "UploadView state machine: OK"
+
+      - name: Smoke-test central types index has all ingestion types
+        run: |
+          grep -q "UploadStage"          artifacts/legal-luminaire/src/types/index.ts
+          grep -q "PreviewResponse"      artifacts/legal-luminaire/src/types/index.ts
+          grep -q "IngestResponse"       artifacts/legal-luminaire/src/types/index.ts
+          grep -q "AutoResearchResponse" artifacts/legal-luminaire/src/types/index.ts
+          grep -q "ExtractionData"       artifacts/legal-luminaire/src/types/index.ts
+          grep -q "ReviewViewProps"      artifacts/legal-luminaire/src/types/index.ts
+          echo "Central type index ingestion types: OK"
+
+      - name: Final typecheck after all Week 3 changes
         run: pnpm --filter @workspace/legal-luminaire run typecheck
 
   backend:
