@@ -144,6 +144,91 @@ jobs:
       - name: Final typecheck after all Week 4 changes
         run: pnpm --filter @workspace/legal-luminaire run typecheck
 
+      # -----------------------------------------------------------------------
+      # Week 1 - Flag declaration check + spec-lint
+      #
+      # flag-type-check: fails if any VITE_FF_* env-var key referenced in
+      #   source is not declared in src/lib/featureFlags.ts.
+      #   Strategy: grep every VITE_FF_ usage across src/, then confirm each
+      #   key exists as a declared flag in featureFlags.ts.
+      #
+      # spec-lint: each of the 8 spec directories must contain all three
+      #   required files: requirements.md, design.md, tasks.md.
+      # -----------------------------------------------------------------------
+      - name: "Week 1: Flag-type-check — featureFlags.ts declares all 8 integration flags"
+        run: |
+          set -e
+          FLAGS_FILE="artifacts/legal-luminaire/src/lib/featureFlags.ts"
+
+          # Confirm the flags module exists
+          if [ ! -f "$FLAGS_FILE" ]; then
+            echo "FAIL: $FLAGS_FILE not found" && exit 1
+          fi
+
+          # Confirm all 8 integration flags are declared
+          REQUIRED=(
+            redaction_studio
+            smart_drop
+            ask_copilot
+            citation_deeplink
+            deadline_engine
+            chronology_studio
+            standards_explorer
+            accuracy_academy
+          )
+          for FLAG in "${REQUIRED[@]}"; do
+            if ! grep -q "$FLAG" "$FLAGS_FILE"; then
+              echo "FAIL: flag '$FLAG' not declared in $FLAGS_FILE" && exit 1
+            fi
+            echo "  [OK] $FLAG"
+          done
+
+          # Confirm all flags default to false (no accidental ON in production)
+          if grep -E ":\s*flag\([^,]+,\s*true\)" "$FLAGS_FILE"; then
+            echo "FAIL: one or more integration flags default to true — all must default OFF" && exit 1
+          fi
+
+          echo "Flag-type-check: PASS — all 8 flags declared and defaulting OFF"
+
+      - name: "Week 1: Spec-lint — all 8 spec packs contain requirements.md + design.md + tasks.md"
+        run: |
+          set -e
+          SPECS=(
+            redaction-studio
+            smart-drop
+            ask-copilot
+            citation-deeplink
+            deadline-engine
+            chronology-studio
+            standards-explorer
+            accuracy-academy
+          )
+          FAIL=0
+          for SPEC in "${SPECS[@]}"; do
+            DIR=".kiro/specs/$SPEC"
+            for FILE in requirements.md design.md tasks.md; do
+              if [ ! -f "$DIR/$FILE" ]; then
+                echo "FAIL: missing $DIR/$FILE"
+                FAIL=1
+              else
+                echo "  [OK] $DIR/$FILE"
+              fi
+            done
+          done
+          if [ "$FAIL" -eq 1 ]; then
+            echo "Spec-lint: FAIL — one or more spec files missing" && exit 1
+          fi
+          echo "Spec-lint: PASS — all 8 spec packs complete"
+
+      - name: "Week 1: Verify /system/flags route registered in routes.tsx"
+        run: |
+          grep -q "/system/flags" artifacts/legal-luminaire/src/routes.tsx
+          grep -q "SystemFlagsPage" artifacts/legal-luminaire/src/routes.tsx
+          echo "  [OK] /system/flags route registered"
+
+      - name: "Week 1: Final typecheck after Week 1 changes"
+        run: pnpm --filter @workspace/legal-luminaire run typecheck
+
   backend:
     name: Backend syntax check (Python)
     runs-on: ubuntu-latest

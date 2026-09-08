@@ -9,6 +9,9 @@ import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 
 // Lazy load components for code splitting
 const NotFound = lazy(() => import("@/pages/not-found"));
+// Week 1 — hidden /system/flags dev route (bilingual flag inspector)
+// Works under Netlify SPA redirects (/* → /index.html 200).
+const SystemFlagsPage = lazy(() => import("@/pages/SystemFlagsPage"));
 const Home = lazy(() => import("@/pages/Home"));
 const DischargeApplication = lazy(() => import("@/pages/DischargeApplication"));
 const CaseResearch = lazy(() => import("@/pages/CaseResearch"));
@@ -132,6 +135,8 @@ export function Router() {
       <Layout>
         <Switch>
           <Route path="/" component={() => Wrap(<Home />, "HomePage")} />
+          {/* Week 1 — hidden dev route: bilingual feature-flag inspector */}
+          <Route path="/system/flags" component={() => Wrap(<SystemFlagsPage />, "SystemFlagsPage")} />
           <Route path="/cases" component={() => <div className="p-6">{Wrap(<CaseSelector />, "CaseSelector")}</div>} />
           <Route path="/intake" component={() => Wrap(<CaseIntakeAssistant />, "CaseIntakeAssistant")} />
           <Route path="/new-case-ingest" component={() => Wrap(<OmniDropzone />, "OmniDropzone")} />
