@@ -64,7 +64,20 @@ function JudgmentQuote({
 }
 
 // ── Section data ────────────────────────────────────────────────────────────
-const sections = [
+/**
+ * A single collapsible section in the discharge application.
+ * `isJudgments` marks the section that renders the full judgment quote block
+ * instead of a plain `<pre>` — keeping the render path explicit and typed.
+ */
+interface ApplicationSection {
+  id: string;
+  title: string;
+  status: VS;
+  content: string;
+  isJudgments?: boolean;
+}
+
+const sections: ApplicationSection[] = [
   {
     id: "heading",
     title: "न्यायालय शीर्षक",
@@ -579,7 +592,7 @@ export default function DischargeApplication() {
   const allText = sections
     .map((s) => {
       let base = `\n\n${"━".repeat(50)}\n${s.title}\n${"━".repeat(50)}\n\n${s.content}`;
-      if ((s as any).isJudgments) {
+      if (s.isJudgments) {
         const judgeText = JUDGMENTS.map((j) =>
           `\n\n[${j.status}] ${j.citation} · ${j.ref}\n${j.court} · ${j.year}\n${j.bench || ""}\n\n"${j.holding}"\n\n${j.extended || ""}\n\nप्रासंगिकता : ${j.relevance}`
         ).join("\n\n" + "─".repeat(60));
@@ -685,7 +698,7 @@ export default function DischargeApplication() {
               )}
 
               {/* Judgment quote blocks for the judgments section */}
-              {(section as any).isJudgments && (
+              {section.isJudgments && (
                 <div className="space-y-2">
                   <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
                     नीचे दिए गए सभी न्यायिक निर्णयों के प्रासंगिक अंश (verbatim) उन्मोचन के आधारों में साक्ष्य के रूप में प्रस्तुत हैं।

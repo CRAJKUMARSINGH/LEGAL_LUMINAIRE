@@ -95,12 +95,14 @@ export function useDraftStream() {
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "An error occurred";
       setState((prev) => ({
         ...prev,
         isStreaming: false,
         stage: "error",
-        error: error.message || "An error occurred",
+        error: message,
       }));
       throw error;
     }

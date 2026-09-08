@@ -328,3 +328,122 @@ export function asDraftId(value: string): DraftId {
   if (!value.trim()) throw new Error("DraftId must be a non-empty string");
   return value as DraftId;
 }
+
+// ── Route safety types (Week 4) ───────────────────────────────────────────
+/**
+ * Every flat (non-case-scoped) route registered in routes.tsx.
+ *
+ * Use this type on any call to setLocation() or navigate() that targets a
+ * flat route — the compiler will catch typos and missing routes at build
+ * time rather than silently navigating to a 404.
+ *
+ * Parameterised routes (/authority/:id, /draft/:id) are intentionally
+ * excluded because their runtime values cannot be statically enumerated;
+ * use template literals for those: `/authority/${id}` as string.
+ *
+ * Keep this union in sync with routes.tsx whenever a flat route is added
+ * or removed.
+ */
+export type FlatRoute =
+  | "/"
+  | "/cases"
+  | "/intake"
+  | "/new-case-ingest"
+  | "/review-queue"
+  | "/improvement-lab"
+  | "/forensic-faq"
+  | "/infra-arb"
+  | "/demo-browser"
+  | "/citation-search"
+  | "/cross-check-report"
+  | "/verification-report"
+  | "/defense-brief"
+  | "/fsl-analysis"
+  | "/standards-index"
+  | "/filing-checklist"
+  | "/ldr-home"
+  | "/ldr-comparison"
+  | "/ldr-motion"
+  | "/ldr-packet"
+  | "/ldr-precedents"
+  | "/ldr-print"
+  | "/ldr-reply"
+  | "/ldr-standards"
+  | "/ldr-timeline"
+  | "/ldr-verification"
+  | "/lps-home"
+  | "/lps-defence"
+  | "/lps-precedents"
+  | "/lps-print"
+  | "/lps-sample-analysis"
+  | "/lps-standards";
+
+/**
+ * The path segment (without /case/:id prefix) for every case-scoped route
+ * registered in routes.tsx.
+ *
+ * Build the full URL by prepending the case id:
+ *   const url = `/case/${caseId}${path}` satisfies string;
+ *
+ * Feature-flagged segments (citation-graph, case-similarity, judge-analytics,
+ * standards-validity, session-workspace) are included — they are valid path
+ * segments even when their flags are off (the route simply won't render).
+ */
+export type CasePath =
+  | "/dashboard"
+  | "/chat"
+  | "/case-law"
+  | "/case-research"
+  | "/cross-reference"
+  | "/ai-research"
+  | "/ai-draft-engine"
+  | "/standards"
+  | "/timeline"
+  | "/documents"
+  | "/upload"
+  | "/drafting"
+  | "/safe-draft"
+  | "/notice-reply"
+  | "/discharge-print"
+  | "/verification"
+  | "/filing-checklist"
+  | "/discharge-application"
+  | "/defence-reply"
+  | "/oral-arguments"
+  | "/standards-validity"
+  | "/session-workspace"
+  | "/citation-graph"
+  | "/case-similarity"
+  | "/judge-analytics";
+
+/**
+ * Convenience alias — either a flat route or a fully-formed case-scoped URL.
+ * Use FlatRoute or CasePath directly in most cases; RouteId is for generic
+ * navigation utilities that accept both forms.
+ */
+export type RouteId = FlatRoute | `/case/${string}${CasePath}` | `/draft/${string}` | `/authority/${string}`;
+
+/**
+ * Type-guard: returns true if `value` is a known LpsRoute, narrowing
+ * the type so callers don't need an unsafe `as LpsRoute` cast.
+ *
+ * Usage:
+ *   if (isLpsRoute(route)) setLocation(LPS_ROUTE_MAP[route]);
+ */
+export function isLpsRoute(value: string): value is LpsRoute {
+  return (["defence", "analysis", "precedents", "standards", "print"] as const).includes(
+    value as LpsRoute
+  );
+}
+
+/**
+ * Canonical mapping from LpsRoute segment to its registered flat URL.
+ * Eliminates repeated string literals in handleLpsNavigate.
+ */
+export const LPS_ROUTE_MAP: Record<LpsRoute, FlatRoute> = {
+  defence:    "/lps-defence",
+  analysis:   "/lps-sample-analysis",
+  precedents: "/lps-precedents",
+  standards:  "/lps-standards",
+  print:      "/lps-print",
+} as const;

@@ -60,7 +60,12 @@ function CaseCard({ c, onSelect }: { c: DemoCaseCard; onSelect: (id: string) => 
               <CatIcon className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{c.id}</p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{c.id}</p>
+                <span className="text-[8px] font-black bg-amber-100 text-amber-700 border border-amber-300 px-1 rounded tracking-tighter">
+                  SYNTHETIC
+                </span>
+              </div>
               <p className="text-sm font-semibold text-foreground leading-tight line-clamp-2">{c.title}</p>
             </div>
           </div>

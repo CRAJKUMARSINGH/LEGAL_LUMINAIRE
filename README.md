@@ -33,6 +33,10 @@ That's not a feature. That's a weapon.
   - Oral argument notes
 - Every draft includes a **Verification Report** and **Pre-Filing Checklist**
 - **NEW**: Harvey.ai integration for legal-grade AI responses with citations
+- **NEW**: Guided workflow (Intake → Research → Draft → Review) with task-oriented dashboard
+- **NEW**: One-click demo mode with 26 pre-loaded synthetic cases
+- **NEW**: Multi-case data layer with case switching and recent cases widget
+- **NEW**: Document-type selector for targeted drafting (Discharge, Bail, Written Submission, Defence Reply, Notice Reply)
 
 ---
 
@@ -82,7 +86,7 @@ npm install --ignore-scripts
 npm run dev
 ```
 
-Open `http://localhost:5173/` — the demo case (Hemraj stadium collapse) loads automatically.
+Open `http://localhost:5173/` — the demo case (Hemraj stadium collapse) loads automatically via one-click demo mode.
 
 ```powershell
 # Backend (optional — enables RAG + multi-agent AI drafting)
@@ -112,12 +116,69 @@ docker compose up --build
 3. Set main file path: `streamlit_app.py`
 4. Click Deploy
 
-### Netlify / Vercel (frontend-only static demo)
+### Netlify (frontend SPA — recommended)
 
-- Netlify: root `netlify.toml` is pre-configured — just connect the repo
+The root `netlify.toml` is pre-configured. Clean-clone deploy:
+
+```bash
+# 1. Verify locally first
+pnpm install --frozen-lockfile
+pnpm --filter @workspace/legal-luminaire run build
+# publish dir produced: artifacts/legal-luminaire/dist/public
+
+# 2. In Netlify UI:
+#    New site → Import from GitHub → select LEGAL_LUMINAIRE repo
+#    Leave "Base directory" blank  (uses repo root)
+#    Netlify auto-detects netlify.toml — do NOT override build settings
+#    Click "Deploy site"
+```
+
+| Setting | Value |
+|---------|-------|
+| Build command | `pnpm install --frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build` |
+| Publish directory | `artifacts/legal-luminaire/dist/public` |
+| Node version | 22 |
+| pnpm version | 10 |
+| SPA routing | `/* → /index.html 200` (in `netlify.toml` + `public/_redirects`) |
+
+See [`artifacts/legal-luminaire/DEPLOY_AND_MULTI_CASE_GUIDE.md`](artifacts/legal-luminaire/DEPLOY_AND_MULTI_CASE_GUIDE.md) for full instructions.
+
+### Vercel (frontend-only static demo)
+
 - Vercel: root `vercel.json` is pre-configured — just connect the repo
 
 Both deploy the React SPA with SPA route rewrites. No backend required for demo mode.
+
+---
+
+## Key Features
+
+### Guided Workflow
+- **4-Step Process**: Intake → Research → Draft → Review
+- **Task-Oriented Dashboard**: Quick access cards for common actions
+- **Document-Type Selector**: Choose document type before drafting (Discharge, Bail, Written Submission, Defence Reply, Notice Reply)
+- **Progress Indicators**: Visual tracking of workflow completion
+- **Bilingual Support**: All labels in English and Hindi
+
+### Demo Mode
+- **One-Click Access**: Load demo cases instantly without API keys
+- **26 Pre-Loaded Cases**: Criminal, civil, arbitration, and infrastructure dispute types
+- **Synthetic Case Labeling**: Clear "SYNTHETIC / DEMO" badges throughout
+- **Full Feature Access**: Explore all capabilities without setup
+
+### Multi-Case System
+- **Case Switching**: Switch between cases via global selector
+- **Recent Cases Widget**: Quick access to recently worked cases
+- **Data Layer**: Structured case data with templates
+- **Case Context**: All pages respect selected case context
+
+### Accuracy Controls
+- **Verification Tiers**: COURT_SAFE, VERIFIED, SECONDARY, PENDING, FATAL_ERROR
+- **Citation Blocking**: PENDING citations automatically blocked from drafts
+- **Fact-Fit Gate**: Score precedents 0–100 based on factual fit
+- **Standards Verification**: IS/ASTM/NABL standards verification
+- **Verification Report**: Comprehensive accuracy assessment
+- **Pre-Filing Checklist**: Required actions before court filing
 
 ---
 
@@ -178,9 +239,9 @@ Deploy    →  Streamlit Cloud / Netlify / Vercel / Docker Compose
 
 ## Documentation
 
-- [User Manual](docs/USER_MANUAL.md) — local run guide
+- [User Manual](docs/USER_MANUAL.md) — local run guide with guided workflow instructions
 - [Harvey.ai Integration Guide](docs/HARVEY_AI_INTEGRATION.md) — Harvey.ai setup and usage
-- [Video Script](docs/VIDEO_MANUAL_SCRIPT.md) — record your own 8-minute demo
+- [Video Script](docs/VIDEO_MANUAL_SCRIPT.md) — record your own 90-second demo
 - [Accuracy Rules](docs/accuracy-governance/ACCURACY_RULES.md) — mandatory governance
 - [Test Case Matrix](docs/testing/TEST_CASE_MATRIX_21.md) — 21 test cases
 - [Modernization Plan](docs/MODERNIZATION_PLAN.md) — Q2 2026 roadmap

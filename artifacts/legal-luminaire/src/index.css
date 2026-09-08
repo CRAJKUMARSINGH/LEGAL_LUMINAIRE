@@ -57,6 +57,36 @@
   --color-sidebar-accent-border: var(--sidebar-accent-border);
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
+  --color-tier-court-safe: hsl(var(--tier-court-safe));
+  --color-tier-court-safe-fg: hsl(var(--tier-court-safe-fg));
+  --color-tier-court-safe-bg: hsl(var(--tier-court-safe-bg));
+  --color-tier-court-safe-border: hsl(var(--tier-court-safe-border));
+  --color-tier-court-safe-row: hsl(var(--tier-court-safe-row));
+
+  --color-tier-verified: hsl(var(--tier-verified));
+  --color-tier-verified-fg: hsl(var(--tier-verified-fg));
+  --color-tier-verified-bg: hsl(var(--tier-verified-bg));
+  --color-tier-verified-border: hsl(var(--tier-verified-border));
+  --color-tier-verified-row: hsl(var(--tier-verified-row));
+
+  --color-tier-secondary: hsl(var(--tier-secondary));
+  --color-tier-secondary-fg: hsl(var(--tier-secondary-fg));
+  --color-tier-secondary-bg: hsl(var(--tier-secondary-bg));
+  --color-tier-secondary-border: hsl(var(--tier-secondary-border));
+  --color-tier-secondary-row: hsl(var(--tier-secondary-row));
+
+  --color-tier-pending: hsl(var(--tier-pending));
+  --color-tier-pending-fg: hsl(var(--tier-pending-fg));
+  --color-tier-pending-bg: hsl(var(--tier-pending-bg));
+  --color-tier-pending-border: hsl(var(--tier-pending-border));
+  --color-tier-pending-row: hsl(var(--tier-pending-row));
+
+  --color-tier-fatal: hsl(var(--tier-fatal));
+  --color-tier-fatal-fg: hsl(var(--tier-fatal-fg));
+  --color-tier-fatal-bg: hsl(var(--tier-fatal-bg));
+  --color-tier-fatal-border: hsl(var(--tier-fatal-border));
+  --color-tier-fatal-row: hsl(var(--tier-fatal-row));
+
   --font-sans: var(--app-font-sans);
   --font-serif: var(--app-font-serif);
   --font-mono: var(--app-font-mono);
@@ -164,6 +194,36 @@
   --muted-border: hsl(var(--muted));
   --accent-border: hsl(var(--accent));
   --destructive-border: hsl(var(--destructive));
+
+  --tier-court-safe: 160 65% 32%;
+  --tier-court-safe-fg: 0 0% 100%;
+  --tier-court-safe-bg: 160 70% 94%;
+  --tier-court-safe-border: 160 55% 75%;
+  --tier-court-safe-row: 160 70% 97%;
+
+  --tier-verified: 220 80% 48%;
+  --tier-verified-fg: 0 0% 100%;
+  --tier-verified-bg: 220 85% 94%;
+  --tier-verified-border: 220 70% 75%;
+  --tier-verified-row: 220 80% 97%;
+
+  --tier-secondary: 38 90% 45%;
+  --tier-secondary-fg: 38 50% 10%;
+  --tier-secondary-bg: 38 95% 92%;
+  --tier-secondary-border: 38 80% 72%;
+  --tier-secondary-row: 38 90% 97%;
+
+  --tier-pending: 25 95% 48%;
+  --tier-pending-fg: 0 0% 100%;
+  --tier-pending-bg: 25 100% 94%;
+  --tier-pending-border: 25 85% 72%;
+  --tier-pending-row: 25 95% 97%;
+
+  --tier-fatal: 0 72% 51%;
+  --tier-fatal-fg: 0 0% 100%;
+  --tier-fatal-bg: 0 85% 95%;
+  --tier-fatal-border: 0 70% 75%;
+  --tier-fatal-row: 0 80% 98%;
 }
 
 /* ── DARK MODE ──────────────────────────────────────────────────────────── */
@@ -232,6 +292,36 @@
   --muted-border: hsl(var(--muted));
   --accent-border: hsl(var(--accent));
   --destructive-border: hsl(var(--destructive));
+
+  --tier-court-safe: 160 55% 45%;
+  --tier-court-safe-fg: 0 0% 100%;
+  --tier-court-safe-bg: 160 40% 18%;
+  --tier-court-safe-border: 160 45% 35%;
+  --tier-court-safe-row: 160 35% 14%;
+
+  --tier-verified: 220 70% 60%;
+  --tier-verified-fg: 0 0% 100%;
+  --tier-verified-bg: 220 40% 18%;
+  --tier-verified-border: 220 50% 35%;
+  --tier-verified-row: 220 35% 14%;
+
+  --tier-secondary: 38 80% 55%;
+  --tier-secondary-fg: 38 50% 8%;
+  --tier-secondary-bg: 38 45% 18%;
+  --tier-secondary-border: 38 55% 35%;
+  --tier-secondary-row: 38 35% 14%;
+
+  --tier-pending: 25 85% 55%;
+  --tier-pending-fg: 0 0% 100%;
+  --tier-pending-bg: 25 45% 20%;
+  --tier-pending-border: 25 55% 38%;
+  --tier-pending-row: 25 35% 15%;
+
+  --tier-fatal: 0 65% 55%;
+  --tier-fatal-fg: 0 0% 100%;
+  --tier-fatal-bg: 0 40% 20%;
+  --tier-fatal-border: 0 50% 38%;
+  --tier-fatal-row: 0 35% 15%;
 }
 
 @layer base {
@@ -354,5 +444,303 @@
   .style-supreme-court::before {
     content: "IN THE SUPREME COURT OF INDIA";
     @apply block text-center font-black mb-10 text-xl border-b-2 pb-2 border-slate-900;
+  }
+}
+
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ * WEEK 3.7 — PRINT-READY CSS
+ * Clean paper output for legal drafts, discharge applications, and reports.
+ * Hides all UI chrome, sets A4 margins, forces page breaks between sections.
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm 18mm 24mm 18mm;
+
+    @top-right {
+      content: "Legal Luminaire — Synthetic Demo / कानूनी ल्यूमिनेयर — सिंथेटिक डेमो";
+      font-family: 'Inter', sans-serif;
+      font-size: 8pt;
+      color: #555;
+    }
+    @bottom-center {
+      content: "— Page " counter(page) " of " counter(pages) " —";
+      font-family: Georgia, 'Noto Serif Devanagari', serif;
+      font-size: 9pt;
+      color: #333;
+    }
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: Georgia, 'Noto Serif Devanagari', 'Times New Roman', serif !important;
+    font-size: 12pt !important;
+    line-height: 1.65 !important;
+    counter-reset: page;
+  }
+  body { counter-increment: page; }
+
+  /* ── Hide ALL UI chrome ──────────────────────────────────────────────── */
+  header, nav, aside, footer,
+  [class*="sidebar"],
+  [class*="Sidebar"],
+  [class*="Layout"] > *:not(main):not(.print-only),
+  [class*="breadcrumb"],
+  [class*="Breadcrumb"],
+  [class*="toast"],
+  [class*="Toast"],
+  [class*="dialog"],
+  [class*="Dialog"],
+  [class*="drawer"],
+  [class*="Drawer"],
+  [class*="tooltip"],
+  [class*="Tooltip"],
+  [class*="menu"],
+  [class*="Menu"],
+  [class*="tabs"] [role="tablist"],
+  [class*="Tabs"] [role="tablist"],
+  [class*="no-print"],
+  [class*="noPrint"],
+  [class*="noprint"],
+  button, .btn, [role="button"],
+  input, select, textarea, form,
+  .upload-dropzone,
+  [data-testid="upload-dropzone"],
+  .progress-bar,
+  [class*="ProgressIndicator"],
+  [class*="DocumentProgress"],
+  [class*="badge"],
+  [class*="Badge"],
+  .demo-banner,
+  [class*="DemoBanner"],
+  [class*="ChatView"] [class*="sidebar"],
+  [class*="SiteHeader"],
+  [class*="AppLayout"] > *:not(main) {
+    display: none !important;
+  }
+
+  /* ── Layout: content only ───────────────────────────────────────────── */
+  main,
+  [role="main"],
+  [class*="main-content"],
+  [class*="MainContent"],
+  [class*="Layout"] main,
+  [class*="AppLayout"] main {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .p-0, .p-2, .p-4, .p-6, .p-8,
+  .px-4, .px-6, .px-8,
+  .py-4, .py-6, .py-8,
+  .m-0, .m-2, .m-4, .m-6, .m-8 {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .max-w-3xl, .max-w-4xl, .max-w-5xl, .max-w-6xl, .max-w-7xl,
+  .container, .mx-auto {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* ── Page breaks between major legal sections ───────────────────────── */
+  h1, .h1, [class*="court-header"], [class*="CourtHeader"] {
+    page-break-before: always;
+  }
+  h1:first-child, .h1:first-child {
+    page-break-before: avoid;
+  }
+
+  h2, .h2, [class*="ground-heading"], [class*="GroundHeading"],
+  [class*="section-title"], [class*="SectionTitle"] {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  table, figure, blockquote, pre {
+    page-break-inside: avoid;
+  }
+
+  .page-break,
+  [class*="page-break"],
+  [data-page-break="before"] {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  [data-page-break="after"] {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  h1 { font-size: 18pt !important; font-weight: 700 !important; text-align: center; margin-bottom: 1em; }
+  h2 { font-size: 14pt !important; font-weight: 700 !important; margin-top: 1.4em; margin-bottom: 0.7em; }
+  h3 { font-size: 12.5pt !important; font-weight: 600 !important; margin-top: 1.1em; margin-bottom: 0.5em; }
+  h4 { font-size: 11.5pt !important; font-weight: 600 !important; margin-top: 0.9em; margin-bottom: 0.4em; }
+  p  { font-size: 12pt !important; margin: 0.55em 0; orphans: 3; widows: 3; text-align: justify; }
+
+  /* ── Lists & tables ──────────────────────────────────────────────────── */
+  ul, ol { margin: 0.6em 0 0.6em 1.6em !important; font-size: 12pt !important; }
+  li { margin: 0.25em 0; page-break-inside: avoid; }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 1em 0 !important;
+    font-size: 10.5pt !important;
+    page-break-inside: auto;
+  }
+  thead { display: table-header-group; }
+  tr   { page-break-inside: avoid; page-break-after: auto; }
+  th, td {
+    border: 1px solid #bbb !important;
+    padding: 0.5em 0.7em !important;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #f0f0f0 !important; font-weight: 700; }
+
+  /* ── Collapsible/accordion: force expanded when printed ─────────────── */
+  [data-state="closed"],
+  [aria-hidden="true"]:not([role="dialog"]):not([role="menu"]):not([class*="sidebar"]),
+  [class*="collapsed"],
+  details:not([open]) {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  details summary { list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  [class*="collapsible"] [class*="content"],
+  [class*="Collapsible"] [class*="Content"] {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  [class*="skeleton"],
+  [class*="Skeleton"] {
+    display: none !important;
+  }
+
+  [class*="style-rajasthan-hc"],
+  [class*="style-supreme-court"] {
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  /* ── Links: print as plain text with URL in parens after ───────────── */
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 10pt;
+    color: #333;
+    word-break: break-all;
+  }
+
+  /* ── Cards / panels: flatten to plain blocks ────────────────────────── */
+  [class*="Card"],
+  [class*="card"],
+  [class*="Panel"],
+  [class*="panel"],
+  [class*="sheet"],
+  [class*="Sheet"] {
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  [class*="CardHeader"], [class*="card-header"],
+  [class*="CardContent"], [class*="card-content"],
+  [class*="CardFooter"], [class*="card-footer"] {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  /* ── Court styles: standard formatting ──────────────────────────────── */
+  .style-supreme-court,
+  .style-rajasthan-hc {
+    font-family: Georgia, 'Times New Roman', serif !important;
+  }
+  .style-supreme-court::before {
+    border: none !important;
+  }
+
+  /* ── Show print-only elements (hidden by default on screen) ─────────── */
+  .print-only,
+  [data-print="only"],
+  [class*="print-only"] {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* ── Bilingual content preservation ─────────────────────────────────── */
+  [lang="hi"], [lang*="hi"], .hindi-text, [class*="hindi"] {
+    font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif !important;
+    page-break-inside: avoid;
+    line-height: 1.8 !important;
+  }
+  [class*="bilingual"] [class*="-en"],
+  [class*="bilingual"] [data-lang="en"] {
+    margin-bottom: 0.2em;
+  }
+  [class*="bilingual"] [class*="-hi"],
+  [class*="bilingual"] [data-lang="hi"] {
+    font-family: 'Noto Serif Devanagari', serif !important;
+    margin-bottom: 0.6em;
+  }
+  [class*="Ground"],
+  [class*="ground"] {
+    page-break-inside: avoid;
+    margin-bottom: 0.8em;
+  }
+
+  /* ── Draft page header / footer (printed on every page via @page rules) */
+  .print-header-space { height: 0; }
+  .print-footer-space { height: 0; }
+
+  /* ── Citation blocks: avoid orphaning ───────────────────────────────── */
+  [class*="citation"],
+  [class*="Citation"],
+  blockquote {
+    border-left: 2px solid #999 !important;
+    padding-left: 1em !important;
+    margin-left: 0.5em !important;
+    page-break-inside: avoid;
+  }
+  [class*="citation-gate"], [class*="CitationGate"],
+  [class*="accuracy"], [class*="Accuracy"],
+  [class*="verification"], [class*="Verification"] {
+    page-break-before: always;
+  }
+  [class*="citation-gate"] button,
+  [class*="verification"] button,
+  [class*="accuracy"] button {
+    display: none !important;
+  }
+
+  /* ── Final page clean-up ────────────────────────────────────────────── */
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
   }
 }

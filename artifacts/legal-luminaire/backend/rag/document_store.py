@@ -12,8 +12,6 @@ from typing import Optional
 from langchain_community.document_loaders import (
     PyPDFLoader,
     TextLoader,
-    UnstructuredWordDocumentLoader,
-    UnstructuredImageLoader,
 )
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
@@ -44,8 +42,18 @@ def _load_file(path: Path) -> list[Document]:
         elif suffix in (".md", ".txt", ".lex"):
             return TextLoader(str(path), encoding="utf-8").load()
         elif suffix in (".doc", ".docx"):
+            try:
+                from langchain_community.document_loaders import UnstructuredWordDocumentLoader
+            except ImportError:
+                logger.warning(f"UnstructuredWordDocumentLoader not available — install 'unstructured' to handle DOCX. Skipping {path.name}.")
+                return []
             return UnstructuredWordDocumentLoader(str(path)).load()
         elif suffix in (".jpg", ".jpeg", ".png", ".tiff"):
+            try:
+                from langchain_community.document_loaders import UnstructuredImageLoader
+            except ImportError:
+                logger.warning(f"UnstructuredImageLoader not available — install 'unstructured[inference]' to handle images. Skipping {path.name}.")
+                return []
             return UnstructuredImageLoader(str(path)).load()
         else:
             logger.warning(f"Unsupported file type: {suffix} — skipping {path.name}")

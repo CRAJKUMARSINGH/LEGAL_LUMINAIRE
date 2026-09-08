@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Upload, FileText, AlertCircle, CheckCircle2, Loader2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { DocumentProgressIndicator } from "@/components/DocumentProgressIndicator";
+import { useCaseContext } from "@/context/CaseContext";
 
 // ── Local upload-state machine ─────────────────────────────────────────────
 type UploadPhase = "idle" | "uploading" | "success" | "error";
@@ -20,9 +22,12 @@ interface UploadFileState {
 // ── Component ──────────────────────────────────────────────────────────────
 export const UploadView = () => {
   const { toast } = useToast();
+  const { selectedCase } = useCaseContext();
   const [fileStates, setFileStates] = useState<UploadFileState[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+
+  const caseId = selectedCase?.id || "default-case";
 
   // ── File selection ───────────────────────────────────────────────────────
   const addFiles = (incoming: FileList | null) => {
@@ -75,6 +80,7 @@ export const UploadView = () => {
 
     const formData = new FormData();
     formData.append("file", entry.file);
+    formData.append("case_id", caseId);
 
     try {
       const res = await fetch("http://localhost:8000/api/v1/upload-document", {
@@ -147,6 +153,13 @@ export const UploadView = () => {
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
+      {/* Week 3: Document Pipeline Progress Indicator */}
+      <DocumentProgressIndicator 
+        currentStep="upload"
+        completedSteps={allDone ? ["upload", "index"] : []}
+        loadingSteps={anyUploading ? ["upload", "index"] : []}
+      />
+      
       <div>
         <h2 className="text-2xl font-bold text-foreground">Upload Case Documents</h2>
         <p className="text-muted-foreground text-sm mt-1">

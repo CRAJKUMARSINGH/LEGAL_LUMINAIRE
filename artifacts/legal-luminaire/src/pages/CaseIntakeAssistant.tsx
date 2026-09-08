@@ -1,14 +1,39 @@
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { Upload, Wand2, ClipboardCopy, FileText, AlertTriangle, CheckCircle2, X } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { CaseFile, CaseRecord, slugifyCase } from "@/lib/case-store";
 import { useCaseContext } from "@/context/CaseContext";
 import { buildResearchPrompt, type ResearchQuery } from "@/lib/ai-research";
 import { checkInputQuality, inputQualityWarning } from "@/lib/input-quality";
 import { validateCaseDates, formatDateConflicts } from "@/lib/date-validator";
 import { detectDuplicates, hashContent, type DocumentEntry } from "@/lib/document-dedup";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 type ParsedFile = CaseFile & { category: "fir" | "chargesheet" | "lab" | "draft" | "other" };
+
+const formSchema = z.object({
+  title: z.string().min(1, "Case title is required").max(200, "Title too long"),
+  court: z.string().min(1, "Court name is required"),
+  caseNo: z.string().min(1, "Case number is required"),
+  brief: z.string().min(10, "Brief must be at least 10 characters").max(2000, "Brief too long"),
+  caseType: z.enum(["discharge", "bail", "writ", "notice-reply", "appeal", "revision", "other"]),
+  accusedName: z.string().optional(),
+  incidentDate: z.string().regex(/^\d{2}-\d{2}-\d{4}$/, "Use DD-MM-YYYY format").optional().or(z.literal("")),
+  firDate: z.string().regex(/^\d{2}-\d{2}-\d{4}$/, "Use DD-MM-YYYY format").optional().or(z.literal("")),
+  arrestDate: z.string().regex(/^\d{2}-\d{2}-\d{4}$/, "Use DD-MM-YYYY format").optional().or(z.literal("")),
+  remandDate: z.string().regex(/^\d{2}-\d{2}-\d{4}$/, "Use DD-MM-YYYY format").optional().or(z.literal("")),
+  chargeSheetDate: z.string().regex(/^\d{2}-\d{2}-\d{4}$/, "Use DD-MM-YYYY format").optional().or(z.literal("")),
+  incidentType: z.string().optional(),
+  evidenceType: z.string().optional(),
+  defects: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 function detectCategory(name: string): ParsedFile["category"] {
   const n = name.toLowerCase();
@@ -38,20 +63,6 @@ export default function CaseIntakeAssistant() {
   const { addCase } = useCaseContext();
   const [, setLocation] = useLocation();
 
-  const [title, setTitle] = useState("");
-  const [court, setCourt] = useState("");
-  const [caseNo, setCaseNo] = useState("");
-  const [brief, setBrief] = useState("");
-  const [caseType, setCaseType] = useState<CaseRecord["case_type"]>("discharge");
-  const [accusedName, setAccusedName] = useState("");
-  const [incidentDate, setIncidentDate] = useState("");
-  const [firDate, setFirDate] = useState("");
-  const [arrestDate, setArrestDate] = useState("");
-  const [remandDate, setRemandDate] = useState("");
-  const [chargeSheetDate, setChargeSheetDate] = useState("");
-  const [incidentType, setIncidentType] = useState("");
-  const [evidenceType, setEvidenceType] = useState("");
-  const [defects, setDefects] = useState("");
   const [files, setFiles] = useState<ParsedFile[]>([]);
   const [docIndex, setDocIndex] = useState<DocumentEntry[]>([]);
   const [dedupSummary, setDedupSummary] = useState<string>("");
@@ -60,13 +71,49 @@ export default function CaseIntakeAssistant() {
   const [copied, setCopied] = useState(false);
   const [created, setCreated] = useState(false);
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      court: "",
+      caseNo: "",
+      brief: "",
+      caseType: "discharge",
+      accusedName: "",
+      incidentDate: "",
+      firDate: "",
+      arrestDate: "",
+      remandDate: "",
+      chargeSheetDate: "",
+      incidentType: "",
+      evidenceType: "",
+      defects: "",
+    },
+  });
+
+  const { watch } = form;
+  const title = watch("title");
+  const court = watch("court");
+  const caseNo = watch("caseNo");
+  const brief = watch("brief");
+  const caseType = watch("caseType");
+  const accusedName = watch("accusedName");
+  const incidentDate = watch("incidentDate");
+  const firDate = watch("firDate");
+  const arrestDate = watch("arrestDate");
+  const remandDate = watch("remandDate");
+  const chargeSheetDate = watch("chargeSheetDate");
+  const incidentType = watch("incidentType");
+  const evidenceType = watch("evidenceType");
+  const defects = watch("defects");
+
   const query: ResearchQuery = useMemo(
     () => ({
       caseTitle: title || "[add title]",
       brief: brief || "[add brief]",
       incidentType: incidentType || "[add incident type]",
       evidenceType: evidenceType || "[add evidence type]",
-      proceduralDefects: defects.split(",").map((d) => d.trim()).filter(Boolean),
+      proceduralDefects: (defects || "").split(",").map((d) => d.trim()).filter(Boolean),
       jurisdiction: court || "India",
     }),
     [title, brief, incidentType, evidenceType, defects, court]
@@ -126,9 +173,12 @@ export default function CaseIntakeAssistant() {
   );
   const dateMsg = useMemo(() => formatDateConflicts(dateResult), [dateResult]);
 
+  const formState = form.formState;
   const isValid =
-    title.trim().length > 0 &&
-    brief.trim().length > 0 &&
+    !formState.errors.title &&
+    !formState.errors.court &&
+    !formState.errors.caseNo &&
+    !formState.errors.brief &&
     (!quality.blockDraft || ackQualityOverride) &&
     (dateResult.valid || ackDateOverride);
 
@@ -144,8 +194,8 @@ export default function CaseIntakeAssistant() {
       createdAt: new Date().toISOString(),
       files: files.map(({ name, size, type }) => ({ name, size, type })),
       case_type: caseType,
-      parties: accusedName.trim()
-        ? [{ name: accusedName.trim(), role: "accused" as const }]
+      parties: (accusedName || "").trim()
+        ? [{ name: (accusedName || "").trim(), role: "accused" as const }]
         : [],
     };
     addCase(record);
@@ -174,83 +224,159 @@ export default function CaseIntakeAssistant() {
       {/* Basic info */}
       <div className="bg-card border border-border rounded-xl p-4 space-y-3">
         <h2 className="text-sm font-semibold">केस विवरण (Case Details)</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Case title *"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+        <Form {...form}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Case title *" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="caseNo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Case number *" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="court"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Court name *" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="caseType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <select
+                      className="border rounded-lg px-3 py-2 text-sm bg-background w-full"
+                      {...field}
+                    >
+                      <option value="discharge">Discharge Application</option>
+                      <option value="bail">Bail Application</option>
+                      <option value="writ">Writ Petition</option>
+                      <option value="notice-reply">Notice Reply</option>
+                      <option value="appeal">Appeal</option>
+                      <option value="revision">Revision</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="accusedName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Accused / Petitioner name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <FormField
+              control={form.control}
+              name="incidentDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Incident date (DD-MM-YYYY)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="firDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="FIR date (DD-MM-YYYY)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="arrestDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Arrest date (DD-MM-YYYY)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="remandDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Remand date (DD-MM-YYYY)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="chargeSheetDate"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm" placeholder="Charge sheet date (DD-MM-YYYY)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="brief"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    className="w-full border rounded-lg p-3 text-sm min-h-24"
+                    placeholder="Brief user statement — facts, allegations, current stage * (mandatory)"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Case number"
-            value={caseNo}
-            onChange={(e) => setCaseNo(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm md:col-span-2"
-            placeholder="Court name"
-            value={court}
-            onChange={(e) => setCourt(e.target.value)}
-          />
-          <select
-            className="border rounded-lg px-3 py-2 text-sm bg-background"
-            value={caseType}
-            onChange={(e) => setCaseType(e.target.value as CaseRecord["case_type"])}
-          >
-            <option value="discharge">Discharge Application</option>
-            <option value="bail">Bail Application</option>
-            <option value="writ">Writ Petition</option>
-            <option value="notice-reply">Notice Reply</option>
-            <option value="appeal">Appeal</option>
-            <option value="revision">Revision</option>
-            <option value="other">Other</option>
-          </select>
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Accused / Petitioner name"
-            value={accusedName}
-            onChange={(e) => setAccusedName(e.target.value)}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Incident date (DD-MM-YYYY)"
-            value={incidentDate}
-            onChange={(e) => setIncidentDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="FIR date (DD-MM-YYYY)"
-            value={firDate}
-            onChange={(e) => setFirDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Arrest date (DD-MM-YYYY)"
-            value={arrestDate}
-            onChange={(e) => setArrestDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            placeholder="Remand date (DD-MM-YYYY)"
-            value={remandDate}
-            onChange={(e) => setRemandDate(e.target.value)}
-          />
-          <input
-            className="border rounded-lg px-3 py-2 text-sm md:col-span-2"
-            placeholder="Charge sheet date (DD-MM-YYYY)"
-            value={chargeSheetDate}
-            onChange={(e) => setChargeSheetDate(e.target.value)}
-          />
-        </div>
-        <textarea
-          className="w-full border rounded-lg p-3 text-sm min-h-24"
-          placeholder="Brief user statement — facts, allegations, current stage * (mandatory)"
-          value={brief}
-          onChange={(e) => setBrief(e.target.value)}
-        />
+        </Form>
       </div>
 
       {/* Input Quality Gate */}
@@ -297,37 +423,49 @@ export default function CaseIntakeAssistant() {
         <p className="text-xs text-muted-foreground">
           These fields control how precedents are scored for fact-fit. More specific = better results.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1">Incident Type</label>
-            <input
-              className="border rounded-lg px-3 py-2 text-sm w-full"
-              placeholder="e.g. construction wall collapse, road accident, medical negligence"
-              value={incidentType}
-              onChange={(e) => setIncidentType(e.target.value)}
+        <Form {...form}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <FormField
+              control={form.control}
+              name="incidentType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-medium text-muted-foreground">Incident Type</FormLabel>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm w-full" placeholder="e.g. construction wall collapse, road accident, medical negligence" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="evidenceType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-medium text-muted-foreground">Evidence Type</FormLabel>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm w-full" placeholder="e.g. forensic material sampling, DNA, CCTV, financial records" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="defects"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel className="text-xs font-medium text-muted-foreground">Procedural Defects (comma-separated)</FormLabel>
+                  <FormControl>
+                    <Input className="border rounded-lg px-3 py-2 text-sm w-full" placeholder="e.g. no panchnama, no chain of custody, no representative, wrong standard" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1">Evidence Type</label>
-            <input
-              className="border rounded-lg px-3 py-2 text-sm w-full"
-              placeholder="e.g. forensic material sampling, DNA, CCTV, financial records"
-              value={evidenceType}
-              onChange={(e) => setEvidenceType(e.target.value)}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="text-xs font-medium text-muted-foreground block mb-1">
-              Procedural Defects (comma-separated)
-            </label>
-            <input
-              className="border rounded-lg px-3 py-2 text-sm w-full"
-              placeholder="e.g. no panchnama, no chain of custody, no representative, wrong standard"
-              value={defects}
-              onChange={(e) => setDefects(e.target.value)}
-            />
-          </div>
-        </div>
+        </Form>
       </div>
 
       {/* File upload */}
@@ -392,7 +530,7 @@ export default function CaseIntakeAssistant() {
       {/* Actions */}
       <div className="flex flex-wrap gap-3">
         <button
-          onClick={createCase}
+          onClick={form.handleSubmit(createCase)}
           disabled={!isValid || created}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
         >
@@ -409,7 +547,7 @@ export default function CaseIntakeAssistant() {
       </div>
 
       {!isValid && (
-        <p className="text-xs text-muted-foreground">* Case title and brief statement are required to create workspace.</p>
+        <p className="text-xs text-muted-foreground">* Case title, court, case number, and brief statement are required to create workspace.</p>
       )}
     </div>
   );

@@ -13,6 +13,19 @@ import { expandQuery, calculateQueryComplexity } from "./query-expansion";
 import { rankResults, type RankedResult, DEFAULT_WEIGHTS, type RankingWeights } from "./relevance-ranking";
 import { trackSearch, trackNoResults, trackSearchError } from "./search-analytics";
 
+// ── Typed filter interface — replaces the previous `filters?: any` ──────────
+/**
+ * Structured filters accepted by the backend search function and
+ * threaded through to analytics. All fields are optional.
+ */
+export interface SearchFilters {
+  court?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  sections?: string[];
+  minCitationCount?: number;
+}
+
 /**
  * Enhanced search options
  */
@@ -25,14 +38,8 @@ export interface SearchOptions {
   // Ranking weights
   weights?: RankingWeights;
   
-  // Filters
-  filters?: {
-    court?: string;
-    dateFrom?: Date;
-    dateTo?: Date;
-    sections?: string[];
-    minCitationCount?: number;
-  };
+  // Filters — fully typed, no more `any`
+  filters?: SearchFilters;
   
   // Analytics
   userId?: string;
@@ -92,10 +99,10 @@ export interface EnhancedSearchResult {
 export async function enhancedSearch(
   options: SearchOptions,
   // Backend search function (from existing system)
-  backendSearch: (query: string, k: number, filters?: any) => Promise<Array<{
+  backendSearch: (query: string, k: number, filters?: SearchFilters) => Promise<Array<{
     id: string;
     content: string;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
     semanticScore: number;
     keywordScore: number;
     matchedTerms: string[];

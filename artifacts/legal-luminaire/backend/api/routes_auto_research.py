@@ -3,7 +3,7 @@ Backend Auto-Query Research Routes — Week 10
 Instantly fetches relevant precedents based on extracted case facts.
 """
 from fastapi import APIRouter, HTTPException, Body
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import os
 import logging
@@ -16,6 +16,7 @@ class AutoResearchRequest(BaseModel):
     case_summary: str
     incident_type: str
     statutes: List[str]
+    case_id: Optional[str] = Field(default=None, description="Optional case context for scoped research")
 
 class PrecedentMatch(BaseModel):
     case: str
@@ -31,13 +32,19 @@ class AutoResearchResponse(BaseModel):
 
 @router.post("/auto-research", response_model=AutoResearchResponse)
 async def auto_research(req: AutoResearchRequest):
-    """Automatically fetch the top 5 precedents based on extracted facts."""
+    """Automatically fetch the top 5 precedents based on extracted facts.
+    Accepts optional case_id for case-scoped research context."""
+    logger.info(
+        "auto_research_event",
+        extra={
+            "event": "auto_research_start",
+            "case_id": req.case_id or "unspecified",
+            "incident_type": req.incident_type,
+            "statutes_count": len(req.statutes),
+        }
+    )
     db = _load_law_db()
     precedents = db.get("precedents", [])
-    
-    # ── Simple Semantic / Keyword Match ────────────────────────────────────────
-    # In production, this would use a vector search (ChromaDB)
-    # For Week 10, we implement the logic for direct fact-to-query mapping
     
     query = f"{req.incident_type} {' '.join(req.statutes)} {req.case_summary}"
     query_words = set(query.lower().split())
@@ -55,8 +62,16 @@ async def auto_research(req: AutoResearchRequest):
                 fit_score=score * 10
             ))
             
-    # Sort by score and take top 5
     matches = sorted(matches, key=lambda x: x.fit_score, reverse=True)[:5]
+    
+    logger.info(
+        "auto_research_event",
+        extra={
+            "event": "auto_research_complete",
+            "case_id": req.case_id or "unspecified",
+            "matches_found": len(matches),
+        }
+    )
     
     return AutoResearchResponse(
         success=True,

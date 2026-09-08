@@ -1,15 +1,38 @@
-# Legal Luminaire SPA — build from monorepo root (pnpm workspace + catalog deps).
-# Netlify: connect this repo; do not override base directory in the UI.
+# ============================================================================
+# Legal Luminaire — Netlify Production Config (Week 1 Lock — NEVER CHANGE)
+# Connect repo root in Netlify UI. Leave "Base directory" blank.
+# Publish dir:  artifacts/legal-luminaire/dist/public
+# Node:         22   |   pnpm: 10
+# ============================================================================
 
 [build]
+  # Full monorepo build: frozen lockfile ensures reproducibility
   command = "pnpm install --frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
   publish = "artifacts/legal-luminaire/dist/public"
 
 [build.environment]
-  NODE_VERSION = "22"
-  PNPM_VERSION = "10"
+  NODE_VERSION    = "22"
+  PNPM_VERSION    = "10"
+  # Disable Netlify's default npm install — pnpm handles everything
+  NPM_FLAGS       = "--version"
 
+# SPA catch-all: every path returns index.html (200, not 301)
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from   = "/*"
+  to     = "/index.html"
   status = 200
+
+# ============================================================================
+# Headers — security baseline
+# ============================================================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

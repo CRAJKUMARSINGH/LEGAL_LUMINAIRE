@@ -3,6 +3,7 @@ import {
   Upload, Zap, FileText, CheckCircle2, AlertTriangle,
   Loader2, Download, Copy, Wifi, WifiOff, Printer,
   MessageSquare, Send, ShieldCheck, RefreshCw, Database,
+  FilePlus,
 } from "lucide-react";
 import { useCaseContext } from "@/context/CaseContext";
 import { apiClient, type ResearchResponse, type HealthResponse } from "@/lib/api-client";
@@ -11,6 +12,8 @@ import { findCitationsInText } from "@/lib/citation-formatter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DraftSkeleton } from "@/components/ui/skeleton-loaders";
 
 type RunStatus = "idle" | "uploading" | "running" | "done" | "error";
 type TabId = "draft" | "chat" | "verify";
@@ -370,6 +373,31 @@ python main.py`}</pre>
             <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700 flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" /> {error}
             </div>
+          )}
+
+          {/* Idle empty state — shown before first run */}
+          {status === "idle" && !result && (
+            <EmptyState
+              icon={<FilePlus className="h-8 w-8" />}
+              title="Ready to generate your draft"
+              titleHi="ड्राफ्ट बनाने के लिए तैयार"
+              description="Select a quick prompt above, or type your own query, then click Run."
+              descriptionHi="ऊपर से एक प्रॉम्प्ट चुनें या अपना सवाल टाइप करें, फिर Run दबाएं।"
+              actions={[
+                {
+                  label: "Load Demo Case",
+                  labelHi: "डेमो केस लोड करें",
+                  href: "/demo-browser",
+                  variant: "outline",
+                },
+              ]}
+              compact
+            />
+          )}
+
+          {/* Skeleton shown while agents run (before pipeline cards appear) */}
+          {status === "running" && !result && steps.every(s => s.status === "pending") && (
+            <DraftSkeleton />
           )}
 
           {/* Agent pipeline */}

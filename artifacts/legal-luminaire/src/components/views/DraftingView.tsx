@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCaseContext } from "@/context/CaseContext";
 import { useToast } from "@/hooks/use-toast";
+import { DocumentProgressIndicator } from "@/components/DocumentProgressIndicator";
 
 type DraftType = "BRIEF" | "DISCHARGE" | "BAIL_439";
 
@@ -122,9 +123,21 @@ export const DraftingView = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-slate-50">
-      {/* --- Sidebar Controls --- */}
-      <aside className="w-80 border-r bg-white p-6 flex flex-col gap-6 overflow-y-auto">
+    <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-slate-50 flex-col">
+      {/* Week 3: Document Pipeline Progress Indicator */}
+      <div className="bg-background border-b border-border shrink-0">
+        <div className="p-3 max-w-7xl mx-auto">
+          <DocumentProgressIndicator 
+            currentStep="draft"
+            completedSteps={["upload", "index", "research"]}
+            loadingSteps={isGenerating ? ["upload", "index", "research", "draft"] : []}
+          />
+        </div>
+      </div>
+      
+      <div className="flex flex-1 overflow-hidden">
+        {/* --- Sidebar Controls --- */}
+        <aside className="w-80 border-r bg-white p-6 flex flex-col gap-6 overflow-y-auto">
         <div>
           <h3 className="text-lg font-bold flex items-center gap-2 mb-1">
             <Bot className="w-5 h-5 text-primary" />
@@ -280,6 +293,15 @@ export const DraftingView = () => {
                   <p className="text-xs text-slate-600 leading-relaxed">
                     {allVerified ? "Verified against ground-truth database. Export permitted." : "Draft contains potentially fabricated precedents. Final export and copy actions are BLOCKED for safety."}
                   </p>
+                  {/* Week 3: Links to Verification Report and Pre-Filing Checklist */}
+                  <div className="flex gap-2 mt-2">
+                    <Button size="sm" variant="outline" className="text-xs gap-1.5 h-7" onClick={() => window.open('/verification-report', '_blank')}>
+                      <FileWarning className="w-3 h-3" /> Verification Report
+                    </Button>
+                    <Button size="sm" variant="outline" className="text-xs gap-1.5 h-7" onClick={() => window.open('/filing-checklist', '_blank')}>
+                      <CheckCircle2 className="w-3 h-3" /> Pre-Filing Checklist
+                    </Button>
+                  </div>
                </div>
             </div>
           )}
@@ -319,6 +341,7 @@ export const DraftingView = () => {
           </Card>
         </div>
       </main>
+      </div>
     </div>
   );
 };

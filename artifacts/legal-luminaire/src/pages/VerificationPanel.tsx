@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
-  CheckCircle2, AlertTriangle, XCircle, ShieldCheck,
-  ExternalLink, Download, Copy, Info, Lock, Unlock,
+  ShieldCheck, CheckCircle2, Info, AlertTriangle, XCircle,
+  ExternalLink, Download, Copy, Lock, Unlock,
   FileText, FlaskConical, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,56 +12,55 @@ import {
   overallAccuracyScore, generateAccuracyReport,
   type AccuracyTier, type PrecedentAccuracy, type StandardAccuracy,
 } from "@/lib/verification-engine";
+import { VerificationSkeleton } from "@/components/ui/skeleton-loaders";
+import {
+  CitationTierBadge,
+  getTierRowStyle,
+} from "@/components/CitationTierBadge";
 
-// ── Tier config ───────────────────────────────────────────────────────────────
-const TIER_CFG: Record<AccuracyTier, {
-  label: string; icon: React.ElementType;
-  badge: string; row: string; border: string;
-}> = {
-  COURT_SAFE:  { label: "Court-Safe",   icon: ShieldCheck,    badge: "bg-emerald-100 text-emerald-800 border-emerald-300", row: "bg-emerald-50/40", border: "border-emerald-300" },
-  VERIFIED:    { label: "Verified",     icon: CheckCircle2,   badge: "bg-blue-100 text-blue-800 border-blue-300",          row: "bg-blue-50/30",    border: "border-blue-300" },
-  SECONDARY:   { label: "Secondary",    icon: Info,           badge: "bg-amber-100 text-amber-800 border-amber-300",       row: "bg-amber-50/20",   border: "border-amber-300" },
-  PENDING:     { label: "⚠ Pending",    icon: AlertTriangle,  badge: "bg-orange-100 text-orange-800 border-orange-300",    row: "bg-orange-50/30",  border: "border-orange-300" },
-  FATAL_ERROR: { label: "⛔ Fatal",     icon: XCircle,        badge: "bg-red-100 text-red-800 border-red-300",             row: "bg-red-50/30",     border: "border-red-300" },
+const TIER_GROUP_LABEL: Record<AccuracyTier, string> = {
+  COURT_SAFE:  "Court-Safe",
+  VERIFIED:    "Verified",
+  SECONDARY:   "Secondary",
+  PENDING:     "Pending",
+  FATAL_ERROR: "Fatal Error",
 };
 
-function TierBadge({ tier }: { tier: AccuracyTier }) {
-  const cfg = TIER_CFG[tier];
-  const Icon = cfg.icon;
-  return (
-    <Badge variant="outline" className={`gap-1 text-xs font-semibold ${cfg.badge}`}>
-      <Icon className="h-3 w-3" /> {cfg.label}
-    </Badge>
-  );
-}
+const TIER_GROUP_ICON: Record<AccuracyTier, React.ElementType> = {
+  COURT_SAFE:  ShieldCheck,
+  VERIFIED:    CheckCircle2,
+  SECONDARY:   Info,
+  PENDING:     AlertTriangle,
+  FATAL_ERROR: XCircle,
+};
 
 // ── Precedent row ─────────────────────────────────────────────────────────────
 function PrecedentRow({ p }: { p: PrecedentAccuracy }) {
   const [open, setOpen] = useState(false);
-  const cfg = TIER_CFG[p.tier];
+  const rowStyle = getTierRowStyle(p.tier);
 
   return (
-    <div className={`border rounded-xl overflow-hidden ${cfg.border} ${p.blockedFromDraft ? "opacity-90" : ""}`}>
+    <div className={`border rounded-xl overflow-hidden ${rowStyle.split(" ")[1]} ${p.blockedFromDraft ? "opacity-90" : ""}`}>
       <button
         onClick={() => setOpen((x) => !x)}
-        className={`w-full flex items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors ${cfg.row}`}
+        className={`w-full flex items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors ${rowStyle.split(" ")[0]}`}
       >
         {p.blockedFromDraft
-          ? <Lock className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-          : <Unlock className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+          ? <Lock className="h-4 w-4 text-tier-fatal mt-0.5 shrink-0" />
+          : <Unlock className="h-4 w-4 text-tier-court-safe mt-0.5 shrink-0" />
         }
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <span className="font-semibold text-sm text-foreground">{p.name}</span>
             <span className="text-xs text-muted-foreground font-mono">{p.citation}</span>
-            <TierBadge tier={p.tier} />
+            <CitationTierBadge tier={p.tier} size="sm" />
             {p.blockedFromDraft && (
               <Badge variant="destructive" className="text-xs">BLOCKED FROM DRAFT</Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground">{p.court} · {p.date}</p>
           {p.paraRef && (
-            <p className="text-xs text-emerald-700 mt-0.5">✓ Para ref: {p.paraRef}</p>
+            <p className="text-xs text-tier-court-safe mt-0.5">✓ Para ref: {p.paraRef}</p>
           )}
         </div>
         {open ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" /> : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
@@ -163,7 +162,7 @@ function StandardRow({ s }: { s: StandardAccuracy }) {
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <span className="font-semibold text-sm text-foreground font-mono">{s.code}</span>
-            <TierBadge tier={s.tier} />
+            <CitationTierBadge tier={s.tier} size="sm" />
             <Badge variant="outline" className={`text-xs ${appCfg.color}`}>{appCfg.label}</Badge>
           </div>
           <p className="text-xs text-muted-foreground">{s.title}</p>
@@ -237,6 +236,13 @@ export default function VerificationPanel() {
   const stats = overallAccuracyScore();
   const [tab, setTab] = useState<"precedents" | "standards">("precedents");
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Simulate brief load so skeleton is visible on first mount
+  // In production this will be replaced by real async fetch
+  if (typeof window !== "undefined" && loading) {
+    Promise.resolve().then(() => setLoading(false));
+  }
 
   const handleCopyReport = () => {
     navigator.clipboard.writeText(generateAccuracyReport()).then(() => {
@@ -282,7 +288,12 @@ export default function VerificationPanel() {
         </div>
       </div>
 
-      {/* Accuracy score dashboard */}
+      {/* Skeleton on initial load */}
+      {loading && <VerificationSkeleton />}
+
+      {!loading && (
+        <>
+          {/* Accuracy score dashboard */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <Card className="col-span-2 sm:col-span-1">
           <CardContent className="p-4 text-center">
@@ -346,12 +357,19 @@ export default function VerificationPanel() {
           {(["COURT_SAFE", "VERIFIED", "SECONDARY", "PENDING", "FATAL_ERROR"] as AccuracyTier[]).map((tier) => {
             const group = PRECEDENT_ACCURACY.filter((p) => p.tier === tier);
             if (!group.length) return null;
-            const cfg = TIER_CFG[tier];
+            const TierIcon = TIER_GROUP_ICON[tier];
+            const tierTextClass: Record<AccuracyTier, string> = {
+              COURT_SAFE:  "text-tier-court-safe",
+              VERIFIED:    "text-tier-verified",
+              SECONDARY:   "text-tier-secondary",
+              PENDING:     "text-tier-pending",
+              FATAL_ERROR: "text-tier-fatal",
+            };
             return (
               <div key={tier}>
                 <div className="flex items-center gap-2 mb-2">
-                  <cfg.icon className="h-4 w-4" />
-                  <h3 className="text-sm font-semibold text-foreground">{cfg.label} ({group.length})</h3>
+                  <TierIcon className={`h-4 w-4 ${tierTextClass[tier]}`} />
+                  <h3 className="text-sm font-semibold text-foreground">{TIER_GROUP_LABEL[tier]} ({group.length})</h3>
                 </div>
                 <div className="space-y-2">
                   {group.map((p) => <PrecedentRow key={p.id} p={p} />)}
@@ -381,6 +399,7 @@ export default function VerificationPanel() {
         </div>
       )}
 
+      </>)}
     </div>
   );
 }

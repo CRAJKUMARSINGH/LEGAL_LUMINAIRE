@@ -1,5 +1,22 @@
 # CHANGELOG - LEGAL LUMINAIRE
 
+## VERSION 2.1.0-ENRICHMENT - SEPTEMBER 2026 - 5-WEEK MULTI-AGENT PRODUCTION RELEASE
+
+### 🚀 MULTI-AGENT ENRICHMENT: Accuracy First, Zero Hallucinations, Netlify Production Lock
+
+This release represents the culmination of a rigorous 5-week collaborative engineering cycle across 4 specialized AI agents (**Kiro**, **Devin**, **Trae**, and **Antigravity**):
+
+#### Key Highlights
+- **Netlify Monorepo Production Lock**: Clean clone build guaranteed via root `netlify.toml` with frozen lockfile (`pnpm install --frozen-lockfile`), SPA catch-all rewrite (`/* /index.html 200`), and strict security headers.
+- **5-Tier Semantic Color & Badge System**: Full light/dark tokenization (`COURT_SAFE`, `VERIFIED`, `SECONDARY`, `PENDING`, `FATAL_ERROR`) with standardized CVA card elevations and bilingual badges.
+- **Fault-Tolerant Route Architecture**: All 55+ application routes individually wrapped in React error boundaries with graceful Hindi/English fallbacks preventing full-SPA crashes.
+- **Multi-Case Context & Grouped Navigation**: Reactive case store with recent cases history, one-click demo mode across 26 synthetic legal cases, and structured workflow navigation.
+- **Document Pipeline & Contradiction Detection**: Multi-format document ingestion (PDF, DOCX, OCR images), date contradiction trapping (TC-E02), and fake citation blocking (TC-E07).
+- **Print-Ready Legal CSS**: Complete `@page` margin control, running headers/counters, sticky table headers, and auto-expansion of collapsed legal arguments for court-ready output.
+- **Full Quality Suite**: 343/343 passing Vitest tests, exit code 0 TypeScript typecheck, zero Python backend syntax errors.
+
+---
+
 ## VERSION 2.0.0 - APRIL 29, 2026 - LEGAL INTELLIGENCE HYBRID INTEGRATION
 
 ### ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â€šÂ¬ MAJOR RELEASE: Zero-Loss Precision Hybridization

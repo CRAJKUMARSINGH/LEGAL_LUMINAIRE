@@ -15,6 +15,9 @@ export function DemoBanner() {
       <span className="flex-1">
         <strong>DEMO MODE</strong> — Synthetic data only. All citations are placeholders.{" "}
         <span className="font-semibold">NOT FOR FILING IN ANY COURT.</span>
+        <span lang="hi" className="block text-xs text-amber-700 mt-0.5 opacity-80">
+          डेमो मोड — केवल काल्पनिक डेटा। किसी न्यायालय में दाखिल करने के लिए नहीं।
+        </span>
       </span>
       <Link href="/intake">
         <span className="underline cursor-pointer font-medium hover:text-amber-900">

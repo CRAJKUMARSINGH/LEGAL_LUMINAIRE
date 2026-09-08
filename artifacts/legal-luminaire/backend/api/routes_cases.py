@@ -74,6 +74,23 @@ async def delete_case(case_id: str):
     return {"success": True, "message": f"Case {case_id} deleted."}
 
 
+@router.post("/cases/{case_id}/switch", response_model=Dict[str, Any])
+async def switch_case(case_id: str):
+    """
+    Explicitly switch the active case context.
+    Emits a structured case_switch event for observability (Week 2).
+    """
+    case = case_manager.switch_active_case(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+    return {
+        "success": True,
+        "case_id": case_id,
+        "case_title": case.get("title", "Untitled"),
+        "message": f"Active case switched to {case_id}",
+    }
+
+
 @router.get("/cases/{case_id}/stats", response_model=Dict[str, Any])
 async def get_case_stats(case_id: str):
     """Compute case analytics for dashboard visualizations (Week 5)."""
@@ -81,7 +98,6 @@ async def get_case_stats(case_id: str):
     if not case:
         raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
 
-    # 1. Forensic Risk Radar Data
     grounding = case.get("forensic_grounding", [])
     categories = {
         "Sampling": 0,
@@ -90,7 +106,7 @@ async def get_case_stats(case_id: str):
         "Legal Procedural": 0,
         "Structural/Engineering": 0
     }
-    
+
     for g in grounding:
         title = g.get("title", "").lower()
         v_count = len(g.get("violations", []))
@@ -102,16 +118,14 @@ async def get_case_stats(case_id: str):
 
     radar_data = [{"subject": k, "A": v, "fullMark": 5} for k, v in categories.items()]
 
-    # 2. Timeline Heatmap Data
     timeline = case.get("timeline", [])
     activity = {}
     for e in timeline:
         date_str = e.get("date", "Unknown")
-        # Simple clustering by Year-Month
         if "-" in date_str:
-            month = date_str[:7] # YYYY-MM
+            month = date_str[:7]
             activity[month] = activity.get(month, 0) + 1
-    
+
     heatmap_data = [{"date": k, "count": v} for k, v in sorted(activity.items())]
 
     return {

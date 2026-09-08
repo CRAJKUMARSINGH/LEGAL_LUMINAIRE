@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { Menu } from "lucide-react";
 import { Sidebar } from "./Sidebar";
+import { BreadcrumbTrail } from "./BreadcrumbTrail";
 import { useCaseContext } from "@/context/CaseContext";
 import { NAV_GROUPS } from "@/config/navigation";
+import { Badge } from "@/components/ui/badge";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,11 +27,21 @@ export function Layout({ children }: LayoutProps) {
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-md hover:bg-muted">
             <Menu className="w-5 h-5" />
           </button>
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">{currentNav?.label || "Legal Luminaire"}</h2>
-            <p className="text-xs text-muted-foreground hidden sm:block">{currentNav?.labelEn || "Advocate Research Platform"}</p>
+          <div className="flex-1 min-w-0">
+            <BreadcrumbTrail />
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-foreground">{currentNav?.label || "Legal Luminaire"}</h2>
+              <p className="text-xs text-muted-foreground hidden sm:block">{currentNav?.labelEn || "Advocate Research Platform"}</p>
+              {selectedCase.isDemo && (
+                <Badge variant="fatal" className="text-[10px] font-black tracking-wider border-dashed">
+                  SYNTHETIC
+                  <span className="opacity-70 ml-0.5">/ कृत्रिम</span>
+                  <span className="ml-1 opacity-60">DEMO</span>
+                </Badge>
+              )}
+            </div>
           </div>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <span className="hidden md:inline text-[9px] font-black tracking-widest bg-emerald-600 text-white px-2.5 py-1 rounded-full shadow-lg">
               NATIONAL BETA 2026
             </span>

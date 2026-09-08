@@ -1,8 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertTriangle, BookOpen, ShieldCheck, AlertCircle, Scaling, FileWarning, Info, GraduationCap } from "lucide-react";
+import { AlertTriangle, BookOpen, ShieldCheck, AlertCircle, Scaling, FileWarning, Info, GraduationCap, Clock } from "lucide-react";
 import { useCaseContext } from "@/context/CaseContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { EmptyState } from "@/components/ui/empty-state";
+import { TimelineSkeleton } from "@/components/ui/skeleton-loaders";
+import { useState, useEffect } from "react";
 
 const EXPLANATIONS: Record<string, { title: string; precedent: string; advice: string }> = {
   "IS 1199": {
@@ -25,6 +28,13 @@ const EXPLANATIONS: Record<string, { title: string; precedent: string; advice: s
 export const TimelineView = () => {
   const { selectedCase } = useCaseContext();
   const timeline = selectedCase.timeline || [];
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Brief skeleton flash so the loader is visible on navigation
+    const t = setTimeout(() => setLoading(false), 350);
+    return () => clearTimeout(t);
+  }, [selectedCase.id]);
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
@@ -35,6 +45,10 @@ export const TimelineView = () => {
         </p>
       </div>
 
+      {/* Skeleton on first load */}
+      {loading && <TimelineSkeleton />}
+
+      {!loading && (
       <div className="relative">
         <div className="absolute left-6 top-0 bottom-0 w-px bg-border" />
         <div className="space-y-4">
@@ -130,12 +144,30 @@ export const TimelineView = () => {
               );
             })
           ) : (
-            <div className="p-12 text-center border-2 border-dashed rounded-xl text-muted-foreground">
-              No timeline events recorded yet. Use AI Case Ingest to populate.
-            </div>
+            <EmptyState
+              icon={<Clock className="h-8 w-8" />}
+              title="No timeline events yet"
+              titleHi="अभी तक कोई टाइमलाइन घटना नहीं"
+              description="Use the AI Case Ingest tool to build the timeline automatically from FIR and charge-sheet documents."
+              descriptionHi="FIR और चार्जशीट से टाइमलाइन अपने-आप बनाने के लिए AI केस इन्जेस्ट टूल का उपयोग करें।"
+              actions={[
+                {
+                  label: "Upload Documents",
+                  labelHi: "दस्तावेज़ अपलोड करें",
+                  href: `/case/${selectedCase.id}/upload`,
+                },
+                {
+                  label: "Demo Cases",
+                  labelHi: "डेमो केस",
+                  href: "/demo-browser",
+                  variant: "outline",
+                },
+              ]}
+            />
           )}
         </div>
       </div>
+      )}
 
       <Card className="bg-primary/5 border-primary/20">
         <CardContent className="p-5">

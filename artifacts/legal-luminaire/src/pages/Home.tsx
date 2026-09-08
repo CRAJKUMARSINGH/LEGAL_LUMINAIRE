@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,11 +7,13 @@ import {
   Scale, FileText, BookOpen, FlaskConical, Clock,
   AlertTriangle, CheckCircle2, Info, ArrowRight,
   MessageSquare, LayoutDashboard, Files, Upload, PlayCircle,
-  Zap, Target, Printer, ShieldCheck,
+  Zap, Target, Printer, ShieldCheck, History, Plus, Sparkles, Edit3,
 } from "lucide-react";
 import { CreateCaseQuickDialog } from "@/components/create-case-quick-dialog";
 import { HarveyEvaluationPanel } from "@/components/HarveyEvaluationPanel";
+import { GuidedFlow } from "@/components/GuidedFlow";
 import { featureFlags } from "@/config/featureFlags";
+import { useCaseContext } from "@/context/CaseContext";
 import {
   caseInfo, caseLawMatrix, standardsMatrix,
   timelineEvents, caseDocuments,
@@ -19,6 +21,7 @@ import {
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip,
 } from "recharts";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // ── Status badge (mirrors DashboardView from update) ──────────────────────
 type VS = "VERIFIED" | "SECONDARY" | "PENDING";
@@ -85,6 +88,8 @@ const PRIORITY_ACTIONS = caseLawMatrix
   .slice(0, 5);
 
 export default function Home() {
+  const { cases, selectedCaseId, setSelectedCaseId } = useCaseContext();
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const verifiedCount  = useMemo(() => caseLawMatrix.filter((c) => c.status === "VERIFIED").length, []);
   const pendingCount   = useMemo(() => caseLawMatrix.filter((c) => c.status === "PENDING").length, []);
   const secondaryCount = useMemo(() => caseLawMatrix.length - verifiedCount - pendingCount, [verifiedCount, pendingCount]);
@@ -97,8 +102,144 @@ export default function Home() {
     { label: "Timeline Events",     value: timelineEvents.length,  icon: Clock,       color: "text-amber-500" },
   ], []);
 
+  // Recent cases - show last 5 cases excluding current
+  const recentCases = useMemo(() => {
+    return cases
+      .filter(c => c.id !== selectedCaseId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5);
+  }, [cases, selectedCaseId]);
+
+  const handleStartNewCase = () => {
+    setShowGuidedFlow(false);
+    window.location.href = "/intake";
+  };
+
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
+
+      {/* ── Empty state — shown when no case data is available ────────────── */}
+      {!caseInfo && (
+        <>
+          {/* ── One-Click Demo Mode Hero Card ─────────────────────────────── */}
+          <div className="rounded-xl border-2 border-amber-400 bg-gradient-to-r from-amber-50 to-amber-100 p-6 flex items-center gap-4 hover-elevate transition-all">
+            <div className="rounded-xl bg-amber-500/15 p-4 shrink-0">
+              <PlayCircle className="h-10 w-10 text-amber-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-bold text-amber-900 text-lg">Load Demo Case (Hemraj – Synthetic)</p>
+                <Badge className="bg-amber-500 text-white text-[10px] font-black">ONE-CLICK</Badge>
+                <Badge className="bg-red-500/10 text-red-700 border-red-500/30 text-[10px] font-black">SYNTHETIC / DEMO</Badge>
+              </div>
+              <p className="text-sm text-amber-800 mt-1">
+                Load full CASE_01 data with pre-filled forms, matrices, and all features enabled.
+                Perfect for exploring the platform without API keys.
+              </p>
+            </div>
+            <Link href="/demo-browser">
+              <Button className="gap-2 shrink-0 bg-amber-500 hover:bg-amber-600 text-white">
+                <PlayCircle className="h-4 w-4" /> Load Demo Case
+              </Button>
+            </Link>
+          </div>
+
+          <EmptyState
+            icon={<Scale className="h-10 w-10" />}
+            title="No case loaded"
+            titleHi="कोई केस लोड नहीं किया गया"
+            description="Load a demo case to explore all features, or upload your own case documents to get started."
+            descriptionHi="सभी सुविधाएं देखने के लिए डेमो केस लोड करें, या अपने केस दस्तावेज़ अपलोड करें।"
+            actions={[
+              {
+                label: "Upload Documents",
+                labelHi: "दस्तावेज़ अपलोड करें",
+                href: "/new-case-ingest",
+                variant: "outline",
+                icon: <Upload className="h-4 w-4" />,
+              },
+              {
+                label: "New Case",
+                labelHi: "नया केस",
+                href: "/intake",
+                variant: "outline",
+              },
+            ]}
+          />
+        </>
+      )}
+
+      {/* ── All content below only renders when caseInfo exists ─────────── */}
+      {caseInfo && (<>
+
+      {/* ── Task-Oriented Dashboard Cards ─────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="glass-surface hover-elevate cursor-pointer group" onClick={() => setShowGuidedFlow(true)}>
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="rounded-lg bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
+              <Sparkles className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">Start Guided Flow</p>
+              <p className="text-xs text-muted-foreground">मार्गदर्शित कार्यप्रवाह शुरू करें</p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          </CardContent>
+        </Card>
+
+        <Link href={`/case/${selectedCaseId}/upload`}>
+          <Card className="glass-surface hover-elevate cursor-pointer group">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="rounded-lg bg-blue-500/10 p-3 group-hover:bg-blue-500/20 transition-colors">
+                <Upload className="h-6 w-6 text-blue-500" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">Upload Documents</p>
+                <p className="text-xs text-muted-foreground">दस्तावेज़ अपलोड करें</p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-500 transition-colors" />
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href={`/case/${selectedCaseId}/case-law`}>
+          <Card className="glass-surface hover-elevate cursor-pointer group">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="rounded-lg bg-emerald-500/10 p-3 group-hover:bg-emerald-500/20 transition-colors">
+                <BookOpen className="h-6 w-6 text-emerald-500" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">Research Case Law</p>
+                <p className="text-xs text-muted-foreground">कानून शोध करें</p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-500 transition-colors" />
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href={`/case/${selectedCaseId}/drafting`}>
+          <Card className="glass-surface hover-elevate cursor-pointer group">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="rounded-lg bg-violet-500/10 p-3 group-hover:bg-violet-500/20 transition-colors">
+                <Edit3 className="h-6 w-6 text-violet-500" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">Draft Document</p>
+                <p className="text-xs text-muted-foreground">दस्तावेज़ लिखें</p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-violet-500 transition-colors" />
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      {/* ── Guided Flow Component (shown when activated) ─────────────── */}
+      {showGuidedFlow && (
+        <GuidedFlow 
+          onComplete={() => setShowGuidedFlow(false)}
+          onStartNew={handleStartNewCase}
+        />
+      )}
 
       {/* ── Discharge Application Hero Card ─────────────────────────────── */}
       <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-5 flex items-center gap-4 hover-elevate transition-all">
@@ -118,7 +259,7 @@ export default function Home() {
             A4 print-ready | 23 named annexures | 12 grounds | Artemis-II Accuracy
           </p>
         </div>
-        <Link href="/case/case-01/discharge-print">
+        <Link href={`/case/${selectedCaseId}/discharge-print`}>
           <Button className="gap-1.5 shrink-0 bg-primary">
             <Printer className="h-3.5 w-3.5" /> Generate PDF
           </Button>
@@ -220,6 +361,53 @@ export default function Home() {
           </Card>
         ))}
       </div>
+
+      {/* ── Recent Cases Widget ─────────────────────────────────────────── */}
+      {recentCases.length > 0 && (
+        <Card className="glass-surface hover-elevate">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <History className="h-4 w-4 text-primary" />
+              Recent Cases
+              <Badge variant="outline" className="ml-auto text-xs">{recentCases.length} recent</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {recentCases.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedCaseId(c.id)}
+                  className={`w-full text-left p-3 rounded-lg border transition-all hover:border-primary/40 hover:bg-primary/5 ${
+                    c.id === selectedCaseId ? "border-primary/30 bg-primary/10" : "border-border/70"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <Scale className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{c.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{c.court}</p>
+                      <p className="text-[10px] text-muted-foreground/70 mt-1">
+                        {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </p>
+                    </div>
+                    {c.isDemo && (
+                      <Badge className="bg-red-500/10 text-red-700 border-red-500/30 text-[9px] font-black shrink-0">
+                        DEMO
+                      </Badge>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <Link href="/cases" className="mt-3 block">
+              <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
+                <Files className="h-3.5 w-3.5" /> View all cases
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── Gift: Defence Strength Radar + Priority Actions ─────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -450,6 +638,7 @@ export default function Home() {
         </CardContent>
       </Card>
 
+      </>)}
     </div>
   );
 }

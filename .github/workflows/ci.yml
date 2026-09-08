@@ -61,13 +61,6 @@ jobs:
       # -----------------------------------------------------------------------
       # Week 3 - Document ingestion pipeline smoke tests
       # -----------------------------------------------------------------------
-      # These checks confirm the document-ingestion pipeline source files
-      # carry correct typed imports and that no component still uses bare `any`
-      # on upload/ingest props. Does NOT start a backend server - confirms
-      # static correctness only. Runs AFTER the Vite build so any missing
-      # imports that slip past tsc --noEmit are caught by the bundler too.
-      # -----------------------------------------------------------------------
-
       - name: Smoke-test ingestion types imported in OmniDropzone
         run: |
           grep -q "ExtractionData" artifacts/legal-luminaire/src/components/views/OmniDropzone.tsx
@@ -102,6 +95,53 @@ jobs:
           echo "Central type index ingestion types: OK"
 
       - name: Final typecheck after all Week 3 changes
+        run: pnpm --filter @workspace/legal-luminaire run typecheck
+
+      # -----------------------------------------------------------------------
+      # Week 4 - Guided-flow route surface and type-safety checks
+      # -----------------------------------------------------------------------
+      # Verifies the expanded route surface (new guided-flow routes, legacy
+      # aliases) and the compile-time route safety types (FlatRoute, CasePath,
+      # RouteId, isLpsRoute, LPS_ROUTE_MAP) are all present and correct.
+      # Also confirms handleLpsNavigate no longer uses an unsafe `as` cast.
+      # -----------------------------------------------------------------------
+
+      - name: Smoke-test FlatRoute and CasePath unions present in types index
+        run: |
+          grep -q "FlatRoute"     artifacts/legal-luminaire/src/types/index.ts
+          grep -q "CasePath"      artifacts/legal-luminaire/src/types/index.ts
+          grep -q "RouteId"       artifacts/legal-luminaire/src/types/index.ts
+          grep -q "isLpsRoute"    artifacts/legal-luminaire/src/types/index.ts
+          grep -q "LPS_ROUTE_MAP" artifacts/legal-luminaire/src/types/index.ts
+          echo "Route safety types present: OK"
+
+      - name: Smoke-test new guided-flow routes registered in routes.tsx
+        run: |
+          grep -q "/verification-report" artifacts/legal-luminaire/src/routes.tsx
+          grep -q "/filing-checklist"    artifacts/legal-luminaire/src/routes.tsx
+          echo "New guided-flow routes registered: OK"
+
+      - name: Smoke-test legacy alias /verification-report documented
+        run: |
+          grep -q "legacy alias" artifacts/legal-luminaire/src/routes.tsx
+          echo "Legacy alias comment present: OK"
+
+      - name: Smoke-test handleLpsNavigate uses type-guard not unsafe cast
+        run: |
+          grep -q "isLpsRoute" artifacts/legal-luminaire/src/routes.tsx
+          grep -q "LPS_ROUTE_MAP" artifacts/legal-luminaire/src/routes.tsx
+          if grep -q "as LpsRoute" artifacts/legal-luminaire/src/routes.tsx; then
+            echo "FAIL: routes.tsx still has unsafe as LpsRoute cast" && exit 1
+          fi
+          echo "handleLpsNavigate uses type-guard: OK"
+
+      - name: Smoke-test /verification-report and /filing-checklist in FlatRoute union
+        run: |
+          grep -q '"/verification-report"' artifacts/legal-luminaire/src/types/index.ts
+          grep -q '"/filing-checklist"'    artifacts/legal-luminaire/src/types/index.ts
+          echo "New routes present in FlatRoute union: OK"
+
+      - name: Final typecheck after all Week 4 changes
         run: pnpm --filter @workspace/legal-luminaire run typecheck
 
   backend:

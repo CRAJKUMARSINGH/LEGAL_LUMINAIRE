@@ -1,9 +1,11 @@
-import React, { Suspense, lazy, useState } from "react";
+import React, { Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useCaseContext } from "@/context/CaseContext";
 import { featureFlags } from "@/config/featureFlags";
 import { Layout } from "@/components/layout/Layout";
-import type { LpsRoute } from "@/types";
+import type { LpsRoute, FlatRoute } from "@/types";
+import { isLpsRoute, LPS_ROUTE_MAP } from "@/types";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 
 // Lazy load components for code splitting
 const NotFound = lazy(() => import("@/pages/not-found"));
@@ -84,103 +86,133 @@ const LoadingFallback = (): React.JSX.Element => (
   </div>
 );
 
+type SafePageProps = Record<string, unknown>;
+function SafePage<T extends SafePageProps>(
+  Comp: ComponentType<T>,
+  componentName?: string
+): (props: T) => ReactNode {
+  return (props: T) => (
+    <AppErrorBoundary
+      componentName={componentName || Comp.displayName || Comp.name || "PageComponent"}
+    >
+      <Suspense fallback={<LoadingFallback />}>
+        <Comp {...props} />
+      </Suspense>
+    </AppErrorBoundary>
+  );
+}
+function Wrap<T extends SafePageProps>(
+  node: ReactNode,
+  componentName: string
+): ReactNode {
+  return (
+    <AppErrorBoundary componentName={componentName}>
+      <Suspense fallback={<LoadingFallback />}>{node}</Suspense>
+    </AppErrorBoundary>
+  );
+}
+
 export function Router() {
   const { selectedCase } = useCaseContext();
   const [, setLocation] = useLocation();
   const [ldrLang, setLdrLang] = useState<"en" | "hi" | "both">("both");
 
   const handleLpsNavigate = (route: string) => {
-    // Narrow to the known LPS routes — unknown values are silently ignored
-    const lpsRoute = route as LpsRoute;
-    if (lpsRoute === "defence")    setLocation("/lps-defence");
-    else if (lpsRoute === "analysis")   setLocation("/lps-sample-analysis");
-    else if (lpsRoute === "precedents") setLocation("/lps-precedents");
-    else if (lpsRoute === "standards")  setLocation("/lps-standards");
-    else if (lpsRoute === "print")      setLocation("/lps-print");
+    // isLpsRoute narrows to LpsRoute — no unsafe `as` cast needed
+    if (isLpsRoute(route)) {
+      const dest: FlatRoute = LPS_ROUTE_MAP[route];
+      setLocation(dest);
+    }
+    // Unknown route values are silently ignored (defensive — callers should
+    // only pass LpsRoute values but external data cannot be guaranteed)
   };
 
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={() => <Suspense fallback={<LoadingFallback />}><Home /></Suspense>} />
-        <Route path="/cases" component={() => <div className="p-6"><Suspense fallback={<LoadingFallback />}><CaseSelector /></Suspense></div>} />
-        <Route path="/intake" component={() => <Suspense fallback={<LoadingFallback />}><CaseIntakeAssistant /></Suspense>} />
-        <Route path="/new-case-ingest" component={() => <Suspense fallback={<LoadingFallback />}><OmniDropzone /></Suspense>} />
-        <Route path="/review-queue" component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><ReviewQueueView /></Suspense></div>} />
-        <Route path="/improvement-lab" component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><ResearchImprovementView /></Suspense></div>} />
-        <Route path="/forensic-faq" component={() => <Suspense fallback={<LoadingFallback />}><ForensicFAQ /></Suspense>} />
-        <Route path="/infra-arb" component={() => <Suspense fallback={<LoadingFallback />}><InfraArbBrowser /></Suspense>} />
-        <Route path="/demo-browser" component={() => <Suspense fallback={<LoadingFallback />}><DemoCaseBrowser /></Suspense>} />
-        <Route path="/citation-search" component={() => <Suspense fallback={<LoadingFallback />}><CitationSearchPage /></Suspense>} />
-        <Route path="/authority/:id" component={() => <Suspense fallback={<LoadingFallback />}><CitationAuthorityPage /></Suspense>} />
+    <AppErrorBoundary componentName="RootLayout">
+      <Layout>
+        <Switch>
+          <Route path="/" component={() => Wrap(<Home />, "HomePage")} />
+          <Route path="/cases" component={() => <div className="p-6">{Wrap(<CaseSelector />, "CaseSelector")}</div>} />
+          <Route path="/intake" component={() => Wrap(<CaseIntakeAssistant />, "CaseIntakeAssistant")} />
+          <Route path="/new-case-ingest" component={() => Wrap(<OmniDropzone />, "OmniDropzone")} />
+          <Route path="/review-queue" component={() => <div className="p-0">{Wrap(<ReviewQueueView />, "ReviewQueueView")}</div>} />
+          <Route path="/improvement-lab" component={() => <div className="p-0">{Wrap(<ResearchImprovementView />, "ResearchImprovementView")}</div>} />
+          <Route path="/forensic-faq" component={() => Wrap(<ForensicFAQ />, "ForensicFAQ")} />
+          <Route path="/infra-arb" component={() => Wrap(<InfraArbBrowser />, "InfraArbBrowser")} />
+          <Route path="/demo-browser" component={() => Wrap(<DemoCaseBrowser />, "DemoCaseBrowser")} />
+          <Route path="/citation-search" component={() => Wrap(<CitationSearchPage />, "CitationSearchPage")} />
+          <Route path="/authority/:id" component={() => Wrap(<CitationAuthorityPage />, "CitationAuthorityPage")} />
 
-        {/* Defense Master Routes */}
-        <Route path="/cross-check-report" component={() => <Suspense fallback={<LoadingFallback />}><CrossCheckReport /></Suspense>} />
-        <Route path="/defense-brief" component={() => <Suspense fallback={<LoadingFallback />}><DefenseBrief /></Suspense>} />
-        <Route path="/fsl-analysis" component={() => <Suspense fallback={<LoadingFallback />}><FslAnalysis /></Suspense>} />
-        <Route path="/standards-index" component={() => <Suspense fallback={<LoadingFallback />}><StandardsIndex /></Suspense>} />
+          {/* Defense Master Routes */}
+          <Route path="/cross-check-report" component={() => Wrap(<CrossCheckReport />, "CrossCheckReport")} />
+          <Route path="/verification-report" component={() => Wrap(<CrossCheckReport />, "CrossCheckReport")} />
+          <Route path="/defense-brief" component={() => Wrap(<DefenseBrief />, "DefenseBrief")} />
+          <Route path="/fsl-analysis" component={() => Wrap(<FslAnalysis />, "FslAnalysis")} />
+          <Route path="/standards-index" component={() => Wrap(<StandardsIndex />, "StandardsIndex")} />
+          <Route path="/filing-checklist" component={() => Wrap(<FilingChecklist />, "FilingChecklist")} />
 
-        {/* Document Review Routes */}
-        <Route path="/ldr-home" component={() => <Suspense fallback={<LoadingFallback />}><LDR_HomePage lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-comparison" component={() => <Suspense fallback={<LoadingFallback />}><LDR_ComparisonPage lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-motion" component={() => <Suspense fallback={<LoadingFallback />}><LDR_MotionPage lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-packet" component={() => <Suspense fallback={<LoadingFallback />}><LDR_PacketPage packetId="A" lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-precedents" component={() => <Suspense fallback={<LoadingFallback />}><LDR_PrecedentsPage lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-print" component={() => <Suspense fallback={<LoadingFallback />}><LDR_PrintPage lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-reply" component={() => <Suspense fallback={<LoadingFallback />}><LDR_ReplyPage lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-standards" component={() => <Suspense fallback={<LoadingFallback />}><LDR_StandardsPage /></Suspense>} />
-        <Route path="/ldr-timeline" component={() => <Suspense fallback={<LoadingFallback />}><LDR_TimelinePage lang={ldrLang} /></Suspense>} />
-        <Route path="/ldr-verification" component={() => <Suspense fallback={<LoadingFallback />}><LDR_VerificationPage /></Suspense>} />
+          {/* Document Review Routes */}
+          <Route path="/ldr-home" component={() => Wrap(<LDR_HomePage lang={ldrLang} />, "LDR_HomePage")} />
+          <Route path="/ldr-comparison" component={() => Wrap(<LDR_ComparisonPage lang={ldrLang} />, "LDR_ComparisonPage")} />
+          <Route path="/ldr-motion" component={() => Wrap(<LDR_MotionPage lang={ldrLang} />, "LDR_MotionPage")} />
+          <Route path="/ldr-packet" component={() => Wrap(<LDR_PacketPage packetId="A" lang={ldrLang} />, "LDR_PacketPage")} />
+          <Route path="/ldr-precedents" component={() => Wrap(<LDR_PrecedentsPage lang={ldrLang} />, "LDR_PrecedentsPage")} />
+          <Route path="/ldr-print" component={() => Wrap(<LDR_PrintPage lang={ldrLang} />, "LDR_PrintPage")} />
+          <Route path="/ldr-reply" component={() => Wrap(<LDR_ReplyPage lang={ldrLang} />, "LDR_ReplyPage")} />
+          <Route path="/ldr-standards" component={() => Wrap(<LDR_StandardsPage />, "LDR_StandardsPage")} />
+          <Route path="/ldr-timeline" component={() => Wrap(<LDR_TimelinePage lang={ldrLang} />, "LDR_TimelinePage")} />
+          <Route path="/ldr-verification" component={() => Wrap(<LDR_VerificationPage />, "LDR_VerificationPage")} />
 
-        {/* Precedent Search Routes */}
-        <Route path="/lps-home" component={() => <Suspense fallback={<LoadingFallback />}><LPS_HomePage onNavigate={handleLpsNavigate} /></Suspense>} />
-        <Route path="/lps-defence" component={() => <Suspense fallback={<LoadingFallback />}><LPS_DefencePage /></Suspense>} />
-        <Route path="/lps-precedents" component={() => <Suspense fallback={<LoadingFallback />}><LPS_PrecedentsPage /></Suspense>} />
-        <Route path="/lps-print" component={() => <Suspense fallback={<LoadingFallback />}><LPS_PrintLetterPage /></Suspense>} />
-        <Route path="/lps-sample-analysis" component={() => <Suspense fallback={<LoadingFallback />}><LPS_SampleAnalysisPage /></Suspense>} />
-        <Route path="/lps-standards" component={() => <Suspense fallback={<LoadingFallback />}><LPS_StandardsPage /></Suspense>} />
+          {/* Precedent Search Routes */}
+          <Route path="/lps-home" component={() => Wrap(<LPS_HomePage onNavigate={handleLpsNavigate} />, "LPS_HomePage")} />
+          <Route path="/lps-defence" component={() => Wrap(<LPS_DefencePage />, "LPS_DefencePage")} />
+          <Route path="/lps-precedents" component={() => Wrap(<LPS_PrecedentsPage />, "LPS_PrecedentsPage")} />
+          <Route path="/lps-print" component={() => Wrap(<LPS_PrintLetterPage />, "LPS_PrintLetterPage")} />
+          <Route path="/lps-sample-analysis" component={() => Wrap(<LPS_SampleAnalysisPage />, "LPS_SampleAnalysisPage")} />
+          <Route path="/lps-standards" component={() => Wrap(<LPS_StandardsPage />, "LPS_StandardsPage")} />
 
-        {/* Case-scoped routes */}
-        <Route path="/case/:id/dashboard"             component={() => <div className="p-6"><Suspense fallback={<LoadingFallback />}><DynamicDashboardView /></Suspense></div>} />
-        <Route path="/case/:id/chat"                  component={() => <div className="flex flex-col h-full"><Suspense fallback={<LoadingFallback />}><ChatView /></Suspense></div>} />
-        <Route path="/case/:id/case-law"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><CaseLawView /></Suspense></div>} />
-        <Route path="/case/:id/case-research"         component={() => <Suspense fallback={<LoadingFallback />}><CaseResearch /></Suspense>} />
-        <Route path="/case/:id/cross-reference"       component={() => <Suspense fallback={<LoadingFallback />}><CrossReferenceMatrix /></Suspense>} />
-        <Route path="/case/:id/ai-research"           component={() => <Suspense fallback={<LoadingFallback />}><AIResearchEngine /></Suspense>} />
-        <Route path="/case/:id/ai-draft-engine"       component={() => <Suspense fallback={<LoadingFallback />}><AIDraftEngine /></Suspense>} />
-        <Route path="/case/:id/standards"             component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><StandardsView /></Suspense></div>} />
-        <Route path="/case/:id/timeline"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><TimelineView /></Suspense></div>} />
-        <Route path="/case/:id/documents"             component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><DocumentsView /></Suspense></div>} />
-        <Route path="/case/:id/upload"                component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><UploadView /></Suspense></div>} />
-        <Route path="/case/:id/drafting"              component={() => <div className="p-0"><Suspense fallback={<LoadingFallback />}><DraftingView /></Suspense></div>} />
-        <Route path="/case/:id/safe-draft"            component={() => <Suspense fallback={<LoadingFallback />}><SafeDraftPage /></Suspense>} />
-        <Route path="/case/:id/notice-reply"          component={() => <Suspense fallback={<LoadingFallback />}><NoticeReplyPage /></Suspense>} />
-        <Route path="/case/:id/discharge-print"       component={() => <Suspense fallback={<LoadingFallback />}><DischargeApplicationPrint /></Suspense>} />
-        <Route path="/case/:id/verification"          component={() => <Suspense fallback={<LoadingFallback />}><VerificationPanel /></Suspense>} />
-        <Route path="/case/:id/filing-checklist"      component={() => <Suspense fallback={<LoadingFallback />}><FilingChecklist /></Suspense>} />
-        <Route path="/case/:id/discharge-application" component={() => <Suspense fallback={<LoadingFallback />}><DischargeApplication /></Suspense>} />
-        <Route path="/case/:id/defence-reply"         component={() => <Suspense fallback={<LoadingFallback />}><DefenceReply /></Suspense>} />
-        <Route path="/case/:id/oral-arguments"        component={() => <Suspense fallback={<LoadingFallback />}><OralArguments /></Suspense>} />
-        {featureFlags.hybridStandardsValidity && (
-          <Route path="/case/:id/standards-validity"  component={() => <Suspense fallback={<LoadingFallback />}><StandardsValidity /></Suspense>} />
-        )}
-        {featureFlags.hybridSessionWorkspace && (
-          <Route path="/case/:id/session-workspace"   component={() => <Suspense fallback={<LoadingFallback />}><SessionWorkspace /></Suspense>} />
-        )}
-        {featureFlags.hybridDraftViewer && (
-          <Route path="/draft/:id"                    component={() => <Suspense fallback={<LoadingFallback />}><DraftViewer /></Suspense>} />
-        )}
-        {(featureFlags.enableCitationGraph || featureFlags.enableCitationExtraction) && (
-          <Route path="/case/:id/citation-graph"    component={() => <Suspense fallback={<LoadingFallback />}><CitationGraphPage /></Suspense>} />
-        )}
-        {(featureFlags.enableCaseSimilarity || featureFlags.enableQueryUnderstanding) && (
-          <Route path="/case/:id/case-similarity"   component={() => <Suspense fallback={<LoadingFallback />}><CaseSimilarityPage /></Suspense>} />
-        )}
-        {(featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics) && (
-          <Route path="/case/:id/judge-analytics"   component={() => <Suspense fallback={<LoadingFallback />}><JudgeAnalyticsPage /></Suspense>} />
-        )}
-        <Route component={() => <Suspense fallback={<LoadingFallback />}><NotFound /></Suspense>} />
-      </Switch>
-    </Layout>
+          {/* Case-scoped routes */}
+          <Route path="/case/:id/dashboard"             component={() => <div className="p-6">{Wrap(<DynamicDashboardView />, "DynamicDashboardView")}</div>} />
+          <Route path="/case/:id/chat"                  component={() => <div className="flex flex-col h-full">{Wrap(<ChatView />, "ChatView")}</div>} />
+          <Route path="/case/:id/case-law"              component={() => <div className="p-0">{Wrap(<CaseLawView />, "CaseLawView")}</div>} />
+          <Route path="/case/:id/case-research"         component={() => Wrap(<CaseResearch />, "CaseResearch")} />
+          <Route path="/case/:id/cross-reference"       component={() => Wrap(<CrossReferenceMatrix />, "CrossReferenceMatrix")} />
+          <Route path="/case/:id/ai-research"           component={() => Wrap(<AIResearchEngine />, "AIResearchEngine")} />
+          <Route path="/case/:id/ai-draft-engine"       component={() => Wrap(<AIDraftEngine />, "AIDraftEngine")} />
+          <Route path="/case/:id/standards"             component={() => <div className="p-0">{Wrap(<StandardsView />, "StandardsView")}</div>} />
+          <Route path="/case/:id/timeline"              component={() => <div className="p-0">{Wrap(<TimelineView />, "TimelineView")}</div>} />
+          <Route path="/case/:id/documents"             component={() => <div className="p-0">{Wrap(<DocumentsView />, "DocumentsView")}</div>} />
+          <Route path="/case/:id/upload"                component={() => <div className="p-0">{Wrap(<UploadView />, "UploadView")}</div>} />
+          <Route path="/case/:id/drafting"              component={() => <div className="p-0">{Wrap(<DraftingView />, "DraftingView")}</div>} />
+          <Route path="/case/:id/safe-draft"            component={() => Wrap(<SafeDraftPage />, "SafeDraftPage")} />
+          <Route path="/case/:id/notice-reply"          component={() => Wrap(<NoticeReplyPage />, "NoticeReplyPage")} />
+          <Route path="/case/:id/discharge-print"       component={() => Wrap(<DischargeApplicationPrint />, "DischargeApplicationPrint")} />
+          <Route path="/case/:id/verification"          component={() => Wrap(<VerificationPanel />, "VerificationPanel")} />
+          <Route path="/case/:id/filing-checklist"      component={() => Wrap(<FilingChecklist />, "FilingChecklist")} />
+          <Route path="/case/:id/discharge-application" component={() => Wrap(<DischargeApplication />, "DischargeApplication")} />
+          <Route path="/case/:id/defence-reply"         component={() => Wrap(<DefenceReply />, "DefenceReply")} />
+          <Route path="/case/:id/oral-arguments"        component={() => Wrap(<OralArguments />, "OralArguments")} />
+          {featureFlags.hybridStandardsValidity && (
+            <Route path="/case/:id/standards-validity"  component={() => Wrap(<StandardsValidity />, "StandardsValidity")} />
+          )}
+          {featureFlags.hybridSessionWorkspace && (
+            <Route path="/case/:id/session-workspace"   component={() => Wrap(<SessionWorkspace />, "SessionWorkspace")} />
+          )}
+          {featureFlags.hybridDraftViewer && (
+            <Route path="/draft/:id"                    component={() => Wrap(<DraftViewer />, "DraftViewer")} />
+          )}
+          {(featureFlags.enableCitationGraph || featureFlags.enableCitationExtraction) && (
+            <Route path="/case/:id/citation-graph"    component={() => Wrap(<CitationGraphPage />, "CitationGraphPage")} />
+          )}
+          {(featureFlags.enableCaseSimilarity || featureFlags.enableQueryUnderstanding) && (
+            <Route path="/case/:id/case-similarity"   component={() => Wrap(<CaseSimilarityPage />, "CaseSimilarityPage")} />
+          )}
+          {(featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics) && (
+            <Route path="/case/:id/judge-analytics"   component={() => Wrap(<JudgeAnalyticsPage />, "JudgeAnalyticsPage")} />
+          )}
+          <Route component={() => Wrap(<NotFound />, "NotFound")} />
+        </Switch>
+      </Layout>
+    </AppErrorBoundary>
   );
 }

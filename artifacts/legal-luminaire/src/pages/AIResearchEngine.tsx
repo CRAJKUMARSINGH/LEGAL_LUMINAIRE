@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ClipboardCopy, ExternalLink, Search, AlertTriangle,
   CheckCircle2, Database, Zap, ShieldCheck, XCircle,
-  Info, BarChart3, FileText,
+  Info, BarChart3, FileText, Filter,
 } from "lucide-react";
 import { useCaseContext } from "@/context/CaseContext";
 import {
@@ -16,6 +16,9 @@ import { CASE01_PRECEDENTS, CASE01_STANDARDS } from "@/lib/case01-data";
 import PrecedentFitGate from "@/components/PrecedentFitGate";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ResearchSkeleton } from "@/components/ui/skeleton-loaders";
+import { DocumentProgressIndicator } from "@/components/DocumentProgressIndicator";
 
 // ── Default query for Case 01 ─────────────────────────────────────────────────
 const DEFAULT_QUERY: ResearchQuery = {
@@ -68,6 +71,11 @@ export default function AIResearchEngine() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<"precedents" | "standards" | "accuracy" | "databases">("precedents");
+  const [initialising, setInitialising] = useState(true);
+
+  useEffect(() => {
+    setInitialising(false);
+  }, []);
 
   // Score all precedents against current query
   const scoredPrecedents = useMemo<PrecedentResult[]>(() => {
@@ -133,6 +141,13 @@ export default function AIResearchEngine() {
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-5">
 
+      {/* Week 3: Document Pipeline Progress Indicator */}
+      <DocumentProgressIndicator 
+        currentStep="research"
+        completedSteps={["upload", "index"]}
+        loadingSteps={initialising ? ["upload", "index", "research"] : []}
+      />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
@@ -157,7 +172,12 @@ export default function AIResearchEngine() {
         </div>
       </div>
 
-      {/* Research prompt */}
+      {/* Skeleton while first computation runs */}
+      {initialising && <ResearchSkeleton />}
+
+      {!initialising && (
+        <>
+          {/* Research prompt */}
       {showPrompt && (
         <div className="bg-muted/50 border border-border rounded-xl p-4">
           <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
@@ -257,6 +277,25 @@ export default function AIResearchEngine() {
           <p className="text-xs text-muted-foreground">
             Showing {filteredPrecedents.length} of {scoredPrecedents.length} precedents · sorted by fit score
           </p>
+
+          {/* Empty state — no results after filtering */}
+          {filteredPrecedents.length === 0 && (
+            <EmptyState
+              icon={<Filter className="h-7 w-7" />}
+              title="No precedents match the current filters"
+              titleHi="वर्तमान फ़िल्टर से कोई मिसाल नहीं मिली"
+              description="Try changing the Fit Level or Tier filter to see more results."
+              descriptionHi="अधिक परिणाम देखने के लिए फ़िट लेवल या टियर फ़िल्टर बदलें।"
+              actions={[
+                {
+                  label: "Show All",
+                  labelHi: "सभी दिखाएं",
+                  onClick: () => { setFilterLevel("all"); setFilterTier("all"); },
+                },
+              ]}
+              compact
+            />
+          )}
 
           {filteredPrecedents.map((p) => (
             <div key={p.id} className={`border rounded-xl overflow-hidden ${
@@ -459,6 +498,8 @@ export default function AIResearchEngine() {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
     </div>
   );

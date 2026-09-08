@@ -34,6 +34,7 @@ export type CaseRecord = {
   brief: string;
   createdAt: string;
   files: CaseFile[];
+  isDemo?: boolean;                   // Flag for synthetic/demo cases
 
   // From live app schema
   case_type?: "bail" | "discharge" | "writ" | "notice-reply" | "appeal" | "revision" | "other";

@@ -29,7 +29,14 @@ from api.routes_legal_stream import router as legal_stream_router
 from api.routes_similarity import router as similarity_router
 from api.routes_analytics import router as analytics_router
 from api.routes_graph import router as graph_router
-from api.routes_harvey import router as harvey_router
+
+_harvey_router_available = False
+try:
+    from api.routes_harvey import router as harvey_router
+    _harvey_router_available = True
+except ImportError:
+    logger = logging.getLogger(__name__)
+    logger.info("routes_harvey not available (gitignored optional module) — skipping harvey router registration")
 
 # â”€â”€ Logging â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 logging.basicConfig(
@@ -43,17 +50,38 @@ logger = logging.getLogger(__name__)
 _request_counts: dict[str, list[float]] = defaultdict(list)
 
 
-def _check_rate_limit(client_ip: str) -> bool:
+def _is_expensive_endpoint(path: str) -> bool:
+    """Week 3: classify endpoints that deserve rate limiting (research, drafting, heavy RAG)."""
+    heavy_markers = (
+        "/research",
+        "/ai-draft",
+        "/drafting",
+        "/discharge",
+        "/chat",
+        "/detect-contradictions",
+        "/auto-research",
+        "/upload-document",
+        "/cases/",
+        "/omni-ingest",
+        "/preview-document",
+        "/ingest",
+    )
+    return any(m in path for m in heavy_markers)
+
+
+def _check_rate_limit(client_ip: str) -> tuple[bool, int]:
+    """Returns (allowed, retry_after_seconds)."""
     now = time.time()
     window = 60.0
     limit = settings.max_requests_per_minute
     timestamps = _request_counts[client_ip]
-    # Remove old timestamps
     _request_counts[client_ip] = [t for t in timestamps if now - t < window]
     if len(_request_counts[client_ip]) >= limit:
-        return False
+        oldest = _request_counts[client_ip][0]
+        retry_after = int(window - (now - oldest)) + 1
+        return False, max(1, retry_after)
     _request_counts[client_ip].append(now)
-    return True
+    return True, 0
 
 
 # â”€â”€ Startup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -107,13 +135,23 @@ app.add_middleware(
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
-    # Only rate-limit the heavy research endpoint
-    if "/research" in request.url.path:
+    # Week 3: Rate limit all expensive endpoints (research, drafting, heavy RAG, uploads)
+    path = request.url.path
+    if _is_expensive_endpoint(path):
         client_ip = request.client.host if request.client else "unknown"
-        if not _check_rate_limit(client_ip):
+        allowed, retry_after = _check_rate_limit(client_ip)
+        if not allowed:
+            headers = {"Retry-After": str(retry_after)}
             return JSONResponse(
                 status_code=429,
-                content={"detail": f"Rate limit: max {settings.max_requests_per_minute} research requests/minute"},
+                content={
+                    "detail": (
+                        f"Rate limit exceeded: max {settings.max_requests_per_minute} "
+                        f"expensive requests/minute. Retry after {retry_after}s."
+                    ),
+                    "retry_after_seconds": retry_after,
+                },
+                headers=headers,
             )
     return await call_next(request)
 
@@ -132,7 +170,8 @@ app.include_router(legal_stream_router, prefix="/api/legal")
 app.include_router(similarity_router)
 app.include_router(analytics_router)
 app.include_router(graph_router)
-app.include_router(harvey_router, prefix="/api/v1")
+if _harvey_router_available:
+    app.include_router(harvey_router, prefix="/api/v1")
 
 
 @app.get("/")

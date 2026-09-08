@@ -98,21 +98,129 @@ class CaseManager:
     """
     High-level service layer for Case management.
     Handles business logic and coordination between repository and AI.
+    Emits structured case-event logging for observability (Week 2).
     """
     def __init__(self, repo: CaseRepository = JSONCaseRepository(settings.case_docs_path)):
         self.repo = repo
+        self._active_case_id: Optional[str] = None
 
     def list_cases(self) -> List[Dict[str, Any]]:
-        return self.repo.list_all()
+        cases = self.repo.list_all()
+        logger.info(
+            "case_event",
+            extra={
+                "event": "cases_listed",
+                "cases_count": len(cases),
+            }
+        )
+        return cases
 
     def get_case(self, case_id: str) -> Optional[Dict[str, Any]]:
-        return self.repo.find_by_id(case_id)
+        case = self.repo.find_by_id(case_id)
+        if case and case_id != self._active_case_id:
+            self._active_case_id = case_id
+            logger.info(
+                "case_event",
+                extra={
+                    "event": "case_switched",
+                    "case_id": case_id,
+                    "case_title": case.get("title", "Untitled"),
+                    "previous_case_id": self._active_case_id,
+                }
+            )
+        elif case:
+            logger.info(
+                "case_event",
+                extra={
+                    "event": "case_accessed",
+                    "case_id": case_id,
+                }
+            )
+        return case
 
     def save_case(self, case_id: str, data: Dict[str, Any]) -> bool:
-        return self.repo.upsert(case_id, data)
+        is_new = self.repo.find_by_id(case_id) is None
+        success = self.repo.upsert(case_id, data)
+        if success:
+            if is_new:
+                logger.info(
+                    "case_event",
+                    extra={
+                        "event": "case_created",
+                        "case_id": case_id,
+                        "case_title": data.get("title", "Untitled"),
+                    }
+                )
+            else:
+                logger.info(
+                    "case_event",
+                    extra={
+                        "event": "case_updated",
+                        "case_id": case_id,
+                        "case_title": data.get("title", "Untitled"),
+                    }
+                )
+        else:
+            logger.error(
+                "case_event",
+                extra={
+                    "event": "case_save_failed",
+                    "case_id": case_id,
+                }
+            )
+        return success
 
     def delete_case(self, case_id: str) -> bool:
-        return self.repo.remove(case_id)
+        success = self.repo.remove(case_id)
+        if success:
+            if self._active_case_id == case_id:
+                self._active_case_id = None
+            logger.info(
+                "case_event",
+                extra={
+                    "event": "case_deleted",
+                    "case_id": case_id,
+                }
+            )
+        else:
+            logger.warning(
+                "case_event",
+                extra={
+                    "event": "case_delete_failed",
+                    "case_id": case_id,
+                }
+            )
+        return success
+
+    def switch_active_case(self, case_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Explicit case-switch operation.
+        Logs a case_switch event for downstream observability pipelines.
+        Returns the case data on success, None if case not found.
+        """
+        case = self.repo.find_by_id(case_id)
+        if case is None:
+            logger.warning(
+                "case_event",
+                extra={
+                    "event": "case_switch_failed",
+                    "case_id": case_id,
+                    "reason": "case_not_found",
+                }
+            )
+            return None
+        previous = self._active_case_id
+        self._active_case_id = case_id
+        logger.info(
+            "case_event",
+            extra={
+                "event": "case_switched",
+                "case_id": case_id,
+                "case_title": case.get("title", "Untitled"),
+                "previous_case_id": previous,
+            }
+        )
+        return case
 
 # Global instance for FastAPI routes
 case_manager = CaseManager()

@@ -77,3 +77,10 @@ export const featureFlags = {
   /** Vector database for semantic search (FAISS/Pinecone) */
   enableVectorSearch: isEnabled(env.VITE_FF_ENABLE_VECTOR_SEARCH, false),
 } as const;
+
+/**
+ * Type of the featureFlags object.
+ * Import as `FeatureFlags` wherever you need to type a flags parameter
+ * or extend the flags shape in tests.
+ */
+export type FeatureFlags = typeof featureFlags;

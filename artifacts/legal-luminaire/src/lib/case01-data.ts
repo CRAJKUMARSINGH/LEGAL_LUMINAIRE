@@ -38,6 +38,12 @@ export type Precedent = {
   statusNote: string;
   sourceUrl: string;
   tags: string[];
+  /**
+   * When true this precedent MUST NOT appear in any generated court document.
+   * Defaults to false for VERIFIED/SECONDARY entries.
+   * MUST be true for every PENDING entry — Accuracy Rule §7.
+   */
+  blockedFromDraft?: boolean;
 };
 
 export type Standard = {
