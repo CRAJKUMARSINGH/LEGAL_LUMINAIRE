@@ -6,6 +6,7 @@ import { BreadcrumbTrail } from "./BreadcrumbTrail";
 import { useCaseContext } from "@/context/CaseContext";
 import { NAV_GROUPS } from "@/config/navigation";
 import { Badge } from "@/components/ui/badge";
+import { CopilotPanel } from "@/features/copilot";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -52,6 +53,8 @@ export function Layout({ children }: LayoutProps) {
         </header>
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      {/* ── Ask Luminaire Copilot Panel (Week 6) ─────────────────────────────── */}
+      <CopilotPanel />
     </div>
   );
 }

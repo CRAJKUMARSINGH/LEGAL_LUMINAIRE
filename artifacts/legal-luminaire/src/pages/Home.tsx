@@ -13,7 +13,9 @@ import { CreateCaseQuickDialog } from "@/components/create-case-quick-dialog";
 import { HarveyEvaluationPanel } from "@/components/HarveyEvaluationPanel";
 import { GuidedFlow } from "@/components/GuidedFlow";
 import { featureFlags } from "@/config/featureFlags";
+import { integrationFlags } from "@/lib/featureFlags";
 import { useCaseContext } from "@/context/CaseContext";
+import { CopilotPanel, SuggestedQuestions } from "@/features/copilot";
 import {
   caseInfo, caseLawMatrix, standardsMatrix,
   timelineEvents, caseDocuments,
@@ -90,6 +92,7 @@ const PRIORITY_ACTIONS = caseLawMatrix
 export default function Home() {
   const { cases, selectedCaseId, setSelectedCaseId } = useCaseContext();
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [copilotInput, setCopilotInput] = useState("");
   const verifiedCount  = useMemo(() => caseLawMatrix.filter((c) => c.status === "VERIFIED").length, []);
   const pendingCount   = useMemo(() => caseLawMatrix.filter((c) => c.status === "PENDING").length, []);
   const secondaryCount = useMemo(() => caseLawMatrix.length - verifiedCount - pendingCount, [verifiedCount, pendingCount]);
@@ -166,6 +169,30 @@ export default function Home() {
               },
             ]}
           />
+
+          {/* ── Ask Luminaire Empty State (Week 6) ─────────────────────────────── */}
+          {integrationFlags.ask_copilot && (
+            <Card className="glass-surface hover-elevate">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  Ask Luminaire
+                  <Badge variant="outline" className="ml-auto text-xs">SYNTHETIC / DEMO</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-6">
+                  <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Load a case to start asking questions
+                  </p>
+                  <p className="text-xs text-muted-foreground/70">
+                    केस लोड करें और प्रश्न पूछना शुरू करें
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
 
@@ -232,6 +259,28 @@ export default function Home() {
           </Card>
         </Link>
       </div>
+
+      {/* ── Ask Luminaire Copilot Card (Week 6) ─────────────────────────────── */}
+      {integrationFlags.ask_copilot && caseInfo && (
+        <Card className="glass-surface hover-elevate">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <MessageSquare className="h-4 w-4 text-primary" />
+              Ask Luminaire
+              <Badge variant="outline" className="ml-auto text-xs">SYNTHETIC / DEMO</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SuggestedQuestions 
+              onQuestionClick={(question) => {
+                setCopilotInput(question);
+                // The CopilotPanel will handle the actual sending
+              }}
+              maxQuestions={3}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── Guided Flow Component (shown when activated) ─────────────── */}
       {showGuidedFlow && (
