@@ -118,3 +118,70 @@ class ObservabilityResponse(BaseModel):
     case_summary: dict[str, Any] = Field(default_factory=dict)
     recent_sessions: list[dict[str, Any]] = Field(default_factory=list)
     error: Optional[str] = None
+
+
+# ── Week 5: Ask Copilot (Vyaas contract — citation-or-refuse, read-only) ─────
+
+class CopilotAskRequest(BaseModel):
+    """
+    Request body for POST /api/v1/copilot/ask.
+
+    Read-only by design: extra="forbid" rejects any additional fields so the
+    endpoint can never be coerced into accepting write operations.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    question: str = Field(
+        ...,
+        min_length=1,
+        max_length=2000,
+        description="Natural-language question about the active case book.",
+    )
+    case_id: str = Field(
+        ...,
+        description="Identifier of the case whose documents/timeline answer the question.",
+    )
+    session_id: Optional[str] = Field(
+        default=None,
+        description="Optional session token for log correlation.",
+    )
+
+
+class CopilotCitation(BaseModel):
+    """A single grounding citation returned with a copilot answer."""
+    type: Literal["document", "timeline", "register", "standard"] = Field(
+        description="Source type of this citation."
+    )
+    id: str = Field(description="Unique identifier of the source item.")
+    snippet: str = Field(
+        description="Verbatim extract from the source (≤300 chars).",
+        max_length=300,
+    )
+
+
+class CopilotRefusal(BaseModel):
+    """Returned when the copilot cannot cite any existing case-book item."""
+    reason: str = Field(
+        default="Not found in this case book. / इस केस बुक में नहीं मिला।",
+        description="Bilingual refusal reason (EN + HI). Never a guessed answer.",
+    )
+
+
+class CopilotAskResponse(BaseModel):
+    """
+    Response for POST /api/v1/copilot/ask.
+
+    Either `answer` + `citations` (non-empty) OR `refusal` is populated — never both.
+    Zero-citation answers are structurally prevented by the endpoint logic.
+    """
+    answer: str = Field(default="", description="Synthesised answer grounded in citations.")
+    citations: list[CopilotCitation] = Field(
+        default_factory=list,
+        description="Source items that ground the answer. Empty only when refusal is set.",
+    )
+    refusal: Optional[CopilotRefusal] = Field(
+        default=None,
+        description="Populated when no case-book item can support an answer.",
+    )
+    latency_ms: int = Field(default=0, description="End-to-end request latency in milliseconds.")
+    session_id: Optional[str] = Field(default=None, description="Echoed from request for correlation.")

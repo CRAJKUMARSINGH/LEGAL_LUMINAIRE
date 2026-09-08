@@ -29,6 +29,8 @@ from api.routes_legal_stream import router as legal_stream_router
 from api.routes_similarity import router as similarity_router
 from api.routes_analytics import router as analytics_router
 from api.routes_graph import router as graph_router
+# Week 5: Ask Copilot — read-only, citation-or-refuse, flag-gated
+from api.routes_copilot import router as copilot_router
 
 _harvey_router_available = False
 try:
@@ -65,6 +67,7 @@ def _is_expensive_endpoint(path: str) -> bool:
         "/omni-ingest",
         "/preview-document",
         "/ingest",
+        "/copilot",          # Week 5: Ask Copilot (expensive RAG + synthesis)
     )
     return any(m in path for m in heavy_markers)
 
@@ -170,6 +173,8 @@ app.include_router(legal_stream_router, prefix="/api/legal")
 app.include_router(similarity_router)
 app.include_router(analytics_router)
 app.include_router(graph_router)
+# Week 5: Ask Copilot — POST /api/v1/copilot/ask
+app.include_router(copilot_router, prefix="/api/v1")
 if _harvey_router_available:
     app.include_router(harvey_router, prefix="/api/v1")
 
