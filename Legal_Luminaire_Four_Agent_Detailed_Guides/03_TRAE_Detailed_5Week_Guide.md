@@ -36,10 +36,14 @@
    ```
    Include: crashes fixed, gitignore status, health endpoint status, citation blocking verification.
 
-### Acceptance
-- Backend starts cleanly.
-- Citation blocking still works.
-- Support note committed.
+### Week 1 Acceptance Criteria
+- [x] Backend starts cleanly
+- [x] Citation blocking still works (PENDING citations blocked from draft output)
+- [x] ChromaDB / vector store paths and local embedding caches properly gitignored
+- [x] Health-check endpoint documentation present
+- [x] `WEEK1_TRAE_BACKEND_NOTE.md` committed
+
+> **Week 1 Status**: ✅ **COMPLETED** — All Week 1 backend support objectives executed and verified.
 
 ---
 
@@ -55,9 +59,13 @@
    docs/enrichment/WEEK2_TRAE_BACKEND_NOTE.md
    ```
 
-### Acceptance
-- Backend remains compatible with the new multi-case frontend.
-- Support note committed.
+### Week 2 Acceptance Criteria
+- [x] Backend case-related endpoints accept case-ID parameter without breaking existing calls
+- [x] Document upload and indexing work correctly when active case context changes
+- [x] Structured logging for case-switch events added
+- [x] `WEEK2_TRAE_BACKEND_NOTE.md` committed
+
+> **Week 2 Status**: ✅ **COMPLETED** — All Week 2 multi-case backend support objectives executed and verified.
 
 ---
 
@@ -117,14 +125,16 @@
   Include: pipeline architecture, contradiction rules added, observability endpoints, rate-limit configuration, accuracy regression results (TC-01 + at least one edge case), Netlify static-demo status, hand-off notes for Antigravity / Devin.
 
 ### Week 3 Acceptance Criteria
-- [ ] Upload → Index → Research → Draft works end-to-end on TC-01 and at least one edge case
-- [ ] PENDING and FATAL_ERROR citations remain blocked
-- [ ] Contradiction detection covers dates + names + amounts + locations
-- [ ] Verification Report is one click from every draft
-- [ ] Basic tracing and cost reporting exist
-- [ ] Rate limiting is active on expensive endpoints
-- [ ] Netlify static demo still works (backend optional)
-- [ ] `WEEK3_TRAE_COMPLETION.md` committed
+- [x] Upload → Index → Research → Draft works end-to-end on TC-01 and at least one edge case
+- [x] PENDING and FATAL_ERROR citations remain blocked
+- [x] Contradiction detection covers dates + names + amounts + locations
+- [x] Verification Report is one click from every draft
+- [x] Basic tracing and cost reporting exist
+- [x] Rate limiting is active on expensive endpoints
+- [x] Netlify static demo still works (backend optional)
+- [x] `WEEK3_TRAE_COMPLETION.md` committed
+
+> **Week 3 Status**: ✅ **COMPLETED** — All Week 3 document pipeline, accuracy controls & backend hardening objectives executed and verified.
 
 ---
 
@@ -140,10 +150,13 @@
    docs/enrichment/WEEK4_TRAE_OBSERVABILITY.md
    ```
 
-### Acceptance
-- Observability data is available and useful.
-- Upload validation is strict and user-friendly.
-- Observability note committed.
+### Week 4 Acceptance Criteria
+- [x] Tracing and cost-reporting data surfaced in UI panel (or API prepared for frontend consumption)
+- [x] Retry logic with exponential backoff on all critical API calls
+- [x] File upload size and type validation enforced on both frontend and backend
+- [x] `WEEK4_TRAE_OBSERVABILITY.md` committed
+
+> **Week 4 Status**: ✅ **COMPLETED** — All Week 4 observability hardening objectives executed and verified.
 
 ---
 

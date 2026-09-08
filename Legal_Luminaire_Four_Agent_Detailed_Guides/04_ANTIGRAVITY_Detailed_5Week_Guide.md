@@ -39,10 +39,13 @@
    docs/enrichment/WEEK1_ANTIGRAVITY_HANDOFF.md
    ```
 
-### Acceptance
-- Visual checklist completed.
-- Netlify SPA routing confirmed.
-- Hand-off file committed.
+### Week 1 Acceptance Criteria
+- [x] Full visual regression checklist completed (empty states, skeleton loaders, desktop + mobile viewports)
+- [x] SPA routing confirmed working on Netlify preview / deploy
+- [x] Precise hand-off checklist prepared for Week 2 (files changed, residual risks, Devin verify-first items)
+- [x] `WEEK1_ANTIGRAVITY_HANDOFF.md` committed
+
+> **Week 1 Status**: ✅ **COMPLETED** — All Week 1 handoff & visual audit objectives executed and verified.
 
 ---
 
@@ -63,9 +66,13 @@
    ```
    Include: walkthrough findings, any residual navigation or labelling issues, Netlify status.
 
-### Acceptance
-- Full UX walkthrough completed.
-- Audit file committed.
+### Week 2 Acceptance Criteria
+- [x] Full UX walkthrough completed (grouped navigation, demo mode, test data browser, case switching)
+- [x] Bilingual labels, empty states, and SYNTHETIC badges remain consistent and visible
+- [x] Netlify deploy succeeds after multi-case data layer changes
+- [x] `WEEK2_ANTIGRAVITY_UX_AUDIT.md` committed with walkthrough findings
+
+> **Week 2 Status**: ✅ **COMPLETED** — All Week 2 UX audit objectives executed and verified.
 
 ---
 
@@ -85,9 +92,14 @@
    docs/enrichment/WEEK3_ANTIGRAVITY_ACCURACY_AUDIT.md
    ```
 
-### Acceptance
-- Accuracy regression passed (or residual issues clearly documented as blockers).
-- Audit file committed.
+### Week 3 Acceptance Criteria
+- [x] Full accuracy regression testing passed on TC-01, TC-E02 (Contradictory Dates), TC-E07 (Adversarial Fake Citation)
+- [x] PENDING and FATAL_ERROR citations remain completely blocked from draft output
+- [x] Verification Report and Pre-Filing Checklist reachable in one click from drafts
+- [x] Netlify static demo still works with backend optional
+- [x] `WEEK3_ANTIGRAVITY_ACCURACY_AUDIT.md` committed
+
+> **Week 3 Status**: ✅ **COMPLETED** — All Week 3 accuracy audit objectives executed and verified.
 
 ---
 

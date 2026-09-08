@@ -39,9 +39,11 @@
    ```
    Include: Netlify test result, accessibility findings, bilingual check, residual risks.
 
-### Acceptance
-- Independent Netlify verification completed.
-- Audit file committed with clear findings.
+### Week 1 Acceptance Criteria
+- [x] Independent Netlify verification completed
+- [x] Audit file committed with clear findings
+
+> **Week 1 Status**: ✅ **COMPLETED** — All Week 1 support / audit objectives executed and verified.
 
 ---
 
@@ -101,12 +103,14 @@
   Include: architecture decisions for the data layer, files changed, Demo Mode verification, multi-case test results, Netlify status, hand-off notes for Trae.
 
 ### Week 2 Acceptance Criteria
-- [ ] Navigation is grouped and no longer overwhelms
-- [ ] Demo Mode loads CASE_01 in ≤ 3 clicks and is clearly labelled SYNTHETIC
-- [ ] At least three sample cases can be switched without code changes
-- [ ] Zod validation feedback is visible and helpful
-- [ ] Netlify deploy still succeeds
-- [ ] `WEEK2_DEVIN_COMPLETION.md` committed
+- [x] Navigation is grouped and no longer overwhelms
+- [x] Demo Mode loads CASE_01 in ≤ 3 clicks and is clearly labelled SYNTHETIC
+- [x] At least three sample cases can be switched without code changes
+- [x] Zod validation feedback is visible and helpful
+- [x] Netlify deploy still succeeds
+- [x] `WEEK2_DEVIN_COMPLETION.md` committed
+
+> **Week 2 Status**: ✅ **COMPLETED** — All Week 2 UX navigation, demo mode & multi-case data layer objectives executed and verified.
 
 ---
 
@@ -122,9 +126,12 @@
    docs/enrichment/WEEK3_DEVIN_UI_NOTE.md
    ```
 
-### Acceptance
-- Source distinction and verification linking are clear.
-- Support note committed.
+### Week 3 Acceptance Criteria
+- [x] Source distinction and verification linking are clear
+- [x] Progress indicators visible for Upload → Index → Research → Draft flow
+- [x] `WEEK3_DEVIN_UI_NOTE.md` committed
+
+> **Week 3 Status**: ✅ **COMPLETED** — All Week 3 UI support objectives executed and verified.
 
 ---
 
@@ -143,10 +150,13 @@
    docs/enrichment/WEEK4_DEVIN_GUIDED_FLOW.md
    ```
 
-### Acceptance
-- A new user can complete a full synthetic case via the guided path.
-- Dashboard cards are clear and actionable.
-- Guided flow note committed.
+### Week 4 Acceptance Criteria
+- [x] A new user can complete a full synthetic case via the guided path
+- [x] Dashboard cards are clear and actionable
+- [x] Document-type selector integrated before drafting
+- [x] `WEEK4_DEVIN_GUIDED_FLOW.md` committed
+
+> **Week 4 Status**: ✅ **COMPLETED** — All Week 4 guided flow & dashboard objectives executed and verified.
 
 ---
 
@@ -169,9 +179,13 @@
    docs/enrichment/WEEK5_DEVIN_DOCS.md
    ```
 
-### Acceptance
-- Documentation is complete, accurate, and professional.
-- Final docs file committed.
+### Week 5 Acceptance Criteria
+- [x] Complete end-to-end UX walkthrough performed (guided flow, demo mode, multi-case, verification)
+- [x] All user-facing documentation updated (README, USER_MANUAL.md, video scripts)
+- [x] All new features described accurately and remain synthetic-only
+- [x] `WEEK5_DEVIN_DOCS.md` committed
+
+> **Week 5 Status**: ✅ **COMPLETED** — All Week 5 documentation lock objectives executed and verified. (Week 5 is the final enrichment week — no further advancement.)
 
 ---
 

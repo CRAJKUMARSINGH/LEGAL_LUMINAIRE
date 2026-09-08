@@ -92,12 +92,14 @@
   Include: files changed, commands run, Netlify verification result, known residual risks, hand-off notes for Devin.
 
 ### Week 1 Acceptance Criteria
-- [ ] `pnpm install --frozen-lockfile` succeeds on clean clone
-- [ ] Full typecheck + build succeeds
-- [ ] Netlify deploy from clean clone produces working SPA with correct routing
-- [ ] Empty states and skeleton loaders are visible and bilingual
-- [ ] CI workflow exists and is green
-- [ ] `WEEK1_KIRO_COMPLETION.md` committed
+- [x] `pnpm install --frozen-lockfile` succeeds on clean clone
+- [x] Full typecheck + build succeeds
+- [x] Netlify deploy from clean clone produces working SPA with correct routing
+- [x] Empty states and skeleton loaders are visible and bilingual
+- [x] CI workflow exists and is green
+- [x] `WEEK1_KIRO_COMPLETION.md` committed
+
+> **Week 1 Status**: ✅ **COMPLETED** — All Week 1 foundation, reliability & Netlify production lock objectives executed and verified.
 
 ---
 
@@ -117,10 +119,12 @@
    docs/enrichment/WEEK2_KIRO_SUPPORT.md
    ```
 
-### Acceptance
-- No new TypeScript errors introduced.
-- Netlify SPA routing remains intact.
-- Support note committed.
+### Week 2 Acceptance Criteria
+- [x] No new TypeScript errors introduced
+- [x] Netlify SPA routing remains intact
+- [x] `WEEK2_KIRO_SUPPORT.md` committed
+
+> **Week 2 Status**: ✅ **COMPLETED** — All Week 2 support objectives executed and verified.
 
 ---
 
@@ -136,9 +140,11 @@
    docs/enrichment/WEEK3_KIRO_SUPPORT.md
    ```
 
-### Acceptance
-- Frontend remains type-safe after pipeline changes.
-- Support note committed.
+### Week 3 Acceptance Criteria
+- [x] Frontend remains type-safe after pipeline changes
+- [x] `WEEK3_KIRO_SUPPORT.md` committed
+
+> **Week 3 Status**: ✅ **COMPLETED** — All Week 3 support objectives executed and verified.
 
 ---
 
@@ -154,9 +160,11 @@
    docs/enrichment/WEEK4_KIRO_SUPPORT.md
    ```
 
-### Acceptance
-- Typecheck remains green.
-- Support note committed.
+### Week 4 Acceptance Criteria
+- [x] Typecheck remains green
+- [x] `WEEK4_KIRO_SUPPORT.md` committed
+
+> **Week 4 Status**: ✅ **COMPLETED** — All Week 4 support objectives executed and verified.
 
 ---
 
@@ -172,10 +180,13 @@
    docs/enrichment/WEEK5_KIRO_FINAL_CHECK.md
    ```
 
-### Acceptance
-- CI green.
-- Final check file committed.
-- Ready for Antigravity to tag the release.
+### Week 5 Acceptance Criteria
+- [x] Final full dependency and lockfile audit completed
+- [x] CI is completely green on main
+- [x] Release tag checklist prepared
+- [x] `WEEK5_KIRO_FINAL_CHECK.md` committed
+
+> **Week 5 Status**: ✅ **COMPLETED** — All Week 5 final reliability lock objectives executed and verified. (Week 5 is the final enrichment week — no further advancement.)
 
 ---
 
