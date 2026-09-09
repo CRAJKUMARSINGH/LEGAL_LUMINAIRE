@@ -34,17 +34,14 @@ export type CaseRecord = {
   brief: string;
   createdAt: string;
   files: CaseFile[];
-  isDemo?: boolean;                   // Flag for synthetic/demo cases
 
-  // From live app schema
+  // Existing extended fields
   case_type?: "bail" | "discharge" | "writ" | "notice-reply" | "appeal" | "revision" | "other";
   status?: string;                     // case status (active, archived, draft)
   filing_date?: string;                // ISO date string
   charges?: string | string[];         // supports both old string and new array format
   parties?: CaseParty[];               // structured party list
   citations?: CaseCitation[];          // verified citations attached to case
-
-  // Existing extended fields
   forensic_grounding?: Array<{ code: string; title: string; keywords: string[]; violations: string[] }>;
   documents?: Array<{ id: string; name: string; type: string; status: string; size: number; uploadedAt: string; description?: string }>;
   caseLaw?: Array<{ case: string; court: string; useForDefence: string; status: string; action: string; citation?: string; holding?: string; fitScore?: number }>;

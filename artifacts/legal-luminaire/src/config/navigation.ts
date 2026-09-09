@@ -5,6 +5,7 @@ import {
   LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
   FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare, Mic, Edit3, GraduationCap,
 } from "lucide-react";
+import { featureFlags } from "@/config/featureFlags";
 
 export type NavItem = {
   path: string;

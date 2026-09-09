@@ -19,10 +19,6 @@ import { DemoModeCard } from "@/components/home/DemoModeCard";
 import { RecentCasesWidget } from "@/components/home/RecentCasesWidget";
 import { DEFAULT_CASE_ID, getChargesArray } from "@/lib/case-store";
 import {
-  caseInfo, caseLawMatrix, standardsMatrix,
-  timelineEvents, caseDocuments,
-} from "@/data/caseData";
-import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip,
 } from "recharts";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -75,12 +71,28 @@ export default function Home() {
   const { cases, selectedCase, selectedCaseId, setSelectedCaseId, isDemoMode } = useCaseContext();
   const caseId = selectedCase?.id ?? selectedCaseId;
   const isHemraj = caseId === DEFAULT_CASE_ID;
+  const caseLawMatrix  = selectedCase?.caseLaw ?? [];
+  const timelineEvents = selectedCase?.timeline ?? [];
+  const standardsMatrix = selectedCase?.standards ?? [];
+  const caseDocuments  = selectedCase?.documents ?? [];
+  const strategyPillars = useMemo(() => (selectedCase?.strategy ?? []).map((s) => s.title), [selectedCase]);
+  const charges = useMemo(() => getChargesArray(selectedCase ?? {} as any), [selectedCase]);
+  const QUICK_LINKS = useMemo(() => quickLinksFor(caseId ?? "demo-1"), [caseId]);
+  const PRIORITY_ACTIONS = useMemo(() => caseLawMatrix
+    .filter((c) => c.status === "PENDING")
+    .map((c) => ({ task: c.action, citation: c.case.split(",")[0], court: c.court }))
+    .concat(
+      timelineEvents
+        .filter((e) => e.note)
+        .map((e) => ({ task: e.note ?? "", citation: e.title, court: "Evidence" }))
+    )
+    .slice(0, 5), [caseLawMatrix, timelineEvents]);
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [copilotInput, setCopilotInput] = useState("");
   const [overdueDeadlines, setOverdueDeadlines] = useState<any[]>([]);
-  const verifiedCount  = useMemo(() => caseLawMatrix.filter((c) => c.status === "VERIFIED").length, []);
-  const pendingCount   = useMemo(() => caseLawMatrix.filter((c) => c.status === "PENDING").length, []);
-  const secondaryCount = useMemo(() => caseLawMatrix.length - verifiedCount - pendingCount, [verifiedCount, pendingCount]);
+  const verifiedCount  = useMemo(() => caseLawMatrix.filter((c) => c.status === "VERIFIED").length, [caseLawMatrix]);
+  const pendingCount   = useMemo(() => caseLawMatrix.filter((c) => c.status === "PENDING").length, [caseLawMatrix]);
+  const secondaryCount = useMemo(() => caseLawMatrix.length - verifiedCount - pendingCount, [caseLawMatrix.length, verifiedCount, pendingCount]);
   const total          = caseLawMatrix.length;
 
   // Fetch overdue deadlines for dashboard (Week 10)
@@ -101,7 +113,7 @@ export default function Home() {
     { label: "Case Law Citations",  value: caseLawMatrix.length,   icon: BookOpen,    color: "text-emerald-500" },
     { label: "Standards Referenced",value: standardsMatrix.length, icon: FlaskConical,color: "text-violet-500" },
     { label: "Timeline Events",     value: timelineEvents.length,  icon: Clock,       color: "text-amber-500" },
-  ];
+  ], [caseDocuments.length, caseLawMatrix.length, standardsMatrix.length, timelineEvents.length]);
 
   // Recent cases - show last 5 cases excluding current
   const recentCases = useMemo(() => {
@@ -122,8 +134,8 @@ export default function Home() {
       {/* ── Demo Mode (1 click) ──────────────────────────────────────────── */}
       <DemoModeCard />
 
-      {/* ── All content below only renders when caseInfo exists ─────────── */}
-      {caseInfo && (<>
+      {/* ── All content below only renders when a case is loaded ─────── */}
+      {selectedCase && (<>
 
       {/* ── Task-Oriented Dashboard Cards ─────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -229,7 +241,7 @@ export default function Home() {
       )}
 
       {/* ── Ask Luminaire Copilot Card (Week 6) ─────────────────────────────── */}
-      {integrationFlags.ask_copilot && caseInfo && (
+      {integrationFlags.ask_copilot && selectedCase && (
         <Card className="glass-surface hover-elevate">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">

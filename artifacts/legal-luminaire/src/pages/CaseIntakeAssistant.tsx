@@ -82,7 +82,7 @@ export default function CaseIntakeAssistant() {
   const [ackDateOverride, setAckDateOverride] = useState(false);
   const [copied, setCopied] = useState(false);
   const [created, setCreated] = useState(false);
-  const [touched, setTouched] = useState<Partial<Record<CaseIntakeField, boolean>>>({});
+  const [touched, setTouched] = useState<Partial<Record<string, boolean>>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const form = useForm<FormValues>({
