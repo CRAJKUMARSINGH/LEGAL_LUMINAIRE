@@ -1,17 +1,16 @@
 # ============================================================================
-# Legal Luminaire — Sub-directory netlify.toml
-# Netlify site base directory: artifacts/legal-luminaire/
-# Publish dir (relative to base):  dist/public
-# Node: 22  |  pnpm: 10
+# Legal Luminaire — artifact-level netlify.toml
 #
-# Build strategy: step up to monorepo root (../../), install with pnpm so that
-# pnpm-workspace.yaml catalog: specifiers resolve correctly, then build the
-# legal-luminaire package. This is equivalent to the root-level netlify.toml
-# but works when Netlify's "Base directory" is set to artifacts/legal-luminaire.
+# IF Netlify UI "Base directory" = artifacts/legal-luminaire:
+#   Netlify sets CWD to /opt/build/repo/artifacts/legal-luminaire
+#   REPOSITORY_ROOT = /opt/build/repo  (always the checkout root)
+#   We cd to REPOSITORY_ROOT so pnpm workspaces resolve correctly.
+#   publish is relative to base dir.
 # ============================================================================
 
 [build]
-  command = "cd ../.. && corepack enable && corepack prepare pnpm@10 --activate && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
+  base    = "artifacts/legal-luminaire"
+  command = "cd $REPOSITORY_ROOT && corepack enable && corepack prepare pnpm@10 --activate && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
   publish = "dist/public"
 
 [build.environment]
@@ -19,13 +18,12 @@
   PNPM_VERSION = "10"
   NPM_FLAGS    = "--version"
 
-# SPA catch-all — every client-side route returns index.html (200, not 301)
+# SPA catch-all
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
   status = 200
 
-# ── Security headers ─────────────────────────────────────────────────────────
 [[headers]]
   for = "/*"
   [headers.values]

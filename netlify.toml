@@ -1,20 +1,24 @@
 # ============================================================================
-# Legal Luminaire — Netlify Production Config (Week 1 Lock — NEVER CHANGE)
-# Connect repo root in Netlify UI. Leave "Base directory" blank.
-# Publish dir:  artifacts/legal-luminaire/dist/public
-# Node:         22   |   pnpm: 10
+# Legal Luminaire — ROOT netlify.toml
+#
+# Netlify UI settings:
+#   Repository:    CRAJKUMARSINGH/LEGAL_LUMINAIRE
+#   Base directory: (blank — repo root)
+#   Build command:  (leave blank — taken from this file)
+#   Publish dir:    artifacts/legal-luminaire/dist/public
+#   Node version:   22
 # ============================================================================
 
 [build]
-  # corepack enable → activates pnpm 10 on Netlify's Node 22 image before install/build
+  base    = ""
   command = "corepack enable && corepack prepare pnpm@10 --activate && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
   publish = "artifacts/legal-luminaire/dist/public"
 
 [build.environment]
-  NODE_VERSION    = "22"
-  PNPM_VERSION    = "10"
-  # Disable Netlify's default npm install — pnpm handles everything
-  NPM_FLAGS       = "--version"
+  NODE_VERSION = "22"
+  PNPM_VERSION = "10"
+  # Prevent Netlify auto-running npm install before our command
+  NPM_FLAGS    = "--version"
 
 # SPA catch-all: every path returns index.html (200, not 301)
 [[redirects]]
@@ -22,9 +26,6 @@
   to     = "/index.html"
   status = 200
 
-# ============================================================================
-# Headers — security baseline
-# ============================================================================
 [[headers]]
   for = "/*"
   [headers.values]
