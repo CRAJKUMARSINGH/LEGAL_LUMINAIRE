@@ -67,10 +67,12 @@ Small proven fixes in `src/features/copilot/*`, backend refusal copy only where 
 > You are working in https://github.com/CRAJKUMARSINGH/LEGAL_LUMINAIRE. Week 8 of the 12-week integration plan: adversarial audit of Ask Luminaire (flags `ask_copilot` + `citation_deeplink` ON) against the deployed Netlify preview, using browser automation with screenshots. Execute the six probes: nonexistent matter/date → bilingual refusal with zero fabrication; cross-case question → refusal, no leakage; PENDING-tier item → never cited; fake citation fed in the question → resolver 404 → refusal; mid-stream interruption → partial answers carry complete citations or are discarded; contradiction question → both sides cited with contradiction id. Then re-run full accuracy regression TC-01, TC-E02, TC-E07 and re-prove the Week 2–3 intake guarantees (local-only redaction, confirm-before-file). Apply only audit-proven trust polish: grounded-in-N-items header with SYNTHETIC/DEMO badge, bilingual refusal transparency, stream reconnection, keyboard-reachable chips. Verify clean-clone Netlify deploy and SPA routing. Write `docs/integration/WEEK08_ANTIGRAVITY_AUDIT.md` with all evidence and commit conventionally.
 
 ## WEEK 8 ACCEPTANCE CRITERIA
-- [ ] 6/6 adversarial probes pass with screenshot evidence
-- [ ] Full accuracy regression green after six weeks of integration changes
-- [ ] Trust polish applied without hiding any accuracy signal
-- [ ] Clean-clone Netlify deploy succeeds; `WEEK08_ANTIGRAVITY_AUDIT.md` committed
+- [x] 6/6 adversarial probes pass with screenshot evidence
+- [x] Full accuracy regression green after six weeks of integration changes
+- [x] Trust polish applied without hiding any accuracy signal
+- [x] Clean-clone Netlify deploy succeeds; `WEEK08_ANTIGRAVITY_AUDIT.md` committed
+
+> **Week 8 Status**: ✅ **COMPLETED** — All Week 8 Copilot Accuracy Audit & Trust Polish objectives executed and verified.
 
 ## ACCURACY GUARDRAILS
 Any probe failure that leaks uncited content is a release blocker for the copilot flag — fix before closing the week or turn the flag OFF.

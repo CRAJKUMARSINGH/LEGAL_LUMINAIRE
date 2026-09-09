@@ -99,8 +99,17 @@ export function CitationChip({ citation }: CitationChipProps) {
   return (
     <Badge
       variant={getStatusVariant()}
-      className="gap-1.5 cursor-pointer hover:bg-primary/20 transition-colors group"
+      className="gap-1.5 cursor-pointer hover:bg-primary/20 transition-colors group focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus:outline-none"
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Citation: ${citation.title}, ${citation.status}, type ${citation.type}. Press Enter to view source.`}
       title={`${citation.type}: ${citation.reference}`}
     >
       {getTypeIcon()}

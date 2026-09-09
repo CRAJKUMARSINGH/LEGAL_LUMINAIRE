@@ -37,6 +37,7 @@ const DraftViewer = lazy(() => import("@/pages/draft-viewer"));
 const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
 const CaseSimilarityPage = lazy(() => import("@/pages/CaseSimilarityPage"));
 const JudgeAnalyticsPage = lazy(() => import("@/pages/JudgeAnalyticsPage"));
+const CopilotPage = lazy(() => import("@/pages/CopilotPage"));
 
 // Citation-Explorer merge
 const CitationSearchPage = lazy(() => import("@/pages/CitationSearchPage"));
@@ -147,6 +148,7 @@ export function Router() {
           <Route path="/demo-browser" component={() => Wrap(<DemoCaseBrowser />, "DemoCaseBrowser")} />
           <Route path="/citation-search" component={() => Wrap(<CitationSearchPage />, "CitationSearchPage")} />
           <Route path="/authority/:id" component={() => Wrap(<CitationAuthorityPage />, "CitationAuthorityPage")} />
+          <Route path="/copilot" component={() => Wrap(<CopilotPage />, "CopilotPage")} />
 
           {/* Defense Master Routes */}
           <Route path="/cross-check-report" component={() => Wrap(<CrossCheckReport />, "CrossCheckReport")} />
@@ -177,6 +179,7 @@ export function Router() {
           <Route path="/lps-standards" component={() => Wrap(<LPS_StandardsPage />, "LPS_StandardsPage")} />
 
           {/* Case-scoped routes */}
+          <Route path="/case/:id/copilot"               component={() => Wrap(<CopilotPage />, "CopilotPage")} />
           <Route path="/case/:id/dashboard"             component={() => <div className="p-6">{Wrap(<DynamicDashboardView />, "DynamicDashboardView")}</div>} />
           <Route path="/case/:id/chat"                  component={() => <div className="flex flex-col h-full">{Wrap(<ChatView />, "ChatView")}</div>} />
           <Route path="/case/:id/case-law"              component={() => <div className="p-0">{Wrap(<CaseLawView />, "CaseLawView")}</div>} />
