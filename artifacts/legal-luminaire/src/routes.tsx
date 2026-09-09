@@ -35,6 +35,8 @@ const DraftViewer = lazy(() => import("@/pages/draft-viewer"));
 // Week 10: Chronology Studio & Deadline Board
 const ChronologyPage = lazy(() => import("@/pages/ChronologyPage"));
 const DeadlinePage = lazy(() => import("@/pages/DeadlinePage"));
+// Week 12: Accuracy Academy
+const AccuracyAcademyPage = lazy(() => import("@/pages/AccuracyAcademyPage"));
 
 // Phase 3-6 Intelligence Pages
 const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
@@ -206,6 +208,10 @@ export function Router() {
           {/* Week 10: Chronology Studio & Deadline Board */}
           <Route path="/case/:id/chronology"           component={() => Wrap(<ChronologyPage />, "ChronologyPage")} />
           <Route path="/case/:id/deadlines"            component={() => Wrap(<DeadlinePage />, "DeadlinePage")} />
+          {/* Week 12: Accuracy Academy */}
+          <Route path="/academy"                       component={() => Wrap(<AccuracyAcademyPage />, "AccuracyAcademyPage")} />
+          <Route path="/accuracy-academy"              component={() => Wrap(<AccuracyAcademyPage />, "AccuracyAcademyPage")} />
+          <Route path="/case/:id/academy"              component={() => Wrap(<AccuracyAcademyPage />, "AccuracyAcademyPage")} />
           {featureFlags.hybridStandardsValidity && (
             <Route path="/case/:id/standards-validity"  component={() => Wrap(<StandardsValidity />, "StandardsValidity")} />
           )}

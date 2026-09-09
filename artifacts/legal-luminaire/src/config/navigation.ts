@@ -3,7 +3,7 @@ import {
   Scale, BookOpen, CheckSquare,
   Home as HomeIcon, FilePlus, FileText,
   LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
-  FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare, Mic, Edit3,
+  FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare, Mic, Edit3, GraduationCap,
 } from "lucide-react";
 import { featureFlags } from "@/config/featureFlags";
 
@@ -86,6 +86,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { path: "/ldr-comparison", label: "Doc Compare", labelEn: "Doc Compare", icon: GitCompare, caseScoped: false, badge: "LDR" },
       { path: "/review-queue", label: "चेंबर समीक्षा", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
       { path: "/improvement-lab", label: "Research Lab", labelEn: "Improvement Lab", icon: FileSearch, caseScoped: false, badge: "P2" },
+      { path: "/academy", label: "सटीकता अकादमी", labelEn: "Accuracy Academy", icon: GraduationCap, caseScoped: false, badge: "W12" },
       ...(featureFlags.hybridStandardsValidity ? [
         { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
       ] : []),

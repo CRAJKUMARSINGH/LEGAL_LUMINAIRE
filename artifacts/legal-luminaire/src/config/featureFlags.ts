@@ -84,6 +84,11 @@ export const featureFlags = {
   enableDeadlineBoard: isEnabled(env.VITE_FF_ENABLE_DEADLINE_BOARD, true),
   /** Month Calendar - calendar view for deadlines */
   enableMonthCalendar: isEnabled(env.VITE_FF_ENABLE_MONTH_CALENDAR, true),
+
+  // === WEEK 12: ACCURACY ACADEMY ===
+  /** Accuracy Academy - branching walkthrough + trade-off meters */
+  accuracyAcademy: isEnabled(env.VITE_FF_ACCURACY_ACADEMY, true),
+  accuracy_academy: isEnabled(env.VITE_FF_ACCURACY_ACADEMY, true),
 } as const;
 
 /**
