@@ -1,4 +1,4 @@
-import { caseDocuments } from "@/data/caseData";
+import { useCaseContext } from "@/context/CaseContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, FileCode, FileCheck, Search } from "lucide-react";
@@ -27,8 +27,18 @@ const typeColors: Record<string, string> = {
   checklist: "bg-teal-500/10 text-teal-600",
 };
 
+function formatSize(bytes: number): string {
+  if (!bytes) return "—";
+  return bytes >= 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
 export const DocumentsView = () => {
   const [search, setSearch] = useState("");
+  const { selectedCase } = useCaseContext();
+  const caseDocuments = [
+    ...(selectedCase.documents ?? []),
+    ...selectedCase.files.map((f, i) => ({ id: `file-${i}`, name: f.name, type: f.type || "upload", status: "UPLOADED", size: f.size, uploadedAt: selectedCase.createdAt })),
+  ];
   const filtered = caseDocuments.filter((d) =>
     d.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -37,9 +47,9 @@ export const DocumentsView = () => {
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Case Documents</h2>
+          <h2 className="text-2xl font-bold text-foreground">केस दस्तावेज़ / Case Documents</h2>
           <p className="text-muted-foreground text-sm mt-1">
-            CASE_01_HemrajG — {caseDocuments.length} files indexed
+            {selectedCase.title} — {caseDocuments.length} files indexed
           </p>
         </div>
         <div className="relative w-64">
@@ -53,19 +63,29 @@ export const DocumentsView = () => {
         </div>
       </div>
 
+      {caseDocuments.length === 0 && (
+        <Card>
+          <CardContent className="p-8 text-center text-sm text-muted-foreground" role="status">
+            <FileText className="h-8 w-8 mx-auto mb-3 opacity-40" aria-hidden="true" />
+            <p className="font-medium text-foreground">अभी कोई दस्तावेज़ नहीं</p>
+            <p>No documents yet for this case. Use Upload to add files.</p>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid gap-3">
         {filtered.map((doc) => {
           const Icon = typeIcons[doc.type] || FileText;
           const color = typeColors[doc.type] || "bg-muted text-muted-foreground";
           return (
-            <Card key={doc.name} className="hover:bg-accent/50 transition-colors cursor-pointer">
+            <Card key={doc.id} className="hover:bg-accent/50 transition-colors cursor-pointer">
               <CardContent className="flex items-center gap-4 p-4">
                 <div className={`rounded-lg p-2.5 ${color}`}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground text-sm truncate">{doc.name}</p>
-                  <p className="text-xs text-muted-foreground">{doc.size}</p>
+                  <p className="text-xs text-muted-foreground">{formatSize(doc.size)}</p>
                 </div>
                 <Badge variant="outline" className="text-xs capitalize">
                   {doc.type}

@@ -4,15 +4,15 @@
  * Artemis-II Accuracy: Fact-Fit Gate scores + verification status on every card.
  */
 import { useState, useMemo } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Scale, Search, ArrowRight, CheckCircle2, AlertTriangle,
+  Scale, Search, ArrowRight, Loader2,
   PlayCircle, Building2, FileText, Gavel, ShieldCheck,
-  Users, Briefcase, Landmark, Zap,
+  Users, Briefcase, Landmark,
 } from "lucide-react";
 import {
   ALL_DEMO_CASES, DEMO_CATEGORIES, filterDemoCases,
@@ -24,6 +24,14 @@ import {
   syntheticSpecHint,
 } from "@/data/case-pack-paths";
 import { useCaseContext } from "@/context/CaseContext";
+import { SCENARIO_LABELS, recordIdForDemo, scenarioTypeFor, type ScenarioType } from "@/cases/registry";
+
+const SCENARIO_COLORS: Record<ScenarioType, string> = {
+  functional: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  edge: "bg-violet-50 text-violet-700 border-violet-200",
+  stress: "bg-rose-50 text-rose-700 border-rose-200",
+  showcase: "bg-sky-50 text-sky-700 border-sky-200",
+};
 
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Criminal: Gavel,
@@ -46,12 +54,16 @@ const CATEGORY_COLORS: Record<string, string> = {
 const SCORE_COLOR = (score: number) =>
   score >= 90 ? "text-emerald-600" : score >= 80 ? "text-blue-600" : "text-amber-600";
 
-function CaseCard({ c, onSelect }: { c: DemoCaseCard; onSelect: (id: string) => void }) {
+function CaseCard({ c, active, loading, onLoad }: { c: DemoCaseCard; active: boolean; loading: boolean; onLoad: (id: string) => void }) {
   const CatIcon = CATEGORY_ICONS[c.category] || Scale;
   const catColor = CATEGORY_COLORS[c.category] || "";
+  const scenario = scenarioTypeFor(c.id);
 
   return (
-    <Card className="hover-elevate transition-all border hover:border-primary/30 group">
+    <Card
+      data-testid={`demo-card-${c.id}`}
+      className={`hover-elevate transition-all border group ${active ? "border-primary ring-1 ring-primary/40" : "hover:border-primary/30"}`}
+    >
       <CardContent className="p-4 space-y-3">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
@@ -67,15 +79,29 @@ function CaseCard({ c, onSelect }: { c: DemoCaseCard; onSelect: (id: string) => 
                 </span>
               </div>
               <p className="text-sm font-semibold text-foreground leading-tight line-clamp-2">{c.title}</p>
+              {c.titleHindi && <p className="text-[11px] text-muted-foreground leading-tight line-clamp-1">{c.titleHindi}</p>}
             </div>
           </div>
-          {c.isNew && (
-            <Badge className="bg-emerald-500 text-white text-[9px] font-black shrink-0">NEW</Badge>
-          )}
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <Badge className="bg-amber-500 text-white text-[8px] font-black tracking-wider">SYNTHETIC / DEMO</Badge>
+            {active && <Badge variant="outline" className="text-[9px] border-primary text-primary">सक्रिय / Active</Badge>}
+            {c.isNew && <Badge className="bg-emerald-500 text-white text-[9px] font-black">NEW</Badge>}
+          </div>
         </div>
+
+        {/* Court + Charges (required card fields) */}
+        <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 text-[11px]">
+          <dt className="text-muted-foreground">न्यायालय / Court</dt>
+          <dd className="text-foreground font-medium truncate" title={c.court}>{c.court}</dd>
+          <dt className="text-muted-foreground">आरोप / Charges</dt>
+          <dd className="text-foreground font-medium truncate" title={c.charges}>{c.charges}</dd>
+        </dl>
 
         {/* Badges */}
         <div className="flex flex-wrap gap-1.5">
+          <Badge variant="outline" className={`text-[10px] border ${SCENARIO_COLORS[scenario]}`} title="Scenario type">
+            {SCENARIO_LABELS[scenario].hi} / {SCENARIO_LABELS[scenario].en}
+          </Badge>
           <Badge variant="outline" className={`text-[10px] border ${catColor}`}>
             {c.category}
           </Badge>
@@ -116,27 +142,39 @@ function CaseCard({ c, onSelect }: { c: DemoCaseCard; onSelect: (id: string) => 
         </div>
 
         {/* Action */}
-        <Link href={c.demoPath}>
-          <Button
-            size="sm"
-            className="w-full gap-1.5 text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-            variant="outline"
-            onClick={() => onSelect(c.id)}
-          >
-            <PlayCircle className="h-3.5 w-3.5" />
-            Open Demo Case
-            <ArrowRight className="h-3 w-3 ml-auto" />
-          </Button>
-        </Link>
+        <Button
+          size="sm"
+          className="w-full gap-1.5 text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+          variant="outline"
+          disabled={loading}
+          data-testid={`load-demo-${c.id}`}
+          onClick={() => onLoad(c.id)}
+        >
+          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : <PlayCircle className="h-3.5 w-3.5" aria-hidden="true" />}
+          लोड करें / Load Case
+          <ArrowRight className="h-3 w-3 ml-auto" aria-hidden="true" />
+        </Button>
       </CardContent>
     </Card>
   );
 }
 
 export default function DemoCaseBrowser() {
-  const { setSelectedCaseId } = useCaseContext();
+  const { loadDemoCase, selectedCaseId } = useCaseContext();
+  const [, setLocation] = useLocation();
   const [activeCategory, setActiveCategory] = useState<DemoCategory>("All");
   const [search, setSearch] = useState("");
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  const handleLoad = async (demoId: string) => {
+    setLoadingId(demoId);
+    try {
+      const id = await loadDemoCase(demoId);
+      if (id) setLocation(`/case/${id}/dashboard`);
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   const filtered = useMemo(
     () => filterDemoCases(ALL_DEMO_CASES, activeCategory, search),
@@ -160,8 +198,8 @@ export default function DemoCaseBrowser() {
           <PlayCircle className="h-8 w-8 text-amber-500 shrink-0 mt-0.5" />
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl font-bold text-amber-900">Demo Case Browser</h1>
-              <Badge className="bg-amber-500 text-white text-[10px] font-black">26 CASES</Badge>
+              <h1 className="text-xl font-bold text-amber-900">टेस्ट डेटा ब्राउज़र / Test Data Browser</h1>
+              <Badge className="bg-amber-500 text-white text-[10px] font-black">SYNTHETIC / DEMO · 26 CASES</Badge>
               <Badge variant="outline" className="border-amber-400 text-amber-700 text-[10px]">NO API KEY REQUIRED</Badge>
             </div>
             <p className="text-sm text-amber-700 mt-1">
@@ -236,7 +274,13 @@ export default function DemoCaseBrowser() {
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.map(c => (
-            <CaseCard key={c.id} c={c} onSelect={setSelectedCaseId} />
+            <CaseCard
+              key={c.id}
+              c={c}
+              active={recordIdForDemo(c.id) === selectedCaseId}
+              loading={loadingId === c.id}
+              onLoad={handleLoad}
+            />
           ))}
         </div>
       ) : (

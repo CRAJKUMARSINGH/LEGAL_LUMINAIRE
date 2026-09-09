@@ -7,6 +7,8 @@ import { CaseRecord, defaultCase, loadCases, saveCases, loadSelectedCaseId, save
 import { CASE_TEMPLATES, generateCaseFromTemplate } from "@/lib/case-templates";
 import type { CaseTemplate } from "@/lib/multi-case-store";
 import { useToast } from "@/hooks/use-toast";
+import { buildCaseRecord, recordIdForDemo } from "@/cases/registry";
+import { loadRecentCases, pushRecentCase, type RecentCaseEntry } from "@/lib/recent-cases";
 
 export type CaseContextType = {
   cases: CaseRecord[];
@@ -19,6 +21,11 @@ export type CaseContextType = {
   createFromTemplate: (templateId: string, overrides?: Partial<CaseRecord>) => void;
   templates: CaseTemplate[];
   isLoading: boolean;
+  /** Build (or rebuild) a catalogue case (TC-01 … TC-26) and make it the active case. Returns the record id. */
+  loadDemoCase: (demoId: string) => Promise<string | null>;
+  /** Last few opened cases, most recent first, resolved against `cases`. */
+  recentCases: CaseRecord[];
+  isDemoMode: boolean;
 };
 
 const CaseContext = createContext<CaseContextType | null>(null);
@@ -31,6 +38,7 @@ export function CaseProvider({ children }: { children: React.ReactNode }) {
   const [cases, setCases] = useState<CaseRecord[]>(() => loadCases());
   const [selectedCaseId, setSelectedCaseIdState] = useState<string>(() => loadSelectedCaseId());
   const [isLoading, setIsLoading] = useState(false);
+  const [recent, setRecent] = useState<RecentCaseEntry[]>(() => loadRecentCases());
   const { toast } = useToast();
 
   // Seed infra arb cases on first load (TC-22 to TC-26)
@@ -48,6 +56,21 @@ export function CaseProvider({ children }: { children: React.ReactNode }) {
         });
       }).catch(() => { /* infra cases optional */ });
     }
+  }, []);
+
+  // Hydrate the built-in CASE_01 slot from the data layer if it is still an empty shell
+  useEffect(() => {
+    const c01 = cases.find((c) => c.id === defaultCase.id);
+    if (!c01 || (c01.caseLaw?.length ?? 0) > 0) return;
+    buildCaseRecord("TC-01").then((rec) => {
+      if (!rec) return;
+      setCases((prev) => {
+        const next = prev.map((c) => (c.id === defaultCase.id ? { ...rec, id: defaultCase.id, files: c.files } : c));
+        saveCases(next);
+        return next;
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Optionally sync from backend — never blocks UI, tries live app prefix first
@@ -82,6 +105,38 @@ export function CaseProvider({ children }: { children: React.ReactNode }) {
   const setSelectedCaseId = (id: string) => {
     setSelectedCaseIdState(id);
     saveSelectedCaseId(id);
+    setRecent(pushRecentCase(id));
+  };
+
+  const recentCases = useMemo(
+    () => recent.map((r) => cases.find((c) => c.id === r.id)).filter((c): c is CaseRecord => Boolean(c)),
+    [recent, cases]
+  );
+
+  const isDemoMode = Boolean(selectedCase.isDemo) || selectedCase.title.startsWith("[DEMO]");
+
+  const loadDemoCase = async (demoId: string): Promise<string | null> => {
+    setIsLoading(true);
+    try {
+      const record = await buildCaseRecord(demoId);
+      if (!record) {
+        toast({ title: "Demo case not found / डेमो केस नहीं मिला", description: demoId, variant: "destructive" });
+        return null;
+      }
+      const id = recordIdForDemo(demoId);
+      const full = { ...record, id };
+      setCases((prev) => {
+        const next = prev.some((c) => c.id === id)
+          ? prev.map((c) => (c.id === id ? full : c))
+          : [full, ...prev];
+        saveCases(next);
+        return next;
+      });
+      setSelectedCaseId(id);
+      return id;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const addCase = (record: CaseRecord) => {
@@ -159,6 +214,7 @@ export function CaseProvider({ children }: { children: React.ReactNode }) {
       cases, selectedCaseId, selectedCase,
       setSelectedCaseId, addCase, deleteCase, duplicateCase,
       createFromTemplate, templates: CASE_TEMPLATES, isLoading,
+      loadDemoCase, recentCases, isDemoMode,
     }}>
       {children}
     </CaseContext.Provider>

@@ -69,6 +69,21 @@ export type CaseRecord = {
     target_event_id?: number;
     severity: string;
   }>;
+
+  /** True for SYNTHETIC / DEMO records — UI must show a persistent demo badge. */
+  isDemo?: boolean;
+  /** Demo catalogue id (e.g. "TC-01") this record was built from, if any. */
+  sourceDemoId?: string;
+  /** Relief sought — one clause per entry, in filing order. */
+  prayerClauses?: string[];
+  /** Verification blocks: what was checked, its tier and evidence. Never hide these in the UI. */
+  verificationBlocks?: Array<{
+    id: string;
+    claim: string;
+    status: "VERIFIED" | "SECONDARY" | "PENDING" | "COURT_SAFE" | "FATAL_ERROR";
+    evidence: string;
+    blockedFromDraft?: boolean;
+  }>;
 };
 
 const CASES_KEY = "legal_luminaire_cases_v1";

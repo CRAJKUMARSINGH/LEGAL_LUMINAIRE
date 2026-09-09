@@ -1,7 +1,8 @@
 import React, { Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useCaseContext } from "@/context/CaseContext";
 import { featureFlags } from "@/config/featureFlags";
+import { LEGACY_FLAT_PATHS } from "@/config/navigation";
 import { Layout } from "@/components/layout/Layout";
 import type { LpsRoute, FlatRoute } from "@/types";
 import { isLpsRoute, LPS_ROUTE_MAP } from "@/types";
@@ -162,6 +163,11 @@ export function Router() {
           <Route path="/fsl-analysis" component={() => Wrap(<FslAnalysis />, "FslAnalysis")} />
           <Route path="/standards-index" component={() => Wrap(<StandardsIndex />, "StandardsIndex")} />
           <Route path="/filing-checklist" component={() => Wrap(<FilingChecklist />, "FilingChecklist")} />
+
+          {/* Legacy flat case routes (e.g. /dashboard) → redirect into the active case. */}
+          {LEGACY_FLAT_PATHS.map((p) => (
+            <Route key={p} path={p} component={() => <Redirect to={`/case/${selectedCase.id}${p}`} replace />} />
+          ))}
 
           {/* Document Review Routes */}
           <Route path="/ldr-home" component={() => Wrap(<LDR_HomePage lang={ldrLang} />, "LDR_HomePage")} />

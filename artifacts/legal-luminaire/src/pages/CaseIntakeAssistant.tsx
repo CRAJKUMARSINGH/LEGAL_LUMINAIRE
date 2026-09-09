@@ -59,6 +59,18 @@ const catColor: Record<ParsedFile["category"], string> = {
   other: "bg-gray-100 text-gray-700",
 };
 
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+  return (
+    <p id={id} role="alert" className="text-[11px] text-rose-700 mt-1 flex items-start gap-1">
+      <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" aria-hidden="true" /> {message}
+    </p>
+  );
+}
+
+const inputCls = (err?: string) =>
+  `border rounded-lg px-3 py-2 text-sm w-full ${err ? "border-rose-500 focus:ring-rose-500" : ""}`;
+
 export default function CaseIntakeAssistant() {
   const { addCase } = useCaseContext();
   const [, setLocation] = useLocation();
@@ -70,6 +82,8 @@ export default function CaseIntakeAssistant() {
   const [ackDateOverride, setAckDateOverride] = useState(false);
   const [copied, setCopied] = useState(false);
   const [created, setCreated] = useState(false);
+  const [touched, setTouched] = useState<Partial<Record<CaseIntakeField, boolean>>>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -183,6 +197,7 @@ export default function CaseIntakeAssistant() {
     (dateResult.valid || ackDateOverride);
 
   const createCase = () => {
+    setSubmitAttempted(true);
     if (!isValid) return;
     const id = slugifyCase(`${title}-${caseNo || Date.now()}`);
     const record: CaseRecord = {
