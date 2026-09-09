@@ -22,14 +22,14 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Enable Corepack (pnpm)
-        run: corepack enable
+      - name: Enable Corepack (pnpm 10, matches netlify.toml)
+        run: corepack enable && corepack prepare pnpm@10 --activate
 
       - name: Install dependencies (frozen - reproducible)
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm run typecheck
+      - name: Typecheck (libs + frontend)
+        run: pnpm run typecheck:libs && pnpm --filter @workspace/legal-luminaire run typecheck
 
       - name: Run Vitest suite
         run: pnpm --filter @workspace/legal-luminaire run test
