@@ -6,8 +6,8 @@
 # ============================================================================
 
 [build]
-  # Full monorepo build: frozen lockfile ensures reproducibility
-  command = "pnpm install --frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
+  # corepack enable → activates pnpm 10 on Netlify's Node 22 image before install/build
+  command = "corepack enable && corepack prepare pnpm@10 --activate && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
   publish = "artifacts/legal-luminaire/dist/public"
 
 [build.environment]

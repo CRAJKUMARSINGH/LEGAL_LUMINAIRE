@@ -1,21 +1,39 @@
 # ============================================================================
 # Legal Luminaire — Sub-directory netlify.toml
-# Used ONLY when Netlify is connected directly to artifacts/legal-luminaire/
-# (not the monorepo root). Prefer root-level netlify.toml for production.
+# Netlify site base directory: artifacts/legal-luminaire/
+# Publish dir (relative to base):  dist/public
+# Node: 22  |  pnpm: 10
+#
+# Build strategy: step up to monorepo root (../../), install with pnpm so that
+# pnpm-workspace.yaml catalog: specifiers resolve correctly, then build the
+# legal-luminaire package. This is equivalent to the root-level netlify.toml
+# but works when Netlify's "Base directory" is set to artifacts/legal-luminaire.
 # ============================================================================
 
 [build]
-  # When building from this sub-directory, pnpm workspace context is missing.
-  # Install deps locally then build.
-  # WARNING: keep "scripts.build" in package.json in sync with root netlify.toml
-  # build command. If you update the root, update here too.
-  command = "npm install && npm run build"
+  command = "cd ../.. && corepack enable && corepack prepare pnpm@10 --activate && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
   publish = "dist/public"
 
 [build.environment]
   NODE_VERSION = "22"
+  PNPM_VERSION = "10"
+  NPM_FLAGS    = "--version"
 
+# SPA catch-all — every client-side route returns index.html (200, not 301)
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
   status = 200
+
+# ── Security headers ─────────────────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
