@@ -254,7 +254,7 @@ export function DeadlineBoard() {
                     className="p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <Badge className={getStatusBadge(item.status)} className="text-xs">
+                      <Badge className={`${getStatusBadge(item.status)} text-xs`}>
                         {item.status}
                       </Badge>
                       {item.due_date && (
