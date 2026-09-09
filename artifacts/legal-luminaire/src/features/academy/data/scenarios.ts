@@ -221,13 +221,13 @@ export const ACADEMY_SCENARIOS: Scenario[] = [
         costHi: "2026 के नए निर्णय के बिना बहस करनी होगी, हालांकि स्थापित सुप्रीम कोर्ट निर्णयों का आधार मौजूद रहेगा।",
         deltas: {
           verificationDepth: 20,
-          timeSpent: 10,
+          timeSpent: -5,
           clientSafety: 25,
         },
         consequenceEn:
-          "Safe, timely, and credible (+20 Verification, +10 Time, +25 Client Safety). The petition passes registry screening and withstands initial scrutiny.",
+          "Safe, timely, and credible (+20 Verification, +25 Client Safety), but counsel spends a few extra minutes restructuring the pleading around the verified core authorities (-5 Time). The petition passes registry screening and withstands initial scrutiny.",
         consequenceHi:
-          "सुरक्षित, समयबद्ध और विश्वसनीय (+20 सत्यापन, +10 समय, +25 सुरक्षा)। याचिका रजिस्ट्री जांच में सफल रही और कोर्ट में तुरंत स्वीकृत हुई।",
+          "सुरक्षित, समयबद्ध और विश्वसनीय (+20 सत्यापन, +25 सुरक्षा), लेकिन याचिका को केवल सत्यापित निर्णयों के आधार पर फिर से व्यवस्थित करने में कुछ अतिरिक्त मिनट लगे (-5 समय)। याचिका रजिस्ट्री जांच में सफल रही और कोर्ट में तुरंत स्वीकृत हुई।",
         optimizedForEn: "Clean Registry Passage & Zero Hallucination Risk",
         optimizedForHi: "रजिस्ट्री की निर्बाध स्वीकृति और शून्य त्रुटि जोखिम",
         sacrificedEn: "Novel 2026 High Court Precedent Citation",
