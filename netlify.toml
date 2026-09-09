@@ -12,9 +12,10 @@
 [build.environment]
   NODE_VERSION    = "22"
   PNPM_VERSION    = "10"
-  # Tell pnpm to skip the minimumReleaseAge check on CI (packages already
-  # installed and verified locally; the age gate is for supply-chain safety
-  # on dev machines, not reproducible CI builds).
+  # Force --no-frozen-lockfile for ALL pnpm invocations including Netlify's
+  # automatic pre-build install step (frozen-lockfile fails because lockfile
+  # was generated on Windows; ignoredOptionalDependencies differs on Linux).
+  PNPM_FLAGS      = "--no-frozen-lockfile"
   NPM_FLAGS       = "--version"
   CI              = "true"
 
