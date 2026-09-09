@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,10 +93,24 @@ export default function Home() {
   const { cases, selectedCaseId, setSelectedCaseId } = useCaseContext();
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [copilotInput, setCopilotInput] = useState("");
+  const [overdueDeadlines, setOverdueDeadlines] = useState<any[]>([]);
   const verifiedCount  = useMemo(() => caseLawMatrix.filter((c) => c.status === "VERIFIED").length, []);
   const pendingCount   = useMemo(() => caseLawMatrix.filter((c) => c.status === "PENDING").length, []);
   const secondaryCount = useMemo(() => caseLawMatrix.length - verifiedCount - pendingCount, [verifiedCount, pendingCount]);
   const total          = caseLawMatrix.length;
+
+  // Fetch overdue deadlines for dashboard (Week 10)
+  useEffect(() => {
+    if (selectedCaseId) {
+      fetch(`/api/v1/case/${selectedCaseId}/deadlines/urgent`)
+        .then(res => res.json())
+        .then(data => {
+          const overdue = data.items?.filter((item: any) => item.status === "OVERDUE") || [];
+          setOverdueDeadlines(overdue);
+        })
+        .catch(err => console.error("Failed to fetch overdue deadlines:", err));
+    }
+  }, [selectedCaseId]);
 
   const stats = useMemo(() => [
     { label: "Case Documents",      value: caseDocuments.length,   icon: FileText,    color: "text-blue-500" },
@@ -259,6 +273,48 @@ export default function Home() {
           </Card>
         </Link>
       </div>
+
+      {/* ── Overdue Deadlines Card (Week 10) ─────────────────────────────── */}
+      {overdueDeadlines.length > 0 && (
+        <Card className="border-red-300 bg-red-50 hover-elevate">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              Overdue Deadlines
+              <Badge variant="destructive" className="ml-auto">
+                {overdueDeadlines.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {overdueDeadlines.slice(0, 3).map((deadline: any) => (
+                <div key={deadline.rule_id} className="p-3 bg-white rounded-lg border">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-medium text-sm">{deadline.name}</p>
+                      <p className="text-xs text-muted-foreground">{deadline.name_hi}</p>
+                    </div>
+                    <Badge variant="outline" className="text-red-700 border-red-300">
+                      {deadline.days_remaining} days overdue
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+              {overdueDeadlines.length > 3 && (
+                <p className="text-xs text-muted-foreground text-center">
+                  +{overdueDeadlines.length - 3} more overdue items
+                </p>
+              )}
+            </div>
+            <Link href={`/case/${selectedCaseId}/deadlines`}>
+              <Button variant="outline" size="sm" className="w-full mt-3">
+                View All Deadlines
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── Ask Luminaire Copilot Card (Week 6) ─────────────────────────────── */}
       {integrationFlags.ask_copilot && caseInfo && (

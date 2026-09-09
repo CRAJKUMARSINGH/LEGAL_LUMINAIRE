@@ -285,3 +285,130 @@ class DeadlineScheduleResponse(BaseModel):
         ),
         description="Mandatory illustrative disclaimer — always present, never suppressed.",
     )
+
+
+# ── Week 10: Chronology Studio ─────────────────────────────────────────────────────
+
+class ChronologyEntry(BaseModel):
+    """
+    A single proposed chronology entry.
+
+    Every entry carries a deep-linked source citation, confidence score,
+    and needs_review flag. Entries are PROPOSALS until accepted by the user.
+    """
+    id: str = Field(description="Unique entry identifier.")
+    case_id: str = Field(description="Case this entry belongs to.")
+    date: Optional[str] = Field(
+        default=None,
+        description="ISO-8601 date if known. Null → 'Needs dating' lane.",
+    )
+    event: str = Field(description="Event description in English.")
+    event_hi: str = Field(description="Event description in Hindi.")
+    source_citation: str = Field(
+        description="Deep-linked source citation (document ID + section/line).",
+    )
+    source_type: str = Field(
+        description="Source type: 'case_facts_timeline' | 'cross_reference_matrix' | 'document_extracted'.",
+    )
+    confidence: str = Field(
+        description="Confidence level: 'VERIFIED' | 'SECONDARY' | 'PENDING'.",
+    )
+    needs_review: bool = Field(
+        default=True,
+        description="True if entry requires user review before acceptance.",
+    )
+    status: str = Field(
+        default="proposed",
+        description="Entry status: 'proposed' | 'accepted' | 'rejected' | 'edited'.",
+    )
+    notes: Optional[str] = Field(
+        default=None,
+        description="Additional notes or context for this entry.",
+    )
+    is_synthetic: bool = Field(
+        default=True,
+        description="Always True — all case data is SYNTHETIC/DEMO.",
+    )
+
+
+class ChronologyProposalRequest(BaseModel):
+    """
+    Request body for POST /api/v1/case/{case_id}/chronology/propose.
+
+    Triggers generation of proposed chronology entries from the case's
+    synthetic documents and data layer.
+    """
+    case_id: str = Field(description="Case identifier to generate chronology for.")
+    include_document_events: bool = Field(
+        default=True,
+        description="Include events extracted from Week 3 document processing.",
+    )
+
+
+class ChronologyProposalResponse(BaseModel):
+    """
+    Response for POST /api/v1/case/{case_id}/chronology/propose.
+
+    Returns a list of proposed chronology entries with source citations.
+    Entries with missing dates are flagged for the 'Needs dating' lane.
+    """
+    case_id: str = Field(description="Case identifier.")
+    proposed_at: str = Field(description="ISO-8601 timestamp when proposal was generated.")
+    total_entries: int = Field(description="Total number of proposed entries.")
+    entries_needing_date: int = Field(
+        description="Count of entries missing dates (will appear in 'Needs dating' lane).",
+    )
+    entries: list[ChronologyEntry] = Field(
+        default_factory=list,
+        description="Proposed chronology entries, sorted by date (undated last).",
+    )
+    disclaimer: str = Field(
+        default=(
+            "All chronology entries are SYNTHETIC/DEMO proposals. "
+            "Review and accept entries before using in official documents. "
+            "/ सभी कालक्रम प्रविष्टियाँ संश्लेषित/डेमो प्रस्ताव हैं। "
+            "आधिकारिक दस्तावेजों में उपयोग करने से पहले समीक्षा करें और स्वीकार करें।"
+        ),
+        description="Mandatory disclaimer — entries are proposals until accepted.",
+    )
+
+
+class ChronologyActionRequest(BaseModel):
+    """
+    Request body for POST /api/v1/case/{case_id}/chronology/action.
+
+    Allows accept/edit/reject actions on individual chronology entries.
+    """
+    case_id: str = Field(description="Case identifier.")
+    entry_id: str = Field(description="Entry identifier to act on.")
+    action: str = Field(
+        description="Action: 'accept' | 'reject' | 'edit'.",
+    )
+    edited_event: Optional[str] = Field(
+        default=None,
+        description="New event text if action is 'edit'.",
+    )
+    edited_event_hi: Optional[str] = Field(
+        default=None,
+        description="New event text in Hindi if action is 'edit'.",
+    )
+    edited_date: Optional[str] = Field(
+        default=None,
+        description="New date (ISO-8601) if action is 'edit'.",
+    )
+
+
+class ChronologyActionResponse(BaseModel):
+    """
+    Response for POST /api/v1/case/{case_id}/chronology/action.
+
+    Confirms the action and returns the updated entry state.
+    """
+    success: bool = Field(description="True if action was successful.")
+    entry_id: str = Field(description="Entry identifier that was acted on.")
+    action: str = Field(description="Action that was performed.")
+    updated_entry: Optional[ChronologyEntry] = Field(
+        default=None,
+        description="Updated entry state after action.",
+    )
+    message: str = Field(description="Bilingual success/error message.")

@@ -12,7 +12,7 @@ interface SuggestedQuestion {
   id: string;
   question: string;
   questionHi: string;
-  category: "facts" | "contradictions" | "deadlines" | "documents" | "precedents";
+  category: "facts" | "contradictions" | "deadlines" | "documents" | "precedents" | "chronology";
 }
 
 const generateSuggestedQuestions = (): SuggestedQuestion[] => {
@@ -62,9 +62,25 @@ const generateSuggestedQuestions = (): SuggestedQuestion[] => {
     });
     questions.push({
       id: "deadlines-2",
-      question: "Which timeline events require immediate attention?",
-      questionHi: "कौन से समयरेखा घटनाओं को तत्काल ध्यान देने की आवश्यकता है?",
+      question: "What is due this week?",
+      questionHi: "इस सप्ताह क्या देय है?",
       category: "deadlines"
+    });
+  }
+
+  // Chronology-based questions (Week 10)
+  if (caseInfo) {
+    questions.push({
+      id: "chronology-1",
+      question: "What happened after the arrest?",
+      questionHi: "गिरफ्तारी के बाद क्या हुआ?",
+      category: "chronology"
+    });
+    questions.push({
+      id: "chronology-2",
+      question: "Show me the case timeline events",
+      questionHi: "मुझे केस टाइमलाइन घटनाएं दिखाएं",
+      category: "chronology"
     });
   }
 

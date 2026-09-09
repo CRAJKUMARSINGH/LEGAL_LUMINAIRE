@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
   ChevronRight, ChevronLeft, CheckCircle2, Circle, 
-  FilePlus, Search, Edit3, ShieldCheck, PlayCircle
+  FilePlus, Search, Edit3, ShieldCheck, PlayCircle, Clock
 } from "lucide-react";
 import { useCaseContext } from "@/context/CaseContext";
 
-export type GuidedFlowStep = "intake" | "research" | "draft" | "review";
+export type GuidedFlowStep = "intake" | "research" | "chronology" | "draft" | "review";
 
 export interface DocumentType {
   id: string;
@@ -60,6 +60,7 @@ const DOCUMENT_TYPES: DocumentType[] = [
 const STEPS = [
   { id: "intake" as GuidedFlowStep, label: "Intake", labelHi: "इनटेक", icon: FilePlus },
   { id: "research" as GuidedFlowStep, label: "Research", labelHi: "शोध", icon: Search },
+  { id: "chronology" as GuidedFlowStep, label: "Chronology", labelHi: "कालक्रम", icon: Clock },
   { id: "draft" as GuidedFlowStep, label: "Draft", labelHi: "प्रारूपण", icon: Edit3 },
   { id: "review" as GuidedFlowStep, label: "Review", labelHi: "समीक्षा", icon: ShieldCheck },
 ];
@@ -181,6 +182,37 @@ export function GuidedFlow({ onComplete, onStartNew }: GuidedFlowProps) {
               >
                 <span className="text-lg">💬</span>
                 <span className="text-sm">AI Chat Assistant</span>
+              </Button>
+            </div>
+          </div>
+        );
+
+      case "chronology":
+        return (
+          <div className="space-y-4">
+            <div className="text-center py-8">
+              <Clock className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Chronology Studio / कालक्रम स्टूडियो</h3>
+              <p className="text-muted-foreground text-sm">
+                Generate and review a source-cited timeline from your case documents.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex-col gap-2"
+                onClick={() => window.location.href = `/case/${selectedCase?.id || 'case-01'}/chronology`}
+              >
+                <Clock className="h-5 w-5" />
+                <span className="text-sm">Open Chronology Studio</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex-col gap-2"
+                onClick={() => window.location.href = `/case/${selectedCase?.id || 'case-01'}/deadlines`}
+              >
+                <span className="text-lg">📅</span>
+                <span className="text-sm">View Deadline Board</span>
               </Button>
             </div>
           </div>

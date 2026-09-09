@@ -76,6 +76,14 @@ export const featureFlags = {
   enableCollaboration: isEnabled(env.VITE_FF_ENABLE_COLLABORATION, false),
   /** Vector database for semantic search (FAISS/Pinecone) */
   enableVectorSearch: isEnabled(env.VITE_FF_ENABLE_VECTOR_SEARCH, false),
+
+  // === WEEK 10: CHRONOLOGY STUDIO & DEADLINE BOARD ===
+  /** Chronology Studio - source-cited timeline generation */
+  enableChronologyStudio: isEnabled(env.VITE_FF_ENABLE_CHRONOLOGY_STUDIO, true),
+  /** Deadline Board - kanban-style deadline tracking */
+  enableDeadlineBoard: isEnabled(env.VITE_FF_ENABLE_DEADLINE_BOARD, true),
+  /** Month Calendar - calendar view for deadlines */
+  enableMonthCalendar: isEnabled(env.VITE_FF_ENABLE_MONTH_CALENDAR, true),
 } as const;
 
 /**

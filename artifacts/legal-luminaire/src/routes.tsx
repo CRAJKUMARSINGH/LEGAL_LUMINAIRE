@@ -32,6 +32,9 @@ const DemoCaseBrowser = lazy(() => import("@/pages/DemoCaseBrowser"));
 const StandardsValidity = lazy(() => import("@/pages/StandardsValidity"));
 const SessionWorkspace = lazy(() => import("@/pages/session-workspace"));
 const DraftViewer = lazy(() => import("@/pages/draft-viewer"));
+// Week 10: Chronology Studio & Deadline Board
+const ChronologyPage = lazy(() => import("@/pages/ChronologyPage"));
+const DeadlinePage = lazy(() => import("@/pages/DeadlinePage"));
 
 // Phase 3-6 Intelligence Pages
 const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
@@ -200,6 +203,9 @@ export function Router() {
           <Route path="/case/:id/discharge-application" component={() => Wrap(<DischargeApplication />, "DischargeApplication")} />
           <Route path="/case/:id/defence-reply"         component={() => Wrap(<DefenceReply />, "DefenceReply")} />
           <Route path="/case/:id/oral-arguments"        component={() => Wrap(<OralArguments />, "OralArguments")} />
+          {/* Week 10: Chronology Studio & Deadline Board */}
+          <Route path="/case/:id/chronology"           component={() => Wrap(<ChronologyPage />, "ChronologyPage")} />
+          <Route path="/case/:id/deadlines"            component={() => Wrap(<DeadlinePage />, "DeadlinePage")} />
           {featureFlags.hybridStandardsValidity && (
             <Route path="/case/:id/standards-validity"  component={() => Wrap(<StandardsValidity />, "StandardsValidity")} />
           )}
