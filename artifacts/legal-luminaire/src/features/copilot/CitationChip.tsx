@@ -11,10 +11,13 @@ interface CitationChipProps {
 }
 
 export function CitationChip({ citation }: CitationChipProps) {
-  // Assert that PENDING and FATAL_ERROR statuses are never rendered
-  if (citation.status === "PENDING" || citation.status === "FATAL_ERROR") {
-    console.error("Invalid citation status rendered:", citation.status);
-    throw new Error(`CitationChip cannot render status: ${citation.status}`);
+  // Runtime safety guard: PENDING and FATAL_ERROR must never reach this component.
+  // The status type is "VERIFIED" | "SECONDARY" by contract; cast to string to
+  // allow the defensive runtime check without TS narrowing errors.
+  const status = citation.status as string;
+  if (status === "PENDING" || status === "FATAL_ERROR") {
+    console.error("Invalid citation status rendered:", status);
+    throw new Error(`CitationChip cannot render status: ${status}`);
   }
 
   const handleClick = () => {

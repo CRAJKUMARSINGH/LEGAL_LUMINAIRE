@@ -31,6 +31,8 @@ from api.routes_analytics import router as analytics_router
 from api.routes_graph import router as graph_router
 # Week 5: Ask Copilot — read-only, citation-or-refuse, flag-gated
 from api.routes_copilot import router as copilot_router
+# Week 9: Limitation & Deadline Engine — deterministic, no LLM, flag-gated
+from api.routes_deadlines import router as deadlines_router
 
 _harvey_router_available = False
 try:
@@ -68,6 +70,7 @@ def _is_expensive_endpoint(path: str) -> bool:
         "/preview-document",
         "/ingest",
         "/copilot",          # Week 5: Ask Copilot (expensive RAG + synthesis)
+        "/deadlines",        # Week 9: Deadline Engine (rule computation per case)
     )
     return any(m in path for m in heavy_markers)
 
@@ -175,6 +178,8 @@ app.include_router(analytics_router)
 app.include_router(graph_router)
 # Week 5: Ask Copilot — POST /api/v1/copilot/ask
 app.include_router(copilot_router, prefix="/api/v1")
+# Week 9: Deadline Engine — GET /api/v1/case/{id}/deadlines + /api/v1/deadlines/rules
+app.include_router(deadlines_router, prefix="/api/v1")
 if _harvey_router_available:
     app.include_router(harvey_router, prefix="/api/v1")
 

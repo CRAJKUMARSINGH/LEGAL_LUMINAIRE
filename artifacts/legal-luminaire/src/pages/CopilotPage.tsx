@@ -433,7 +433,7 @@ export function CopilotPage() {
               <div className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4 text-primary" />
                 <span className="font-semibold text-sm">Grounded Conversation</span>
-                <span className="text-xs text-muted-foreground">({selectedCase?.name || "Hemraj - SYNTHETIC"})</span>
+                <span className="text-xs text-muted-foreground">({selectedCase?.title || "Hemraj - SYNTHETIC"})</span>
               </div>
               <div className="flex items-center gap-2">
                 {isStreaming && (
@@ -485,7 +485,7 @@ export function CopilotPage() {
                       <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border/40 text-xs">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="font-semibold text-foreground truncate max-w-[200px]">
-                            {selectedCase?.name || "State v. Hemraj"}
+                            {selectedCase?.title || "State v. Hemraj"}
                           </span>
                           <Badge variant="outline" className="text-[9px] px-1 py-0 font-bold border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 shrink-0">
                             SYNTHETIC / DEMO

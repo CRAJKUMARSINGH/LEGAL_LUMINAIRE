@@ -160,8 +160,9 @@ def _build_citations(chunks: list) -> List[CopilotCitation]:
     for chunk in chunks[:TOP_K_SYNTHESIS]:
         meta = chunk.document.metadata
         # Determine citation type from metadata; default to "document"
+        # "deadline" added Week 9: cites the deterministic engine's rule_id + basis.
         raw_type = meta.get("citation_type", meta.get("type", "document"))
-        if raw_type not in {"document", "timeline", "register", "standard"}:
+        if raw_type not in {"document", "timeline", "register", "standard", "deadline"}:
             raw_type = "document"
 
         citation_id = (

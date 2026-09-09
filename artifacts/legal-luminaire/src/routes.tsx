@@ -37,7 +37,7 @@ const DraftViewer = lazy(() => import("@/pages/draft-viewer"));
 const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
 const CaseSimilarityPage = lazy(() => import("@/pages/CaseSimilarityPage"));
 const JudgeAnalyticsPage = lazy(() => import("@/pages/JudgeAnalyticsPage"));
-const CopilotPage = lazy(() => import("@/pages/CopilotPage"));
+const CopilotPage = lazy(() => import("@/pages/CopilotPage").then(m => ({ default: m.CopilotPage })));
 
 // Citation-Explorer merge
 const CitationSearchPage = lazy(() => import("@/pages/CitationSearchPage"));

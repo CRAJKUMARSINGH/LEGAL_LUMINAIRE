@@ -149,8 +149,12 @@ class CopilotAskRequest(BaseModel):
 
 class CopilotCitation(BaseModel):
     """A single grounding citation returned with a copilot answer."""
-    type: Literal["document", "timeline", "register", "standard"] = Field(
-        description="Source type of this citation."
+    type: Literal["document", "timeline", "register", "standard", "deadline"] = Field(
+        description=(
+            "Source type of this citation. "
+            "'deadline' added in Week 9: cites a deterministic engine result "
+            "(rule_id + basis string) — never an invented date."
+        )
     )
     id: str = Field(description="Unique identifier of the source item.")
     snippet: str = Field(
@@ -185,3 +189,99 @@ class CopilotAskResponse(BaseModel):
     )
     latency_ms: int = Field(default=0, description="End-to-end request latency in milliseconds.")
     session_id: Optional[str] = Field(default=None, description="Echoed from request for correlation.")
+
+
+# ── Week 9: Limitation & Deadline Engine ──────────────────────────────────────
+
+class DeadlineItem(BaseModel):
+    """
+    A single computed deadline entry in a case's deadline schedule.
+
+    Every field is traceable: rule_id links back to limitation_rules.json,
+    basis_en/basis_hi contain the full computation chain,
+    source_note carries the illustrative disclaimer.
+    is_synthetic is always True for demo data.
+    """
+    rule_id: str = Field(description="Unique rule identifier from limitation_rules.json.")
+    case_id: str = Field(description="Case this deadline belongs to.")
+    event_type: str = Field(description="Event type that triggered this rule (e.g. 'arrest_date').")
+    event_date: Optional[str] = Field(
+        default=None,
+        description="ISO-8601 date of the triggering event. Null → CANNOT_COMPUTE.",
+    )
+    due_date: Optional[str] = Field(
+        default=None,
+        description="ISO-8601 computed deadline date. Null when event_date is missing.",
+    )
+    days_remaining: Optional[int] = Field(
+        default=None,
+        description=(
+            "Days until due_date from reference date. "
+            "Negative = overdue. Null = CANNOT_COMPUTE."
+        ),
+    )
+    status: str = Field(
+        description=(
+            "OVERDUE | URGENT (≤14d) | WARNING (≤30d) | UPCOMING | "
+            "COMPLETED | CANNOT_COMPUTE"
+        ),
+    )
+    name: str = Field(description="Rule name in English.")
+    name_hi: str = Field(description="Rule name in Hindi.")
+    basis_en: str = Field(
+        description=(
+            "Full English computation chain: rule + statute + event + period = due_date. "
+            "Includes SYNTHETIC/DEMO disclaimer."
+        ),
+    )
+    basis_hi: str = Field(
+        description="Full Hindi computation chain (mirrors basis_en).",
+    )
+    statute: str = Field(description="Governing statute (e.g. 'CrPC / BNSS').")
+    section: str = Field(description="Specific section / provision.")
+    source_note: str = Field(
+        description="Illustrative disclaimer — verify against current statute text.",
+    )
+    period_days: int = Field(description="Rule period in days (calendar or working).")
+    period_basis: str = Field(description="'calendar' or 'working'.")
+    consequence: str = Field(default="", description="Legal consequence if deadline is missed (EN).")
+    consequence_hi: str = Field(default="", description="Legal consequence in Hindi.")
+    computed_at: str = Field(description="ISO-8601 date computation was performed.")
+    is_synthetic: bool = Field(
+        default=True,
+        description="Always True — all event dates are SYNTHETIC/DEMO.",
+    )
+    completed: bool = Field(
+        default=False,
+        description="True if the deadline has been marked completed by the user.",
+    )
+
+
+class DeadlineScheduleResponse(BaseModel):
+    """
+    Response for GET /api/v1/case/{case_id}/deadlines.
+
+    Contains the full computed deadline schedule for one synthetic case.
+    Every item is traceable to a rule_id + event_date.
+    disclaimer is present on every response — never suppressed.
+    """
+    case_id: str = Field(description="Case identifier.")
+    computed_at: str = Field(description="ISO-8601 reference date used for computation.")
+    total: int = Field(description="Total number of deadline items in the schedule.")
+    status_counts: dict[str, int] = Field(
+        default_factory=dict,
+        description="Count of items per status (OVERDUE, URGENT, WARNING, UPCOMING, CANNOT_COMPUTE).",
+    )
+    items: list[DeadlineItem] = Field(
+        default_factory=list,
+        description="Computed deadline items, sorted by due_date ascending (CANNOT_COMPUTE last).",
+    )
+    disclaimer: str = Field(
+        default=(
+            "All dates and deadlines are SYNTHETIC/DEMO only. "
+            "Verify every rule against current statute text before professional use. "
+            "/ सभी तिथियाँ और समय-सीमाएँ संश्लेषित/डेमो हैं। "
+            "व्यावसायिक उपयोग से पहले वर्तमान विधि-पाठ से सत्यापित करें।"
+        ),
+        description="Mandatory illustrative disclaimer — always present, never suppressed.",
+    )
