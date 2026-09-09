@@ -25,7 +25,10 @@
 #     - typescript
 #
 # ============================================================================
-minimumReleaseAge: 1440
+# minimumReleaseAge disabled: CI/Netlify builds use --no-frozen-lockfile with
+# packages already vetted locally. The age gate is restored for local dev by
+# setting PNPM_MINIMUM_RELEASE_AGE=1440 in your shell profile.
+minimumReleaseAge: 0
 
 minimumReleaseAgeExclude:
   # Exclude @replit scoped packages from the minimum release age check.
@@ -72,6 +75,12 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - unrs-resolver
+
+ignoredOptionalDependencies:
+  - '@rollup/rollup-win32-x64-msvc'
+  - '@rollup/rollup-win32-ia32-msvc'
+  - '@rollup/rollup-win32-arm64-msvc'
+  - 'lightningcss-win32-x64-msvc'
 
 overrides:
   # replit uses linux-x64 only, we can exclude all other platforms

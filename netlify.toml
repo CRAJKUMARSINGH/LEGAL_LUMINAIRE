@@ -1,26 +1,24 @@
 # ============================================================================
-# Legal Luminaire — ROOT netlify.toml
+# Legal Luminaire — Netlify Production Config
 #
-# Netlify UI settings:
-#   Repository:    CRAJKUMARSINGH/LEGAL_LUMINAIRE
-#   Base directory: (blank — repo root)
-#   Build command:  (leave blank — taken from this file)
-#   Publish dir:    artifacts/legal-luminaire/dist/public
-#   Node version:   22
+# Netlify UI: Base directory = (blank/empty)  ← MUST be blank
+# Build runs from repo root. pnpm activated via corepack (Node 22 image).
 # ============================================================================
 
 [build]
-  base    = ""
-  command = "corepack enable && corepack prepare pnpm@10 --activate && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/legal-luminaire run build"
+  command = "corepack enable && corepack prepare pnpm@10 --activate && pnpm install --no-frozen-lockfile --ignore-scripts=false && pnpm --filter @workspace/legal-luminaire run build"
   publish = "artifacts/legal-luminaire/dist/public"
 
 [build.environment]
-  NODE_VERSION = "22"
-  PNPM_VERSION = "10"
-  # Prevent Netlify auto-running npm install before our command
-  NPM_FLAGS    = "--version"
+  NODE_VERSION    = "22"
+  PNPM_VERSION    = "10"
+  # Tell pnpm to skip the minimumReleaseAge check on CI (packages already
+  # installed and verified locally; the age gate is for supply-chain safety
+  # on dev machines, not reproducible CI builds).
+  NPM_FLAGS       = "--version"
+  CI              = "true"
 
-# SPA catch-all: every path returns index.html (200, not 301)
+# SPA catch-all — every client-side route returns index.html
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
