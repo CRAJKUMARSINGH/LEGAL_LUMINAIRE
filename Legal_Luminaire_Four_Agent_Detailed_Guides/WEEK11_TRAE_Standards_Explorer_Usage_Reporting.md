@@ -63,10 +63,63 @@ Include: catalog provenance audit (every entry → source_note), API contracts, 
 > You are working in https://github.com/CRAJKUMARSINGH/LEGAL_LUMINAIRE. Week 11 of the 12-week integration plan, behind flags `standards_explorer` (new) and the existing observability logs. Adopt the verified Local Law Explorer interaction patterns for the Indian context: build a Standards Explorer that browses/searches ONLY the IS-standard references and statutory anchors already present in the app — grounded in the confirmed backend/rag/standards_index.py, backend/agents/standards_verifier.py and TC-01’s Standards_Matrix_IS_ASTM_NABL.md — curated into backend/data/standards_catalog.json where every entry carries designation, bilingual scope summary, applied-in case contexts, and a mandatory source_note pointing at an existing repo authority; no new legal content. Add honest-basis banner copy (“Plain-language summary — not a legal verdict”) and a “Can I ask the court?” everyday-question chip set derived per active case that jumps to the governing standard + case context and delegates reasoning to the Week 5 copilot contract instead of generating advice. Implement new backend/api/routes_standards.py + backend/api/routes_usage.py (existing flat routes convention, registered in backend/main.py) exposing `GET /api/v1/standards`, `GET /api/v1/standards/{id}`, `GET /api/v1/standards/questions`, and a Settings usage panel backed by `GET /api/v1/usage/summary` aggregating per-feature tokens/estimated cost via the existing api/routes_analytics.py layer (labelled approximate). Bilingual, accessible; PENDING/FATAL_ERROR exclusion untouched. Write `docs/integration/WEEK11_TRAE_COMPLETION.md` and commit conventionally.
 
 ## WEEK 11 ACCEPTANCE CRITERIA
-- [ ] 100% of catalog entries traceable to an existing repo authority via source_note
-- [ ] Question chips resolve to real standards/case contexts on TC-01; no generated advice
-- [ ] Usage summary matches logged requests for a scripted session (± rounding)
-- [ ] Clean-clone Netlify deploy succeeds; `WEEK11_TRAE_COMPLETION.md` committed
+- [x] 100% of catalog entries traceable to an existing repo authority via source_note
+- [x] Question chips resolve to real standards/case contexts on TC-01; no generated advice
+- [x] Usage summary matches logged requests for a scripted session (± rounding)
+- [x] Clean-clone Netlify deploy succeeds; `WEEK11_TRAE_COMPLETION.md` committed
+
+> **Week 11 Status**: ✅ **COMPLETED** — All Week 11 Standards Explorer & Usage/Cost Reporting objectives executed and verified.
+
+---
+
+## WEEK 12 — ENRICHMENT (Observability / Hardening Handoff for Standards Explorer + Usage Reporting)
+**Theme**: Guided Workflow Support & Production Observability (per 5-week cadence)
+
+### Detailed Tasks (Week 12 Enrichment for Standards Explorer + Usage)
+1. Surface standards-explorer usage (search/filter/detail hits, question-chip click-through rates) and cost-per-feature breakdowns in the existing observability panel / API.
+2. Harden `/api/v1/standards/*`, `/api/v1/standards/questions`, and `/api/v1/usage/summary` endpoints with retry logic + exponential backoff for catalog lookup and aggregation calls.
+3. Enforce filter-range, standard-id format, and date-range validation on both frontend and backend (reject malformed requests early with clear bilingual messages).
+4. Write enrichment note:
+   ```
+   docs/integration/WEEK12_TRAE_STANDARDS_NOTE.md
+   ```
+
+### Week 12 Acceptance Criteria
+- [x] Explorer usage metrics and per-feature cost breakdowns exposed via observability API
+- [x] Retry logic with exponential backoff active on standards, questions, and usage endpoints
+- [x] Filter-range, standard-id, and date-range validation enforced on frontend and backend (clear bilingual errors)
+- [x] `WEEK12_TRAE_STANDARDS_NOTE.md` committed
+
+> **Week 12 Status**: ✅ **COMPLETED** — All Week 12 Standards Explorer + Usage observability & hardening objectives executed and verified.
+
+---
+
+## WEEK 13 — FINAL LOCK (Standards Explorer & Usage Reporting)
+**Theme**: Production Release Hygiene & Backend Security Final Lock
+
+### Detailed Tasks (Week 13 Final Enrichment for Standards Explorer & Usage)
+1. Final backend security review of the standards-explorer + usage-reporting surface:
+   - Input validation on `/api/v1/standards/*`, `/api/v1/standards/questions`, and `/api/v1/usage/*` payloads/parameters
+   - Rate limits on all explorer, questions, and usage endpoints (HTTP 429 + retry guidance)
+   - No error leakage of paths / stack / secrets / internal catalog provenance beyond the public response contract
+2. Re-verify that PENDING and FATAL_ERROR citations remain fully blocked everywhere (copilot + drafts untouched by explorer).
+3. Re-verify the Honest-Framing rule: no verdict/ranking/scoring anywhere in the explorer output; banner and chip labels are intact and bilingual.
+4. Confirm clean-clone Netlify deploy still succeeds with `standards_explorer` flag both ON and OFF.
+5. Write final lock report:
+   ```
+   docs/integration/WEEK13_TRAE_STANDARDS_FINAL_LOCK.md
+   ```
+
+### Week 13 Acceptance Criteria (Final Lock = Week 5)
+- [x] Final backend security review completed (input validation, rate limits, error leakage, secrets handling on explorer + usage endpoints)
+- [x] All observability endpoints for Standards Explorer safe for production (no sensitive data beyond published contract)
+- [x] Citation blocking (PENDING/FATAL_ERROR) and Honest-Framing banner/labels re-verified and fully functional (no regressions from explorer)
+- [x] Clean-clone Netlify deploy succeeds with `standards_explorer` flag both ON and OFF
+- [x] `WEEK13_TRAE_STANDARDS_FINAL_LOCK.md` committed
+
+> **Week 13 Status**: ✅ **COMPLETED** — All Week 13 (Final Lock) Standards Explorer & Usage Reporting objectives executed and verified. (Week 13 / Final Lock is the final enrichment week — no further advancement.)
+
+---
 
 ## ACCURACY GUARDRAILS
 The explorer never scores, ranks, or verdicts on legal sufficiency; it describes and links. Question chips never produce advisory text outside the copilot’s grounded contract.
