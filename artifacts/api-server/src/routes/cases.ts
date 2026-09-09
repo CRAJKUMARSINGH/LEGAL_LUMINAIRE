@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { db, casesTable, noticesTable, correspondenceTable, billsTable } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { CreateCaseBody, UpdateCaseBody } from "@workspace/api-zod";
+import { toDateOnlyString } from "../lib/route-value-mappers.js";
 
 const router = Router();
 
@@ -15,23 +16,30 @@ router.get("/", async (req, res) => {
   if (category) {
     return res.json(cases.filter((c) => c.category === category));
   }
-  res.json(cases);
+  return res.json(cases);
 });
 
 router.post("/", async (req, res) => {
   const body = CreateCaseBody.parse(req.body);
   const [newCase] = await db
     .insert(casesTable)
-    .values({ ...body, updatedAt: new Date() })
+    .values({
+      ...body,
+      contractDate: toDateOnlyString(body.contractDate),
+      scheduledStartDate: toDateOnlyString(body.scheduledStartDate),
+      scheduledCompletionDate: toDateOnlyString(body.scheduledCompletionDate),
+      actualStartDate: toDateOnlyString(body.actualStartDate),
+      updatedAt: new Date(),
+    })
     .returning();
-  res.status(201).json(newCase);
+  return res.status(201).json(newCase);
 });
 
 router.get("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const [c] = await db.select().from(casesTable).where(eq(casesTable.id, id));
   if (!c) return res.status(404).json({ error: "Case not found" });
-  res.json(c);
+  return res.json(c);
 });
 
 router.put("/:id", async (req, res) => {
@@ -43,13 +51,13 @@ router.put("/:id", async (req, res) => {
     .where(eq(casesTable.id, id))
     .returning();
   if (!updated) return res.status(404).json({ error: "Case not found" });
-  res.json(updated);
+  return res.json(updated);
 });
 
 router.delete("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   await db.delete(casesTable).where(eq(casesTable.id, id));
-  res.status(204).send();
+  return res.status(204).send();
 });
 
 router.get("/:id/notices", async (req, res) => {
@@ -59,7 +67,7 @@ router.get("/:id/notices", async (req, res) => {
     .from(noticesTable)
     .where(eq(noticesTable.caseId, id))
     .orderBy(noticesTable.issuedDate);
-  res.json(notices);
+  return res.json(notices);
 });
 
 router.get("/:id/correspondence", async (req, res) => {
@@ -69,7 +77,7 @@ router.get("/:id/correspondence", async (req, res) => {
     .from(correspondenceTable)
     .where(eq(correspondenceTable.caseId, id))
     .orderBy(correspondenceTable.correspondenceDate);
-  res.json(items);
+  return res.json(items);
 });
 
 router.get("/:id/bills", async (req, res) => {
@@ -79,7 +87,7 @@ router.get("/:id/bills", async (req, res) => {
     .from(billsTable)
     .where(eq(billsTable.caseId, id))
     .orderBy(billsTable.billDate);
-  res.json(bills);
+  return res.json(bills);
 });
 
 export default router;
