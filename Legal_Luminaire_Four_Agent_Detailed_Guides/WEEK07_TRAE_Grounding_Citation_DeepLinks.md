@@ -1,6 +1,6 @@
 # LEGAL LUMINAIRE — 12-WEEK INTEGRATION
 ## WEEK 7 — ASK LUMINAIRE: GROUNDING HARDENING & CITATION DEEP-LINKS
-**Version**: 1.0 | Professional Grade | Accuracy-First  
+**Version**: 1.1 | Professional Grade | Accuracy-First | Enriched  
 **Agent**: Trae (ByteDance Trae)  
 **Week-7 Role**: Backend Pipeline • Grounding • Citation Deep-Links • Precision Edits  
 **Repo**: https://github.com/CRAJKUMARSINGH/LEGAL_LUMINAIRE  
@@ -129,3 +129,188 @@ The resolver serves previews only — it can never fabricate text or upgrade a c
 
 ## ROLLBACK
 Flag `citation_deeplink` OFF falls back to plain citation text (no anchors); resolver endpoint is additive and independently disableable.
+
+---
+
+## WEEK 5 ENRICHMENT STANDARDS
+
+### WEEK 5 VERIFICATION METHODOLOGY
+
+As part of the 5-week enrichment program, Week 7 deliverables must undergo comprehensive verification following Week 5 (Final Lock) production lock standards:
+
+**Testing Methodology**:
+1. **Resolver Endpoint Contract Review**: Static review of `backend/api/routes_citations.py` path parameters, Pydantic schema for `{source_type, source_id, locator:{page, paragraph, char_span}}`, HTTP codes (200/404/422), and preview payload contract against spec.
+2. **Citation Anchor Audit**: Walk every citation in TC-01 (draft output, Verification Report, copilot answers) and confirm resolver returns a matching source locator for each — 100% hit rate required.
+3. **Fake-Citation / TC-E07 Adversarial Audit**: Inject 15 malformed citation ids (short, non-hex, wrong-shape, non-existent) plus 10 plausible-but-fake citation strings into copilot prompts; confirm resolver 404s on invalid ids and the answer path flatly refuses to invent citations.
+4. **Grounding Regression Test**: Exercise W5 copilot endpoint on bilingual noisy-OCR fixtures before and after the W7 chunking changes; compare answer quality, citation count, and page-anchor accuracy — no regressions in correctness; anchor precision improved or maintained.
+5. **Contradiction-Aware Retrieval Test**: Pose 10 contested-fact questions (dates, names, amounts, locations) and assert both contradicting annexure items appear in context with correct contradiction ids cited in metadata.
+6. **Precedent Gate Enforcement Test**: Audit every context-bundle log entry to confirm only Fact-Fit-Gate-scored COURT_SAFE / VERIFIED tier precedents are sent; never SECONDARY, PENDING, or FATAL_ERROR — with scores present in chip metadata.
+7. **Frontend Chip + Resolver Modal Integration Test**: Click every citation chip in draft, report, and copilot surfaces; assert resolver modal opens, preview snippet shows, and “View in source” scrolls the viewer to page/paragraph locator without JS errors.
+8. **Netlify Clean-Clone + Flag-Matrix Verification**: Fresh clone → build → deploy with `citation_deeplink` both ON and OFF; assert SPA routing, chip rendering, and resolver fallback work when backend is optional.
+
+**Testing Coverage**:
+- ✅ `GET /api/v1/citations/{citation_id}/resolve` 200/404/422 behavior, preview payload shape (snippet + locator + metadata), no path/stack/secrets leakage
+- ✅ Stable anchor extension on citation objects: `{source_type, source_id, locator:{page, paragraph, char_span}}` for user-uploaded docs
+- ✅ Draft + Verification Report + copilot chips rewritten → one-click resolution (Vyaas standard)
+- ✅ Script-aware (Devanagari/Latin boundary) sentence chunking on bilingual OCR + near-duplicate annexure dedupe
+- ✅ Contradiction-aware retrieval: both sides of contested fact returned with contradiction ids cited
+- ✅ Precedent context restricted to Fact-Fit-Gate-scored COURT_SAFE / VERIFIED tiers; scores in chip metadata
+- ✅ Resolver modal UI: preview snippet + “View in source” scroll-to-locator on document viewer
+- ✅ PENDING / FATAL_ERROR citations fully blocked — resolver never surfaces them either
+- ✅ TC-01: 100% citation-to-locator resolution hit rate
+- ✅ TC-E07: fake citations impossible (resolver 404 + answer-level refusal)
+- ✅ Netlify clean-clone passes with `citation_deeplink` flag ON and OFF
+- ✅ Demo Mode: synthetic citations labeled SYNTHETIC/DEMO and resolver surfaces demo-only locators
+
+---
+
+### BILINGUAL COMPLIANCE VERIFICATION
+
+All user-facing strings in the Citation Deep-Link surface must include both English and Hindi labels:
+
+**Resolver Modal / Citation Chip Labels**:
+- ✅ "Source" / "स्रोत"
+- ✅ "Page" / "पृष्ठ"
+- ✅ "Paragraph" / "पैरा"
+- ✅ "Preview" / "पूर्वावलोकन"
+- ✅ "View in source document" / "स्रोत दस्तावेज़ में देखें"
+- ✅ "Citation not found" / "उद्धरण नहीं मिला"
+- ✅ "Unable to load citation preview" / "उद्धरण पूर्वावलोकन लोड करने में असमर्थ"
+- ✅ "Locating in document…" / "दस्तावेज़ में स्थान खोजा जा रहा है…"
+
+**Resolver Errors / Validation (bilingual)**:
+- ✅ 404 refusal body: "Citation not found — the citation id may be invalid or the source document is no longer available." / "उद्धरण नहीं मिला — उद्धरण id अमान्य हो सकता है या स्रोत दस्तावेज़ अब उपलब्ध नहीं है।"
+- ✅ 422 (malformed id): "Invalid citation id format." / "अमान्य उद्धरण id प्रारूप।"
+- ✅ 429 (rate-limited): "Too many requests — please retry after a moment." / "बहुत अधिक अनुरोध — कृपया थोड़ी देर बाद पुनः प्रयास करें।"
+- ✅ Backend-down fallback: "Citation preview unavailable (backend offline)." / "उद्धरण पूर्वावलोकन अनुपलब्ध (बैकएंड ऑफलाइन)।"
+
+**Status**: All user-facing strings must include both English and Hindi labels as required, including resolver errors and validation messages surfaced through modals, chips, and notifications.
+
+---
+
+### SYNTHETIC CASE LABELING VERIFICATION
+
+Demo Mode citations and sample citation fixtures must be clearly labeled as SYNTHETIC/DEMO:
+
+**Visual Indicators**:
+- ✅ "SYNTHETIC / DEMO" badge on citation chips when rendered inside Demo Mode answers/drafts
+- ✅ "SYNTHETIC / DEMO" header ribbon inside resolver modal for demo citations
+- ✅ Resolver preview snippet footer: "This preview is generated from a synthetic/demo fixture." / "यह पूर्वावलोकन एक सिंथेटिक/डेमो फिक्स्चर से उत्पन्न किया गया है।"
+- ✅ Locator values for demo fixtures include a `-demo` suffix marker in source_id so devs can distinguish at a glance
+
+**Demo Integrity**:
+- ✅ `isDemo` flag preserved on enriched citation objects when generated from Demo Mode or synthetic fixtures
+- ✅ Demo citations cannot resolve against real case-book items; resolver returns a demo preview or 404 (no data bleed)
+- ✅ Warning banner if user pastes a real-case citation link into a Demo Mode chat
+- ✅ Synthetic citations never appear in non-Demo output, even if backend fixtures leak (filter at render tier)
+
+**Status**: All synthetic/demo citations, modals, and fixtures must be clearly labeled and visually distinguished from real-case deep-links.
+
+---
+
+### NETLIFY COMPATIBILITY VERIFICATION
+
+Citation Deep-Link routes, resolver types, and frontend modules must be compatible with existing Netlify SPA routing and the clean-clone build:
+
+**SPA Routing Check**:
+- ✅ Resolver modal is a client-side component overlay (no dedicated route needed); no 404 under Netlify `/* → /index.html` 200 redirect
+- ✅ `citation_deeplink` OFF: chip clicks fall back to plain citation text; resolver tree-shaken; no console errors
+- ✅ Document viewer scroll-to-locator works on Netlify-hosted PDF.js / viewer; no hardcoded `localhost` URLs
+- ✅ Breadcrumbs and URL state preserved after resolver modal open/close
+
+**Build Compatibility**:
+- ✅ Shared TS types for `EnrichedCitation`, `SourceLocator`, `ResolveResponse`, `CitationResolveError` are strict and compile
+- ✅ Frontend chip + modal components use existing UI library (CVA badges, modals, scroll helpers)
+- ✅ Backend `routes_citations.py` is additive; `py_compile` passes; no import break when `citation_deeplink` off
+- ✅ TypeScript strict mode: no `any` on resolver or anchor types
+- ✅ No build errors or warnings introduced by resolver/deeplink modules
+
+**Flag Isolation (matrix)**:
+- ✅ `citation_deeplink` OFF + `copilot_streaming` OFF → static draft chips as plain text, no resolver calls
+- ✅ `citation_deeplink` ON + `copilot_streaming` OFF → chip resolution works on all surfaces
+- ✅ `citation_deeplink` OFF + `copilot_streaming` ON → streaming chips without resolver (fallback)
+- ✅ `citation_deeplink` ON + `copilot_streaming` ON → streaming chips resolve after first delta containing citation_id
+
+**Status**: All changes must be compatible with existing Netlify configuration, SPA routing, and the clean-clone build across the full flag-isolation matrix.
+
+---
+
+### ACCURACY RULES COMPLIANCE
+
+Citation Deep-Links must never alter accuracy controls, verification tiers, Fact-Fit Gate, or citation blocking:
+
+**Citation Blocking Re-Verification (Critical)**:
+- ✅ PENDING citations remain fully blocked from draft output, Verification Report, AND copilot answers; resolver never returns a locator for PENDING id
+- ✅ FATAL_ERROR citations remain fully blocked; resolver 404s; no chip rendered; not sent in context
+- ✅ Citation tiers (COURT_SAFE, VERIFIED, SECONDARY, PENDING, FATAL_ERROR) untouched by enrichment
+- ✅ `citation_tier` badges on chips unchanged; existing tier-filtering logic preserved
+
+**Fact-Fit Gate & Verification Tiers**:
+- ✅ Fact-Fit Gate scoring unchanged; resolver never re-runs Fact-Fit and never overrides
+- ✅ Precedent context restriction to COURT_SAFE / VERIFIED enforced at retrieval tier (before enrichment); scores are read-only metadata on chips
+- ✅ Verification tiers (1/2/3) unchanged; anchor extension happens post-verification
+- ✅ Verification Report remains accessible and layout-identical after resolver link rewiring
+
+**Resolver Accuracy Guardrails**:
+- ✅ Resolver serves previews only — never fabricates text, never upgrades tier, never writes to index
+- ✅ Preview snippet is a substring of the actual source doc at the locator; no LLM rewrite inside resolver
+- ✅ `source_id` uniqueness enforced; two citations cannot resolve to swapped locators (non-repudiation)
+- ✅ Locator (page/paragraph/char_span) is immutable once written; enrichments are additive only
+
+**Status**: Citation Deep-Links must be completely isolated from accuracy logic — resolver is read-only, preview-only, additive-only.
+
+---
+
+### WEEK 5 ACCEPTANCE CRITERIA ENHANCEMENT
+
+In addition to Week 7 base acceptance criteria, Week 5 (Final Lock) enrichment requires:
+
+- [ ] Resolver endpoint contract reviewed: schemas, HTTP codes, preview payload shape, zero error leakage verified
+- [ ] TC-01 anchor audit passed: 100% of draft + Verification Report + copilot citations resolve to a real locator with correct page/paragraph
+- [ ] TC-E07 adversarial audit passed: 15 malformed ids → 404; 10 fake citations → answer-level refusal; zero fabrication
+- [ ] Bilingual labels verified end-to-end across all chip/modal/error surfaces (EN + HI present)
+- [ ] Demo Mode / SYNTHETIC labeling preserved across chips, modals, and resolver output; `isDemo` flag retained
+- [ ] Netlify clean-clone deploy succeeds for both `citation_deeplink` ON and OFF (full 4-way flag matrix tested)
+- [ ] Contradiction-aware retrieval test passed: 10 contested-fact questions → both sides returned with contradiction ids
+- [ ] Precedent gate enforcement audit passed: 100% of context precedent items are COURT_SAFE/VERIFIED with scores in metadata
+- [ ] PENDING / FATAL_ERROR citation blocking re-verified after resolver rewiring (drafts, report, copilot, resolver 404)
+- [ ] Accessibility compliance verified (keyboard chip focus, modal ARIA, announce-on-resolve, ESC-to-close)
+- [ ] WEEK07_TRAE_COMPLETION.md includes anchor schema, resolver contract, retrieval changes, regression tables, and W8 hand-off notes
+
+---
+
+### WEEK 5 HAND-OFF NOTES
+
+**For Future Development (Antigravity W8 Observability / Hardening → Kiro W9 Final Lock)**:
+1. **Resolver Caching**: Add LRU cache on hot `citation_id → preview` pairs with 60-second TTL to reduce document-store reads; invalidate on re-upload of source_id.
+2. **Anchor Stability Guarantee**: Introduce a `locator_hash` field on citations so downstream consumers can detect if a document OCR re-run shifted anchors; log a stability metric.
+3. **Precision Deep-Links for Non-Annexure Sources**: Extend anchors to register/timeline/standard source types (Week 5 ids exist; needs locator mapping).
+4. **Grounding Quality Signal**: Pipe contradiction-id citation count + precedent Fact-Fit score distribution into the observability panel as leading indicators of answer quality regressions.
+
+**For Documentation & Governance Maintenance**:
+1. Keep the TC-01 and TC-E07 anchor auditors up to date as new answer paths or output surfaces are introduced; add an automated golden anchor-regression job on CI.
+2. Maintain the EN+HI label registry for all chip/modal/error strings — whenever a new error code or UI surface is added, both languages must ship in the same PR.
+3. Re-run the precedent-gate enforcement audit after any retrieval or Fact-Fit refactor; the audit script should live under `scripts/audit_precedent_gate.py`.
+4. Keep the flag-matrix test plan (`citation_deeplink` × `copilot_streaming`) version-controlled and re-validated on every release candidate.
+
+---
+
+### WEEK 5 COMMIT INFORMATION
+
+**Files Changed**: WEEK07_TRAE_Grounding_Citation_DeepLinks.md
+**Lines Added**: ~170 (Week 5 enrichment sections)
+**Lines Removed**: 0
+
+**Suggested Commit Message**:
+```
+docs: Apply Week 5 enrichment standards to Week 7 Grounding/Citation DeepLinks guide
+
+- Bump guide version to 1.1 (enriched)
+- Add Week 5 verification methodology (endpoint contract, anchor audit, TC-01/TC-E07 adversarial, grounding regression, contradiction retrieval, precedent gate audit, chip+modal integration, Netlify flag matrix)
+- Add bilingual compliance verification (resolver modal/chip labels, 404/422/429/offline error bodies EN+HI)
+- Add synthetic case labeling verification (SYNTHETIC/DEMO badges on chips & modal, isDemo flag, no data bleed)
+- Add Netlify compatibility verification (SPA overlay, build/TS strict, 4-way flag matrix citation_deeplink × copilot_streaming)
+- Add accuracy rules compliance (PENDING/FATAL_ERROR blocking, Fact-Fit gate, resolver preview-only guarantee, immutable locator)
+- Enhance acceptance criteria with Week 5 enrichment-specific checks and a11y
+- Add hand-off notes for caching, anchor stability hash, precedent audit CI, and flag-matrix governance
+```
