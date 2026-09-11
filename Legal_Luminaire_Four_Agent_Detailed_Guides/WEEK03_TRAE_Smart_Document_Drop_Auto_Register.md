@@ -1,6 +1,6 @@
 # LEGAL LUMINAIRE — 12-WEEK INTEGRATION
 ## WEEK 3 — SMART DOCUMENT DROP & AUTO-REGISTER
-**Version**: 1.0 | Professional Grade | Accuracy-First  
+**Version**: 1.1 | Professional Grade | Accuracy-First | Enriched  
 **Agent**: Trae (ByteDance Trae)  
 **Week-3 Role**: Backend Pipeline • Classification • Register Pre-fill • Precision Edits  
 **Repo**: https://github.com/CRAJKUMARSINGH/LEGAL_LUMINAIRE  
@@ -131,3 +131,194 @@ Classification output is a PROPOSAL only — it can never write drafts, alter ve
 
 ## ROLLBACK
 Flag `smart_drop` OFF hides the overlay and routes; backend endpoints are additive and can be disabled without touching existing ingestion.
+
+---
+
+## WEEK 5 ENRICHMENT STANDARDS
+
+### WEEK 5 VERIFICATION METHODOLOGY
+
+As part of the 5-week enrichment program, Week 3 deliverables must undergo comprehensive verification following Week 5 production lock standards:
+
+**Testing Methodology**:
+1. **Endpoint Contract Review**: Static review of `routes_smart_drop.py` schemas, Pydantic models, and error paths against the documented API contract.
+2. **Classification Rule Audit**: Walk every rule-based classifier cue (FIR, charge-sheet, FSL, bail stage) against TC-01 synthetic bundle text + a noisy-OCR sample.
+3. **Proposal-Only Guarantee Audit**: Inspect every call site of `/classify` and `/register-proposal` to confirm no code path writes to case store, draft store, citation store, or verification tiers without an explicit Confirm click.
+4. **Pipeline Integration Test**: Exercise Drop → Redaction Gate (W2 flag ON) → Classify → Proposal → Confirm → Upload → Index end-to-end with TC-01 and one edge-case bundle.
+5. **Noisy / Bilingual Input Test**: Pass Hindi-heavy mixed-language and garbled-OCR extracts through classify; verify no 500, no empty reasons[], and confidence drops honestly rather than hallucinating.
+6. **Duplicate Annexure Detection**: Drop a bundle containing the same annexure twice (byte-identical and text-identical variants); confirm proposal surfaces a warning reason.
+7. **Frontend Accessibility Audit**: Keyboard-only navigation through drop overlay, proposal card, editable fields, Confirm/Discard; ARIA live regions for classify progress and errors.
+8. **Netlify Clean-Clone Verification**: Fresh clone → install → build → deploy with flags ON and OFF; confirm SPA routing, drop route, and case-context switch all work with backend optional.
+
+**Testing Coverage**:
+- ✅ `POST /api/v1/smart-drop/classify` payload validation, Pydantic typing, and proposal shape
+- ✅ `POST /api/v1/smart-drop/register-proposal` pre-fill of parties/forum/case-no/stage/side + first diary draft
+- ✅ Rule-based classifier cues: FIR, charge-sheet, FSL report, bail stage
+- ✅ LLM-assist path (optional) clearly logged and never auto-saving
+- ✅ Noisy OCR normalization + mixed Hindi-English graceful handling
+- ✅ Duplicate annexure detection with warning reason surfaced in UI
+- ✅ Full-window drop overlay on Home and Case pages, flag-gated `/drop` route
+- ✅ Proposal card: every field editable, confidence badge, reasons list, Confirm & File / Discard
+- ✅ Redaction Studio (W2) gate ordering when both flags ON
+- ✅ Active case context clean switch on proposal confirm (multi-case data layer)
+- ✅ Upload progress/error feedback extended to classify step, typed and bilingual
+- ✅ PENDING / FATAL_ERROR citations remain fully blocked; Fact-Fit Gate untouched
+- ✅ Demo Mode SYNTHETIC/DEMO badge persists on proposal card and drop overlay
+
+---
+
+### BILINGUAL COMPLIANCE VERIFICATION
+
+All user-facing strings in the Smart Document Drop surface must include both English and Hindi labels:
+
+**Drop Overlay Labels**:
+- ✅ "Drop documents anywhere to classify" / "वर्गीकरण के लिए दस्तावेज़ कहीं भी छोड़ें"
+- ✅ "Select files" / "फ़ाइलें चुनें"
+- ✅ "Classifying…" / "वर्गीकृत किया जा रहा है…"
+- ✅ "Classification failed — try again or upload manually" / "वर्गीकरण विफल — पुनः प्रयास करें या मैन्युअली अपलोड करें"
+
+**Proposal Card Labels**:
+- ✅ "Proposed case" / "प्रस्तावित केस"
+- ✅ "Proposed folder / filename" / "प्रस्तावित फ़ोल्डर / फ़ाइलनाम"
+- ✅ "Case type" / "केस प्रकार"
+- ✅ "Confidence" / "विश्वास स्तर"
+- ✅ "Reasons" / "कारण"
+- ✅ "Confirm & File" / "पुष्टि करें और फ़ाइल करें"
+- ✅ "Discard" / "ख़ारिज करें"
+
+**Register Proposal Fields**:
+- ✅ "Parties" / "पक्ष"
+- ✅ "Forum" / "फोरम"
+- ✅ "Case number" / "केस संख्या"
+- ✅ "Stage" / "स्टेज"
+- ✅ "Client side" / "ग्राहक पक्ष"
+- ✅ "First diary entry (draft)" / "प्रथम डायरी प्रविष्टि (ड्राफ्ट)"
+
+**Status**: All user-facing strings must include both English and Hindi labels as required, including validation and error messages surfaced through the drop surface.
+
+---
+
+### SYNTHETIC CASE LABELING VERIFICATION
+
+Demo Mode and sample drop bundles must be clearly labeled as SYNTHETIC/DEMO:
+
+**Visual Indicators**:
+- ✅ "SYNTHETIC / DEMO" badge in drop overlay header when Demo Mode is active
+- ✅ "SYNTHETIC / DEMO" badge anchored on proposal card in Demo Mode
+- ✅ Sample drop bundle button clearly labelled "Load SYNTHETIC / DEMO bundle"
+- ✅ Red-accent styling for demo badges matching the existing design system
+
+**Demo Case Flagging**:
+- ✅ `isDemo` property preserved on proposals generated from Demo Mode drops
+- ✅ Proposals generated from synthetic bundles carry a synthetic-only reason entry
+- ✅ Warning message when user drops real-case-looking files in Demo Mode
+- ✅ No demo-bundle content is ever cited or surfaced outside Demo Mode
+
+**Status**: All synthetic/demo drop proposals and bundles must be clearly labeled and visually distinguished from real-case input.
+
+---
+
+### NETLIFY COMPATIBILITY VERIFICATION
+
+Smart Document Drop routes and frontend modules must be compatible with existing Netlify SPA routing and the clean-clone build:
+
+**SPA Routing Check**:
+- ✅ `/drop` route registered in `src/routes.tsx` and functional under Netlify `/* → /index.html` 200 redirect
+- ✅ Drop overlay on Home and Case pages works without route navigation (overlay mount/unmount)
+- ✅ Case-context switch on proposal confirm preserves SPA state (no full reload)
+- ✅ Breadcrumb trail and multi-case tabs remain consistent after confirm & file
+
+**Build Compatibility**:
+- ✅ `src/features/smartDrop/` uses existing UI library (CVA cards, badges, empty states)
+- ✅ TypeScript strict mode: all proposal, classify response, and error types are fully typed
+- ✅ No build errors or warnings introduced by the smart-drop module
+- ✅ Backend endpoints (`routes_smart_drop.py`) are additive; disabling `smart_drop` flag leaves no broken imports on frontend
+- ✅ `python -m py_compile` passes on `routes_smart_drop.py` and schemas in `api/models.py`
+
+**Flag Isolation**:
+- ✅ `smart_drop` OFF: overlay hidden, `/drop` route guarded, proposal card tree-shaken
+- ✅ With `redaction_studio` OFF: drop bypasses redaction gate and goes straight to classify (documented order preserved)
+- ✅ With `redaction_studio` ON: Drop → Redaction → Classify → Proposal order enforced
+
+**Status**: All changes must be compatible with existing Netlify configuration, SPA routing, and the clean-clone build with flags ON and OFF.
+
+---
+
+### ACCURACY RULES COMPLIANCE
+
+Smart Document Drop must never alter accuracy controls, verification tiers, Fact-Fit Gate, or citation blocking:
+
+**Citation Blocking Re-Verification**:
+- ✅ PENDING citations remain fully blocked from all draft generation, unaffected by smart-drop confirm
+- ✅ FATAL_ERROR citations remain fully blocked; no proposal, register-prefill, or diary-draft output ever references them
+- ✅ Citation tiers (COURT_SAFE, VERIFIED, SECONDARY, PENDING, FATAL_ERROR) unchanged
+- ✅ `citation_tier` badges and filtering logic untouched by `routes_smart_drop.py` or smart-drop frontend
+
+**Fact-Fit Gate & Verification Tiers**:
+- ✅ Fact-Fit Gate scoring unchanged; proposal confirm does not trigger any Fact-Fit re-run or override
+- ✅ Verification tiers (1/2/3) unchanged; dropped documents follow existing Upload→Index→Verify pipeline
+- ✅ Verification Report remains accessible and unchanged after confirm & file
+
+**Proposal-Only Guarantee (Critical)**:
+- ✅ Classify endpoint never writes to case store, draft store, citation store, or index
+- ✅ Register-proposal endpoint never writes — it returns a proposal object only
+- ✅ The ONLY write path is the existing Upload → Index pipeline, triggered after explicit "Confirm & File"
+- ✅ Discard leaves zero state: no temp files, no partial case records, no orphaned index entries
+- ✅ No auto-save of proposals; page refresh before confirm loses the proposal (documented behavior)
+
+**Status**: Smart Document Drop must be completely isolated from accuracy logic, with write authority strictly after explicit user confirmation only.
+
+---
+
+### WEEK 5 ACCEPTANCE CRITERIA ENHANCEMENT
+
+In addition to Week 3 acceptance criteria, Week 5 enrichment requires:
+
+- [ ] Classification rule-set audited against every cue category (FIR, charge-sheet, FSL, bail) with documented pass/fail per cue
+- [ ] Proposal-only guarantee proven by code walk-through and an integration test that asserts zero writes when Discard is clicked
+- [ ] All bilingual labels verified end-to-end through drop → classify → proposal → confirm flow
+- [ ] SYNTHETIC/DEMO badge and sample-bundle labeling maintained across Demo Mode drop surface
+- [ ] Netlify clean-clone deploy succeeds with `smart_drop` ON and OFF, and with `redaction_studio` ON/OFF in combination
+- [ ] Noisy-OCR and Hindi-English mixed sample classifies with non-empty reasons[] and honest confidence; no crash, no 500
+- [ ] Duplicate annexure detection surfaces a warning reason for both byte-identical and text-identical variants
+- [ ] Accessibility compliance verified (keyboard navigation, ARIA live regions, screen-reader announcement of classify result)
+- [ ] PENDING / FATAL_ERROR citation blocking re-verified after smart-drop confirm & file
+- [ ] WEEK03_TRAE_COMPLETION.md committed with Week 5 verification sections appended
+
+---
+
+### WEEK 5 HAND-OFF NOTES
+
+**For Future Development (Antigravity W4 UX polish → Kiro W5 copilot integration)**:
+1. **Classifier Expansion**: Add rule-based cues for more case types (civil plaint, caveat, vakalatnama, order sheet) and a pattern-registry file so new cues do not require refactoring.
+2. **Proposal Diff View**: When a proposal suggests an existing case, show a diff of the existing register fields vs. proposed pre-fill before Confirm.
+3. **Bulk Drop**: Extend the drop surface to accept a zip of annexures and propose case-splitting when the bundle clearly contains multiple matters.
+4. **Saved Draft Proposals**: Optionally persist proposals to browser storage so refresh-before-confirm does not lose work (keep strictly local, no backend write).
+
+**For Documentation & Governance Maintenance**:
+1. Keep classifier cue registry and reasons[] output bilingual when new case types are added.
+2. Re-verify the Proposal-Only Guarantee after any refactor of the drop→classify→confirm pipeline; add a regression test that blocks any accidental write before Confirm.
+3. Maintain the flag-combination matrix (`smart_drop` × `redaction_studio`) and re-test every combination on Netlify before release.
+4. Keep Demo Mode synthetic bundles in sync with TC-01 content so classifier accuracy benchmarks remain stable.
+
+---
+
+### WEEK 5 COMMIT INFORMATION
+
+**Files Changed**: WEEK03_TRAE_Smart_Document_Drop_Auto_Register.md
+**Lines Added**: ~140 (Week 5 enrichment sections)
+**Lines Removed**: 0
+
+**Suggested Commit Message**:
+```
+docs: Apply Week 5 enrichment standards to Week 3 Smart Document Drop guide
+
+- Bump guide version to 1.1 (enriched)
+- Add Week 5 verification methodology section (endpoint contract, rule audit, proposal-only audit, pipeline + noisy + duplicate annexure tests, a11y, Netlify)
+- Add bilingual compliance verification section (drop overlay, proposal card, register fields EN+HI)
+- Add synthetic case labeling verification section (Demo Mode badges, sample bundle labeling, isDemo flag)
+- Add Netlify compatibility verification section (SPA routing, build/TS strict, flag-isolation matrix)
+- Add accuracy rules compliance section (citation blocking, Fact-Fit Gate, critical proposal-only guarantee)
+- Enhance acceptance criteria with Week 5 enrichment-specific checks
+- Add hand-off notes for future classifier expansion and documentation maintenance
+```
