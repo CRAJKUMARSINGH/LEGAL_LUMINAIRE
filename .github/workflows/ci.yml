@@ -229,6 +229,88 @@ jobs:
       - name: "Week 1: Final typecheck after Week 1 changes"
         run: pnpm --filter @workspace/legal-luminaire run typecheck
 
+      # -----------------------------------------------------------------------
+      # Week 13 - Foundation Lock smoke-tests
+      # Verifies: ADR library complete (ADR-001..008), feature flag matrix
+      # present, competition readiness docs present, netlify.toml CSP header,
+      # and protected source files integrity (never removed or broken).
+      # -----------------------------------------------------------------------
+
+      - name: "Week 13: ADR library complete — all 8 ADRs present"
+        run: |
+          set -e
+          for N in 001 002 003 004 005 006 007 008; do
+            FILE=$(find docs/adr -name "ADR-${N}-*.md" | head -1)
+            if [ -z "$FILE" ]; then
+              echo "FAIL: ADR-${N} not found in docs/adr/" && exit 1
+            fi
+            echo "  [OK] $FILE"
+          done
+          echo "ADR library check: PASS — all 8 ADRs present"
+
+      - name: "Week 13: Feature flag matrix present and Week 13 dated"
+        run: |
+          set -e
+          if [ ! -f "docs/FEATURE_FLAGS_MATRIX_W13.md" ]; then
+            echo "FAIL: docs/FEATURE_FLAGS_MATRIX_W13.md not found" && exit 1
+          fi
+          grep -q "2026-09" docs/FEATURE_FLAGS_MATRIX_W13.md
+          echo "  [OK] Feature flag matrix present and dated"
+
+      - name: "Week 13: Competition readiness docs present"
+        run: |
+          set -e
+          test -f docs/submission/JUDGE_WALKTHROUGH.md
+          echo "  [OK] docs/submission/JUDGE_WALKTHROUGH.md present"
+          test -f docs/enrichment/WEEK13_KIRO_COMPETITION_LOCK.md
+          echo "  [OK] docs/enrichment/WEEK13_KIRO_COMPETITION_LOCK.md present"
+
+      - name: "Week 13: netlify.toml has Content-Security-Policy header"
+        run: |
+          grep -q "Content-Security-Policy" netlify.toml
+          echo "  [OK] CSP header present in netlify.toml"
+
+      - name: "Week 13: Protected source files integrity check"
+        run: |
+          set -e
+          PROTECTED=(
+            "artifacts/legal-luminaire/src/App.tsx"
+            "artifacts/legal-luminaire/src/main.tsx"
+            "artifacts/legal-luminaire/src/index.css"
+            "artifacts/legal-luminaire/src/context/CaseContext.tsx"
+            "artifacts/legal-luminaire/src/context/AccuracyContext.tsx"
+            "artifacts/legal-luminaire/src/lib/citation-gate.ts"
+            "artifacts/legal-luminaire/src/components/CitationGatePanel.tsx"
+            "artifacts/legal-luminaire/src/lib/verification-engine.ts"
+            "artifacts/legal-luminaire/src/lib/case01-data.ts"
+            "artifacts/legal-luminaire/vite.config.ts"
+          )
+          for F in "${PROTECTED[@]}"; do
+            if [ ! -f "$F" ]; then
+              echo "FAIL: Protected file missing: $F" && exit 1
+            fi
+            echo "  [OK] $F"
+          done
+          # vite.config.ts must NOT reference PORT or BASE_PATH env vars (Replit pattern)
+          if grep -q "process.env.PORT\|process.env.BASE_PATH" artifacts/legal-luminaire/vite.config.ts; then
+            echo "FAIL: vite.config.ts contains Replit-style PORT/BASE_PATH env vars" && exit 1
+          fi
+          echo "  [OK] vite.config.ts: no Replit env vars"
+          # CaseContext must NOT be backend-only (must reference localStorage)
+          if ! grep -q "localStorage" artifacts/legal-luminaire/src/context/CaseContext.tsx; then
+            echo "FAIL: CaseContext.tsx has no localStorage fallback" && exit 1
+          fi
+          echo "  [OK] CaseContext.tsx: localStorage fallback present"
+          # citation-gate.ts must exist and export a scan function
+          if ! grep -q "scanDraft\|BLOCKED\|SAFE\|WARN" artifacts/legal-luminaire/src/lib/citation-gate.ts; then
+            echo "FAIL: citation-gate.ts does not appear to contain scan/gate logic" && exit 1
+          fi
+          echo "  [OK] citation-gate.ts: gate logic present"
+          echo "Protected files integrity check: PASS"
+
+      - name: "Week 13: Final typecheck after Week 13 changes"
+        run: pnpm --filter @workspace/legal-luminaire run typecheck
+
   backend:
     name: Backend syntax check (Python)
     runs-on: ubuntu-latest
