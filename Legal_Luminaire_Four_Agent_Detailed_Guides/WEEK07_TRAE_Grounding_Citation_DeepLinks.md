@@ -25,7 +25,7 @@
 ## SOURCE PROJECTS (verified 8 Sept 2026)
 
 - **Vyaas Docket** — https://vibecode.law/showcase/vyaas-docket-508140 — verified: “Every cited case links to its source PDF. Research can be started from inside a matter, so the file's own documents are part of the context.”
-- **Vaadhan** — https://vibecode.law/showcase/vaadhan-723173 — verified feature *Citation Verification*: “Verify case citations and identify relevant judicial authorities.” Adopted as: copilot context includes precedent items only through the existing Fact-Fit Gate scoring — never raw.
+- **Statutory** — https://vibecode.law/showcase/Statutory-723173 — verified feature *Citation Verification*: “Verify case citations and identify relevant judicial authorities.” Adopted as: copilot context includes precedent items only through the existing Fact-Fit Gate scoring — never raw.
 
 ## OBJECTIVES
 

@@ -28,7 +28,7 @@
 ## SOURCE CONTEXT
 
 No external feature this week. This is the enabling week for all features adopted from:
-- Vaadhan (https://vibecode.law/showcase/vaadhan-723173)
+- Statutory (https://vibecode.law/showcase/Statutory-723173)
 - Vyaas Docket (https://vibecode.law/showcase/vyaas-docket-508140)
 - AI Law (https://vibecode.law/showcase/ai-law-a-simulation-in-working-with-ai-495228)
 - Document Redactor (https://vibecode.law/showcase/document-redactor-and-recompiler-357726)

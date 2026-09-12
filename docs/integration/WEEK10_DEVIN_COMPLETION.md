@@ -12,7 +12,7 @@
 
 ## 1. EXECUTIVE SUMMARY
 
-During Week 10, Devin implemented the **Chronology Studio** (Vaadhan-sourced feature: *Case Chronology Generation*) and the **Deadline Board & Calendar** (Vyaas Docket-sourced: *limitation and tasks board* + *month diary*) as a review-first, source-cited, bilingual UX layer on top of the Week 9 deterministic engine.
+During Week 10, Devin implemented the **Chronology Studio** (Statutory-sourced feature: *Case Chronology Generation*) and the **Deadline Board & Calendar** (Vyaas Docket-sourced: *limitation and tasks board* + *month diary*) as a review-first, source-cited, bilingual UX layer on top of the Week 9 deterministic engine.
 
 Key results:
 1. **Chronology Studio** — TC-01 generates entries from 3 independent source parsers, every entry carries a deep-linked source citation, confidence tier, and needs_review flag. Accept / edit / reject round-trips work. Undated entries surface in a visible "Needs Dating" amber lane — never silently guessed. Export produces accepted-entries-only Markdown or print-ready annexure.

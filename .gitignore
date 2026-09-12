@@ -74,3 +74,5 @@ test_font.pdf
 artifacts/legal-luminaire/backend/agents/harvey_client.py
 artifacts/legal-luminaire/backend/api/routes_harvey.py
 test-assets/harvey-samples/
+
+SUPPLEMENT/

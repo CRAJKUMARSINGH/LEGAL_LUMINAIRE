@@ -27,7 +27,7 @@
 
 ## SOURCE PROJECTS (verified 8 Sept 2026)
 
-- **Vaadhan** — https://vibecode.law/showcase/vaadhan-723173 — verified feature *Limitation & Deadline Tracking*: "Keep track of important limitation periods, filing deadlines, and case-related dates."
+- **Statutory** — https://vibecode.law/showcase/Statutory-723173 — verified feature *Limitation & Deadline Tracking*: "Keep track of important limitation periods, filing deadlines, and case-related dates."
 - **Vyaas Docket** — https://vibecode.law/showcase/vyaas-docket-508140 — verified feature *limitation and tasks board* within the docketing system (board UI itself lands in W10; this week is the engine).
 
 ---
@@ -228,7 +228,7 @@ Frontend flag `VITE_FF_DEADLINE_ENGINE` OFF → no deadline UI rendered (Week 10
 
 ## TOOL PROMPT FOR KIRO (original — preserved for traceability)
 
-> You are working in https://github.com/CRAJKUMARSINGH/LEGAL_LUMINAIRE. Week 9 of the 12-week integration plan, behind flag `deadline_engine`. Implement the verified Vaadhan feature *Limitation & Deadline Tracking* as a deterministic engine: a versioned `backend/services/limitation_rules.json` table in a NEW backend/services/ dir (each rule with id, event basis, period, calendar/working basis, extension rule, and a mandatory source_note marked illustrative-synthetic), a pure-function Python engine at backend/services/limitation_engine.py computing deadlines from synthetic case event dates (FIR date, arrest, charge-sheet stage, hearings) — absolutely no LLM in the computation path; property-based tests for boundaries, month-ends, exclusions; `GET /api/v1/case/{case_id}/deadlines` in a new backend/api/routes_deadlines.py router (existing flat routes convention, registered in backend/main.py) returning `{deadline_date, basis_string EN+HI, rule_id}`; add a `deadline` citation type to the W5 copilot so deadline answers cite rule id + basis and never invent dates; extend TC-01 (backend/uploaded_cases/TC-01/) with synthetic event dates and label everything SYNTHETIC/DEMO. Update the `.kiro/specs/deadline-engine` spec first. Typecheck, build, clean-clone Netlify verify. Write `docs/integration/WEEK09_KIRO_COMPLETION.md` and commit conventionally.
+> You are working in https://github.com/CRAJKUMARSINGH/LEGAL_LUMINAIRE. Week 9 of the 12-week integration plan, behind flag `deadline_engine`. Implement the verified Statutory feature *Limitation & Deadline Tracking* as a deterministic engine: a versioned `backend/services/limitation_rules.json` table in a NEW backend/services/ dir (each rule with id, event basis, period, calendar/working basis, extension rule, and a mandatory source_note marked illustrative-synthetic), a pure-function Python engine at backend/services/limitation_engine.py computing deadlines from synthetic case event dates (FIR date, arrest, charge-sheet stage, hearings) — absolutely no LLM in the computation path; property-based tests for boundaries, month-ends, exclusions; `GET /api/v1/case/{case_id}/deadlines` in a new backend/api/routes_deadlines.py router (existing flat routes convention, registered in backend/main.py) returning `{deadline_date, basis_string EN+HI, rule_id}`; add a `deadline` citation type to the W5 copilot so deadline answers cite rule id + basis and never invent dates; extend TC-01 (backend/uploaded_cases/TC-01/) with synthetic event dates and label everything SYNTHETIC/DEMO. Update the `.kiro/specs/deadline-engine` spec first. Typecheck, build, clean-clone Netlify verify. Write `docs/integration/WEEK09_KIRO_COMPLETION.md` and commit conventionally.
 
 ---
 

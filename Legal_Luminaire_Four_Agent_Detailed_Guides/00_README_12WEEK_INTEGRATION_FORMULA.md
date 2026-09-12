@@ -18,7 +18,7 @@
 
 | # | Project | Link | Verified essence |
 |---|---------|------|------------------|
-| S1 | **Vaadhan** | https://vibecode.law/showcase/vaadhan-723173 | Integrated litigation workspace: AI research, drafting, citation verification, **case chronology generation**, **limitation & deadline tracking**, case/document management |
+| S1 | **Statutory** | https://vibecode.law/showcase/Statutory-723173 | Integrated litigation workspace: AI research, drafting, citation verification, **case chronology generation**, **limitation & deadline tracking**, case/document management |
 | S2 | **Vyaas Docket** | https://vibecode.law/showcase/vyaas-docket-508140 | **Document Drop** (AI proposes matter/folder/name, one-click confirm, nothing filed until approved), **new matter from documents**, **"Ask Vyaas" docket copilot** that never invents matters/dates/orders, research with **every cited case linked to its source PDF**, **per-feature cost tracking**, local-first |
 | S3 | **AI Law: A Simulation** | https://vibecode.law/showcase/ai-law-a-simulation-in-working-with-ai-495228 | Branching scenario training with **visible trade-off meters**; every choice has a cost; teaches *judgment* about when to trust AI (**7 scenarios & 5 meters per module** in the source; adopted compactly) |
 | S4 | **Document Redactor & Recompiler** | https://vibecode.law/showcase/document-redactor-and-recompiler-357726 | **ALL redaction done locally in the browser — nothing goes to an AI**; protect client PII before any LLM sees a document |
@@ -37,7 +37,7 @@
 | S2 | **New Matter from Documents** (auto-classify case type, pre-fill register, first diary entry) | ✅ ADOPT (W3) | Removes manual case-setup friction; every field stays editable |
 | S2 | **"Ask Luminaire" copilot** over the live case book | ✅ ADOPT (W5–W8) | Flagship Vyaas feature; grounded Q&A ("it never invents matters, dates or orders") is the perfect copilot contract for an accuracy-first app |
 | S2 | **Citation deep-links to source PDFs** | ✅ ADOPT (W7) | Extends Fact-Fit Gate + Verification Report; every citation becomes click-to-source |
-| S1 | **Limitation & deadline engine** | ✅ ADOPT (W9) | Verified Vaadhan feature; pure-computation, synthetic-data-safe |
+| S1 | **Limitation & deadline engine** | ✅ ADOPT (W9) | Verified Statutory feature; pure-computation, synthetic-data-safe |
 | S1 | **Chronology generation** from case documents | ✅ ADOPT (W10) | Extends the existing timeline + cross-reference matrix |
 | S2 | **Limitation board + calendar view** | ✅ ADOPT (W10) | UI layer for W9 engine |
 | S5 | **Standards Explorer** (browse laws/standards, plain-language, honest non-verdict framing, "Can I?" question surfacing) | ✅ ADOPT (W11, adapted to Indian IS-standards/statutes) | Interaction pattern adopted; US corpus rejected |

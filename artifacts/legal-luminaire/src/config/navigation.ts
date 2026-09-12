@@ -4,6 +4,7 @@ import {
   Home as HomeIcon, FilePlus, FileText,
   LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
   FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare, Mic, Edit3, GraduationCap,
+  Gavel, Users, Zap, Bot, HelpCircle,
 } from "lucide-react";
 import { featureFlags } from "@/config/featureFlags";
 
@@ -49,6 +50,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { path: "/new-case-ingest", label: "AI केस इंजेस्ट", labelEn: "AI Case Ingest", icon: Upload,   caseScoped: false },
       { path: "/upload",           label: "अपलोड",      labelEn: "Upload",           icon: Upload,      caseScoped: true },
       { path: "/documents",        label: "दस्तावेज़",  labelEn: "Documents",        icon: Files,       caseScoped: true },
+      { path: "/court-tracker",    label: "कोर्ट ट्रैकर", labelEn: "Court & Case Tracking", icon: Gavel,  caseScoped: false, badge: "NEW" },
+      { path: "/client-matter",    label: "मुवक्किल/वाद",  labelEn: "Client & Matter Mgmt", icon: Users,  caseScoped: false, badge: "NEW" },
     ],
   },
   {
@@ -112,11 +115,14 @@ export const NAV_GROUPS: NavGroup[] = [
       { path: "/filing-checklist", label: "चेकलिस्ट",  labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
       { path: "/review-queue", label: "चेंबर समीक्षा", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
       { path: "/academy", label: "सटीकता अकादमी", labelEn: "Accuracy Academy", icon: GraduationCap, caseScoped: false, badge: "W12" },
+      { path: "/litigation-workflow", label: "वर्कफ्लो ऑटोमेशन", labelEn: "Workflow Automation", icon: Zap, caseScoped: false, badge: "NEW" },
+      { path: "/ai-agents",        label: "AI एजेंट",    labelEn: "AI Agents",        icon: Bot,         caseScoped: false, badge: "NEW" },
     ],
     secondary: [
       { path: "/cross-check-report", label: "Cross Check", labelEn: "Cross Check", icon: CheckSquare, caseScoped: false, badge: "LDM" },
       { path: "/fsl-analysis", label: "FSL Analysis", labelEn: "FSL Analysis", icon: FlaskConical, caseScoped: false, badge: "LDM" },
       { path: "/ldr-comparison", label: "Doc Compare", labelEn: "Doc Compare", icon: GitCompare, caseScoped: false, badge: "LDR" },
+      { path: "/how-to-use",    label: "उपयोग मार्गदर्शिका", labelEn: "How To Use Manual", icon: HelpCircle, caseScoped: false, badge: "NEW" },
       ...(featureFlags.hybridStandardsValidity ? [
         { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
       ] : []),

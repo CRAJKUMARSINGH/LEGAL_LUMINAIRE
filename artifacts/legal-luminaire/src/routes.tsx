@@ -39,6 +39,13 @@ const DeadlinePage = lazy(() => import("@/pages/DeadlinePage"));
 // Week 12: Accuracy Academy
 const AccuracyAcademyPage = lazy(() => import("@/pages/AccuracyAcademyPage"));
 
+// Statutory Competition Features (statutory feature parity)
+const CourtCaseTrackerPage    = lazy(() => import("@/pages/CourtCaseTrackerPage"));
+const ClientMatterPage        = lazy(() => import("@/pages/ClientMatterPage"));
+const LitigationWorkflowPage  = lazy(() => import("@/pages/LitigationWorkflowPage"));
+const AIAgentsDashboardPage   = lazy(() => import("@/pages/AIAgentsDashboardPage"));
+const HowToUsePage            = lazy(() => import("@/pages/HowToUsePage"));
+
 // Phase 3-6 Intelligence Pages
 const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
 const CaseSimilarityPage = lazy(() => import("@/pages/CaseSimilarityPage"));
@@ -218,6 +225,13 @@ export function Router() {
           <Route path="/academy"                       component={() => Wrap(<AccuracyAcademyPage />, "AccuracyAcademyPage")} />
           <Route path="/accuracy-academy"              component={() => Wrap(<AccuracyAcademyPage />, "AccuracyAcademyPage")} />
           <Route path="/case/:id/academy"              component={() => Wrap(<AccuracyAcademyPage />, "AccuracyAcademyPage")} />
+          {/* Statutory Competition Features */}
+          <Route path="/court-tracker"        component={() => Wrap(<CourtCaseTrackerPage />,   "CourtCaseTrackerPage")} />
+          <Route path="/client-matter"        component={() => Wrap(<ClientMatterPage />,        "ClientMatterPage")} />
+          <Route path="/litigation-workflow"  component={() => Wrap(<LitigationWorkflowPage />,  "LitigationWorkflowPage")} />
+          <Route path="/ai-agents"            component={() => Wrap(<AIAgentsDashboardPage />,   "AIAgentsDashboardPage")} />
+          <Route path="/how-to-use"           component={() => Wrap(<HowToUsePage />,            "HowToUsePage")} />
+          <Route path="/manual"               component={() => Wrap(<HowToUsePage />,            "HowToUsePage")} />
           {featureFlags.hybridStandardsValidity && (
             <Route path="/case/:id/standards-validity"  component={() => Wrap(<StandardsValidity />, "StandardsValidity")} />
           )}

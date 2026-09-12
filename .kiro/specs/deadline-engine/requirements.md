@@ -1,7 +1,7 @@
 # Limitation & Deadline Engine — Requirements
 **Flag**: `deadline_engine` (default OFF)
 **Weeks**: 9 (Kiro backend) → 10 (Devin board UI)
-**Source**: Vaadhan — *Limitation & Deadline Tracking* feature (vibecode.law/showcase/vaadhan-723173)
+**Source**: Statutory — *Limitation & Deadline Tracking* feature (vibecode.law/showcase/Statutory-723173)
 **Primary Principle**: Deadlines are computed deterministically from synthetic dates only and always displayed with their governing basis. No LLM in the computation path. Bilingual throughout.
 
 ---
