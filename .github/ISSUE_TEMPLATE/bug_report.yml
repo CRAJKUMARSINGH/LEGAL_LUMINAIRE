@@ -1,0 +1,100 @@
+name: "🐛 Bug Report"
+description: "Report a bug in Legal Luminaire"
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to file a bug report! 🐛
+
+        Please fill in every section below — the more detail, the faster we can triage.
+        Screenshots, logs, and exact reproduction steps are the most valuable part.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence summary of the bug.
+      placeholder: "Example: Citation Gate blocks VERIFIED citation when switching case language is Hindi"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Step-by-step reproduction. The more exact, the better.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What you expected to happen.
+      placeholder: "The citation should remain VERIFIED and allowed in the draft output."
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened instead.
+      placeholder: "The citation was unexpectedly reclassified to PENDING and blocked."
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: Which OS were you running?
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other (please describe in logs)
+    validations:
+      required: false
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      description: "Run: node --version"
+      placeholder: "v22.x.x
+  - type: input
+    id: python
+    attributes:
+      label: Python version (if using backend)
+      description: "Run: python --version"
+      placeholder: "3.11.x (or N/A if frontend-only)"
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Firefox
+        - Edge
+        - Safari
+        - Other (describe below)
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Browser console logs, terminal output, screenshots, anything else that helps.
+      render: shell
+      placeholder: "Paste or attach. For console errors please include full stack trace."
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before you submit...
+      options:
+        - label: I have confirmed this bug is **not** a PENDING-tier citation expected to be blocked (see Accuracy Rules).
+          required: false
+        - label: I have searched the existing issues to make sure this is not a duplicate.
+          required: true

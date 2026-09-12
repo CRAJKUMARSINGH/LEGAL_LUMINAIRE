@@ -1,0 +1,66 @@
+name: "💡 Feature Request"
+description: "Suggest a feature or improvement for Legal Luminaire"
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature! 💡
+
+        Legal Luminaire is accuracy-first. If your idea changes legal citations,
+        draft output, or any governance tier, please mark the checkboxes at the bottom carefully — they help us ship safely.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Tell us what pain point you're feeling. The more concrete, the better.
+      placeholder: "Example: I always lose 2 hours every time a new infra-arbitration claim because filing CPWD/FIDIC standards matrix has to be hand-built for every matter."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you solve it? A sketch / mock / bullet list / code snippet all welcome.
+      placeholder: |
+        Proposed: add a CPWD/FIDIC pre-seeded standards picker in /standards-view that generates a claim-matrix.csv with the Hemraj-style columns prefilled.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Other ways you tried to work around this, or other tools that solved it elsewhere.
+      placeholder: Manual copy-paste from past cases / spreadsheet templates.
+  - type: checkboxes
+    id: accuracy
+    attributes:
+      label: Accuracy / Governance Impact ⚠️
+      description: "Tick anything this feature touches. If you're not sure, tick the last one and we'll review together."
+      options:
+        - label: Affects citation verification tiers (VERIFIED / SECONDARY / PENDING / FATAL_ERROR / COURT_SAFE)
+          required: false
+        - label: Affects Fact-Fit Gate scoring (auto-reject below 30 behavior)
+          required: false
+        - label: Adds new legal authority citations requiring verification
+          required: false
+        - label: Changes agent prompts / drafting templates / citation flow
+          required: false
+        - label: No accuracy impact — docs / UI polish / refactor / tests / tooling only
+          required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else — screenshots, prior art, similar tools, references, use case details.
+      placeholder: Reference materials, case examples, links to related tools or standards docs.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before you submit...
+      options:
+        - label: I have searched the existing issues / roadmap to make sure this idea isn't already suggested.
+          required: true
+        - label: I have considered whether this feature complies with the project's accuracy governance (docs/accuracy-governance/ACCURACY_RULES.md).
+          required: false
