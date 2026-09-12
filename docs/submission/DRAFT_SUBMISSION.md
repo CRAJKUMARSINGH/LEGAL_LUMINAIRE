@@ -54,7 +54,7 @@ Complementing the workbench is the Accuracy Academy, an interactive simulation t
 
 | Agent / Tool | Primary Role & Responsibilities | Underlying Models | Human vs. AI Contribution |
 |---|---|---|---|
-| **Human Architect & Lead Counsel** | Domain requirements, Indian statutory rules, forensic test design, code review, quality gate | N/A (Human) | 100% human oversight, final production approval |
+| **Rajkumar Singh Chauhan** — Senior Counsel & Civil Engineer | Domain architect, accuracy rules author, IS/ASTM standards expert, forensic evidence design, criminal/civil/arbitration strategy, 30+ years courtroom experience | N/A (Human) | 100% human domain expertise — every accuracy rule, citation tier, and IS standard guard originates from frontline courtroom practice |
 | **Google Antigravity** | Architecture management, Copilot integration, Week 12 Accuracy Academy, submission kit, final release gate | Gemini 1.5 Pro / Claude 3.5 Sonnet | 45% AI generation / 55% Human guidance & test verification |
 | **Kiro** | Spec authoring, ADR design, feature flag architecture, initial prototype foundations | Claude 3.5 Sonnet | 50% AI generation / 50% Human review |
 | **Devin (Cognition)** | Full-stack test harness setup, Vitest suite expansion (340+ tests), refactoring automation | GPT-4o / Claude 3.5 Sonnet | 60% AI execution / 40% Human prompt steering |

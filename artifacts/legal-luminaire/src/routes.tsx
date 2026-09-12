@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
+﻿import React, { Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useCaseContext } from "@/context/CaseContext";
 import { featureFlags } from "@/config/featureFlags";
@@ -45,6 +45,8 @@ const ClientMatterPage        = lazy(() => import("@/pages/ClientMatterPage"));
 const LitigationWorkflowPage  = lazy(() => import("@/pages/LitigationWorkflowPage"));
 const AIAgentsDashboardPage   = lazy(() => import("@/pages/AIAgentsDashboardPage"));
 const HowToUsePage            = lazy(() => import("@/pages/HowToUsePage"));
+const AboutCreatorPage        = lazy(() => import("@/pages/AboutCreatorPage"));
+const UserManualPrintPage     = lazy(() => import("@/pages/UserManualPrintPage"));
 
 // Phase 3-6 Intelligence Pages
 const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
@@ -232,6 +234,10 @@ export function Router() {
           <Route path="/ai-agents"            component={() => Wrap(<AIAgentsDashboardPage />,   "AIAgentsDashboardPage")} />
           <Route path="/how-to-use"           component={() => Wrap(<HowToUsePage />,            "HowToUsePage")} />
           <Route path="/manual"               component={() => Wrap(<HowToUsePage />,            "HowToUsePage")} />
+          <Route path="/about"                component={() => Wrap(<AboutCreatorPage />,         "AboutCreatorPage")} />
+          <Route path="/creator"              component={() => Wrap(<AboutCreatorPage />,         "AboutCreatorPage")} />
+          <Route path="/user-manual-pdf"      component={() => Wrap(<UserManualPrintPage />,      "UserManualPrintPage")} />
+          <Route path="/manual-pdf"           component={() => Wrap(<UserManualPrintPage />,      "UserManualPrintPage")} />
           {featureFlags.hybridStandardsValidity && (
             <Route path="/case/:id/standards-validity"  component={() => Wrap(<StandardsValidity />, "StandardsValidity")} />
           )}

@@ -123,6 +123,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { path: "/fsl-analysis", label: "FSL Analysis", labelEn: "FSL Analysis", icon: FlaskConical, caseScoped: false, badge: "LDM" },
       { path: "/ldr-comparison", label: "Doc Compare", labelEn: "Doc Compare", icon: GitCompare, caseScoped: false, badge: "LDR" },
       { path: "/how-to-use",    label: "उपयोग मार्गदर्शिका", labelEn: "How To Use Manual", icon: HelpCircle, caseScoped: false, badge: "NEW" },
+      { path: "/about",         label: "निर्माता के बारे में", labelEn: "About the Creator", icon: Users,      caseScoped: false, badge: "NEW" },
       ...(featureFlags.hybridStandardsValidity ? [
         { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
       ] : []),

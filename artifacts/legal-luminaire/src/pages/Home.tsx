@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+﻿import { useMemo, useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,7 @@ import { useCaseContext } from "@/context/CaseContext";
 import { CopilotPanel, SuggestedQuestions } from "@/features/copilot";
 import { DemoModeCard } from "@/components/home/DemoModeCard";
 import { RecentCasesWidget } from "@/components/home/RecentCasesWidget";
+import { OnboardingHero } from "@/components/home/OnboardingHero";
 import { DEFAULT_CASE_ID, getChargesArray } from "@/lib/case-store";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip,
@@ -130,6 +131,9 @@ export default function Home() {
 
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
+
+      {/* Onboarding hero: shown ONLY when no case is loaded yet */
+      {!selectedCase && <OnboardingHero />}
 
       {/* ── Demo Mode (1 click) ──────────────────────────────────────────── */}
       <DemoModeCard />
