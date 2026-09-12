@@ -47,6 +47,8 @@ const AIAgentsDashboardPage   = lazy(() => import("@/pages/AIAgentsDashboardPage
 const HowToUsePage            = lazy(() => import("@/pages/HowToUsePage"));
 const AboutCreatorPage        = lazy(() => import("@/pages/AboutCreatorPage"));
 const UserManualPrintPage     = lazy(() => import("@/pages/UserManualPrintPage"));
+// Week 01 Kiro — Drafting Intake Examples EX-001..EX-011
+const IntakeExamplesPage      = lazy(() => import("@/pages/IntakeExamplesPage"));
 
 // Phase 3-6 Intelligence Pages
 const CitationGraphPage = lazy(() => import("@/pages/CitationGraphPage"));
@@ -238,6 +240,9 @@ export function Router() {
           <Route path="/creator"              component={() => Wrap(<AboutCreatorPage />,         "AboutCreatorPage")} />
           <Route path="/user-manual-pdf"      component={() => Wrap(<UserManualPrintPage />,      "UserManualPrintPage")} />
           <Route path="/manual-pdf"           component={() => Wrap(<UserManualPrintPage />,      "UserManualPrintPage")} />
+          {/* Week 01 Kiro — Drafting Intake Examples */}
+          <Route path="/intake-examples"      component={() => Wrap(<IntakeExamplesPage />,       "IntakeExamplesPage")} />
+          <Route path="/drafting-examples"    component={() => Wrap(<IntakeExamplesPage />,       "IntakeExamplesPage")} />
           {featureFlags.hybridStandardsValidity && (
             <Route path="/case/:id/standards-validity"  component={() => Wrap(<StandardsValidity />, "StandardsValidity")} />
           )}
