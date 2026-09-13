@@ -1,7 +1,7 @@
 # Smart Drop — Requirements
 **Flag**: `smart_drop` (default OFF)
 **Week**: 3 (Trae primary)
-**Source**: Vaadhan showcase — document drop classification + register proposal
+**Source**: Statutory showcase — document drop classification + register proposal
 
 ## Scope
 A drag-and-drop zone that classifies an uploaded document (FIR, charge sheet, bail order, evidence list, forensic report…) and proposes a case-register entry. The user confirms or edits the proposal; on confirmation the document is added to the case register.

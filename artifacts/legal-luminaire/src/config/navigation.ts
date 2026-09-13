@@ -4,6 +4,7 @@ import {
   Home as HomeIcon, FilePlus, FileText,
   LayoutDashboard, MessageSquare, Clock, FlaskConical, Upload, Files, ShieldCheck, Globe, AlertCircle,
   FileSearch, Table2, Brain, Sparkles, Network, BarChart3, GitCompare, Mic, Edit3, GraduationCap,
+  Gavel, Users, Zap, Bot, HelpCircle, Bot as Robot,
 } from "lucide-react";
 import { featureFlags } from "@/config/featureFlags";
 
@@ -16,7 +17,7 @@ export type NavItem = {
   badge?: string;
 };
 
-export type NavGroupId = "setup" | "research" | "drafting" | "review";
+export type NavGroupId = "setup" | "research" | "drafting" | "review" | "week04";
 
 export type NavGroup = {
   id: NavGroupId;
@@ -49,6 +50,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { path: "/new-case-ingest", label: "AI केस इंजेस्ट", labelEn: "AI Case Ingest", icon: Upload,   caseScoped: false },
       { path: "/upload",           label: "अपलोड",      labelEn: "Upload",           icon: Upload,      caseScoped: true },
       { path: "/documents",        label: "दस्तावेज़",  labelEn: "Documents",        icon: Files,       caseScoped: true },
+      { path: "/court-tracker",    label: "कोर्ट ट्रैकर", labelEn: "Court & Case Tracking", icon: Gavel,  caseScoped: false, badge: "NEW" },
+      { path: "/client-matter",    label: "मुवक्किल/वाद",  labelEn: "Client & Matter Mgmt", icon: Users,  caseScoped: false, badge: "NEW" },
     ],
   },
   {
@@ -56,15 +59,16 @@ export const NAV_GROUPS: NavGroup[] = [
     groupLabel: "शोध / Research",
     groupLabelEn: "Research",
     items: [
-      { path: "/case-law",    label: "कानून खोज",      labelEn: "Case Law Research",  icon: BookOpen,        caseScoped: true },
-      { path: "/case-research", label: "विधिक शोध", labelEn: "Case Research", icon: FileSearch, caseScoped: true },
-      { path: "/cross-reference", label: "क्रॉस-रेफ मैट्रिक्स", labelEn: "Cross-Ref Matrix", icon: Table2, caseScoped: true },
-      { path: "/ai-research", label: "AI शोध इंजन", labelEn: "AI Research Engine", icon: Brain, caseScoped: true },
-      { path: "/standards",   label: "मानक / Lab",     labelEn: "Forensic Standards", icon: FlaskConical,    caseScoped: true },
-      { path: "/chat",        label: "AI चैट",         labelEn: "AI Chat",            icon: MessageSquare,   caseScoped: true },
+      { path: "/case-law",    label: "कानून खोज",      labelEn: "Case Law",         icon: BookOpen,        caseScoped: true },
+      { path: "/ai-research", label: "AI शोध इंजन", labelEn: "AI Research",       icon: Brain, caseScoped: true },
+      { path: "/standards",   label: "मानक",          labelEn: "Standards",         icon: FlaskConical,    caseScoped: true },
+      { path: "/copilot",     label: "AI कोपायलट",    labelEn: "Copilot",          icon: Sparkles,       caseScoped: true },
+      { path: "/citation-search", label: "Citation Explorer", labelEn: "Citation Explorer", icon: BookOpen, caseScoped: false, badge: "NEW" },
     ],
     secondary: [
-      { path: "/citation-search", label: "Citation Explorer", labelEn: "25+ Authorities", icon: BookOpen, caseScoped: false, badge: "NEW" },
+      { path: "/case-research", label: "विधिक शोध", labelEn: "Case Research", icon: FileSearch, caseScoped: true },
+      { path: "/cross-reference", label: "क्रॉस-रेफ मैट्रिक्स", labelEn: "Cross-Ref Matrix", icon: Table2, caseScoped: true },
+      { path: "/chat",        label: "AI चैट",         labelEn: "AI Chat",            icon: MessageSquare,   caseScoped: true },
       { path: "/lps-home", label: "Precedent Search", labelEn: "Precedent Search", icon: FileSearch, caseScoped: false, badge: "LPS" },
       { path: "/lps-defence", label: "LPS Defence", labelEn: "LPS Defence", icon: ShieldCheck, caseScoped: false, badge: "LPS" },
       { path: "/lps-sample-analysis", label: "नमूना विश्लेषण", labelEn: "Sample Analysis", icon: FlaskConical, caseScoped: false, badge: "LPS" },
@@ -88,13 +92,13 @@ export const NAV_GROUPS: NavGroup[] = [
     groupLabel: "प्रारूपण / Drafting",
     groupLabelEn: "Drafting",
     items: [
-      { path: "/drafting",            label: "AI प्रारूप",     labelEn: "AI Drafting",         icon: Edit3,   caseScoped: true },
-      { path: "/ai-draft-engine", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine", icon: Sparkles, caseScoped: true },
-      { path: "/oral-arguments",   label: "मौखिक बहस",     labelEn: "Oral Arguments",     icon: Mic,          caseScoped: true },
-      { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App", icon: Scale,    caseScoped: true },
-      { path: "/safe-draft",  label: "सेफ ड्राफ्ट",   labelEn: "Safe Draft Editor",  icon: ShieldCheck,     caseScoped: true, badge: "NEW" },
+      { path: "/ai-draft-engine", label: "AI ड्राफ्ट इंजन", labelEn: "AI Draft Engine",    icon: Sparkles, caseScoped: true },
+      { path: "/safe-draft",      label: "सेफ ड्राफ्ट",   labelEn: "Safe Draft Editor", icon: ShieldCheck, caseScoped: true, badge: "NEW" },
+      { path: "/discharge-application", label: "प्रार्थना-पत्र", labelEn: "Discharge App",   icon: Scale,    caseScoped: true },
+      { path: "/oral-arguments", label: "मौखिक बहस",     labelEn: "Oral Arguments",   icon: Mic,      caseScoped: true },
     ],
     secondary: [
+      { path: "/drafting",            label: "AI प्रारूप",     labelEn: "AI Drafting",         icon: Edit3,   caseScoped: true },
       { path: "/defence-reply", label: "डिफेंस रिप्लाई", labelEn: "Defence Reply", icon: FileText,        caseScoped: true },
       { path: "/notice-reply", label: "नोटिस रिप्लाई", labelEn: "Notice Reply",       icon: FileText,        caseScoped: true, badge: "NEW" },
       { path: "/discharge-print", label: "डिस्चार्ज PDF", labelEn: "Discharge PDF v5",  icon: Scale,           caseScoped: true, badge: "NEW" },
@@ -110,13 +114,18 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { path: "/verification",     label: "सत्यापन",    labelEn: "Verification",     icon: ShieldCheck, caseScoped: true },
       { path: "/filing-checklist", label: "चेकलिस्ट",  labelEn: "Filing Checklist", icon: CheckSquare, caseScoped: true },
-      { path: "/review-queue", label: "चेंबर समीक्षा", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
       { path: "/academy", label: "सटीकता अकादमी", labelEn: "Accuracy Academy", icon: GraduationCap, caseScoped: false, badge: "W12" },
+      { path: "/ai-agents",        label: "AI एजेंट",    labelEn: "AI Agents",        icon: Robot,         caseScoped: false, badge: "NEW" },
+      { path: "/how-to-use",    label: "उपयोग मार्गदर्शिका", labelEn: "How To Use", icon: HelpCircle, caseScoped: false, badge: "NEW" },
     ],
     secondary: [
+      { path: "/review-queue", label: "चेंबर समीक्षा", labelEn: "Review Queue", icon: FilePlus, caseScoped: false, badge: "3" },
+      { path: "/litigation-workflow", label: "वर्कफ्लो ऑटोमेशन", labelEn: "Workflow Automation", icon: Zap, caseScoped: false, badge: "NEW" },
       { path: "/cross-check-report", label: "Cross Check", labelEn: "Cross Check", icon: CheckSquare, caseScoped: false, badge: "LDM" },
       { path: "/fsl-analysis", label: "FSL Analysis", labelEn: "FSL Analysis", icon: FlaskConical, caseScoped: false, badge: "LDM" },
       { path: "/ldr-comparison", label: "Doc Compare", labelEn: "Doc Compare", icon: GitCompare, caseScoped: false, badge: "LDR" },
+      { path: "/intake-examples", label: "इनटेक उदाहरण W01", labelEn: "Drafting Intake Examples", icon: BookOpen, caseScoped: false, badge: "W01" },
+      { path: "/about",         label: "निर्माता के बारे में", labelEn: "About the Creator", icon: Users,      caseScoped: false, badge: "NEW" },
       ...(featureFlags.hybridStandardsValidity ? [
         { path: "/standards-validity", label: "मानक वैधता", labelEn: "Standards Validity", icon: AlertCircle, caseScoped: true, badge: "NEW" as const },
       ] : []),
@@ -124,6 +133,23 @@ export const NAV_GROUPS: NavGroup[] = [
         { path: "/session-workspace", label: "कार्यस्थान", labelEn: "Hybrid Workspace", icon: LayoutDashboard, caseScoped: true, badge: "BETA" as const },
       ] : []),
     ],
+  },
+  {
+    id: "week04",
+    groupLabel: "सप्ताह 04 – एंटिग्रैविटी",
+    groupLabelEn: "Week 04 – Antigravity",
+    items: [
+      { path: "/example33", label: "उदाहरण 33 – Sale Deed", labelEn: "Example 33 – Sale Deed", icon: Scale, caseScoped: false },
+      { path: "/example34", label: "उदाहरण 34 – Commercial Lease", labelEn: "Example 34 – Commercial Lease", icon: HomeIcon, caseScoped: false },
+      { path: "/example35", label: "उदाहरण 35 – Mortgage", labelEn: "Example 35 – Mortgage", icon: Scale, caseScoped: false },
+      { path: "/example36", label: "उदाहरण 36 – Gift Deed", labelEn: "Example 36 – Gift Deed", icon: Scale, caseScoped: false },
+      { path: "/example37", label: "उदाहरण 37 – Will", labelEn: "Example 37 – Will", icon: Gavel, caseScoped: false },
+      { path: "/example38", label: "उदाहरण 38 – POA", labelEn: "Example 38 – POA", icon: Scale, caseScoped: false },
+      { path: "/example39", label: "उदाहरण 39 – Partnership", labelEn: "Example 39 – Partnership", icon: Users, caseScoped: false },
+      { path: "/example40", label: "उदाहरण 40 – Dissolution", labelEn: "Example 40 – Dissolution", icon: Gavel, caseScoped: false },
+      { path: "/example41", label: "उदाहरण 41 – NDA & IP", labelEn: "Example 41 – NDA & IP", icon: ShieldCheck, caseScoped: false }
+    ],
+    secondary: []
   },
 ];
 

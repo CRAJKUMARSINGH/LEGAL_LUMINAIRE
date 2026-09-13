@@ -59,8 +59,8 @@ describe("Week 2 — recent cases (localStorage)", () => {
 });
 
 describe("Week 2 — case registry / data layer", () => {
-  it("exposes all 26 catalogue cases with required card fields", () => {
-    expect(CASE_CATALOG.length).toBe(26);
+  it("exposes all 36 catalogue cases with required card fields", () => {
+    expect(CASE_CATALOG.length).toBe(36);
     for (const c of CASE_CATALOG) {
       expect(c.id).toMatch(/^TC-\d\d$/);
       expect(c.title).toBeTruthy();
@@ -99,8 +99,8 @@ describe("Week 2 — case registry / data layer", () => {
 });
 
 describe("Week 2 — navigation", () => {
-  it("has exactly four top-level groups and legacy flat paths", () => {
-    expect(NAV_GROUPS.map((g) => g.id)).toEqual(["setup", "research", "drafting", "review"]);
+  it("has exactly five top-level groups and legacy flat paths", () => {
+    expect(NAV_GROUPS.map((g) => g.id)).toEqual(["setup", "research", "drafting", "review", "week04"]);
     expect(LEGACY_FLAT_PATHS).toContain("/dashboard");
     expect(LEGACY_FLAT_PATHS).toContain("/case-law");
   });

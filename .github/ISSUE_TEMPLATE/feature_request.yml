@@ -1,0 +1,53 @@
+﻿name: Feature Request
+description: Suggest a new feature or improvement
+title: '[Feature]: '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your suggestion! Legal Luminaire is accuracy-first.
+        All new features must respect the 6 Accuracy Rules in docs/accuracy-governance/.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem this solves
+      description: What courtroom problem does this feature address?
+      placeholder: As an advocate, I need...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      placeholder: Describe the feature clearly
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Practice Area
+      options:
+        - Criminal Law
+        - Civil Litigation
+        - Infrastructure / Arbitration
+        - Forensic Evidence
+        - Case Management
+        - General / UI
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: accuracy
+    attributes:
+      label: Accuracy Compliance
+      options:
+        - label: This feature does not bypass the Fact-Fit Gate
+          required: true
+        - label: This feature does not allow PENDING citations in drafts
+          required: true
+        - label: This feature uses only SYNTHETIC data in demo mode
+          required: true

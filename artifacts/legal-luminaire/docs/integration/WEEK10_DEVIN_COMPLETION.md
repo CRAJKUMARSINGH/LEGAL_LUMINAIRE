@@ -10,7 +10,7 @@
 
 ## EXECUTIVE SUMMARY
 
-Week 10 successfully implemented the Chronology Studio and Deadline Board & Calendar features as specified in the integration plan. The implementation follows the verified Vaadhan and Vyaas Docket reference patterns, providing source-cited timeline generation and kanban-style deadline tracking with bilingual support and SYNTHETIC/DEMO labelling throughout.
+Week 10 successfully implemented the Chronology Studio and Deadline Board & Calendar features as specified in the integration plan. The implementation follows the verified Statutory and Vyaas Docket reference patterns, providing source-cited timeline generation and kanban-style deadline tracking with bilingual support and SYNTHETIC/DEMO labelling throughout.
 
 **Key Achievements:**
 - ✅ Backend chronology proposal endpoint with source citation deep-links
@@ -188,7 +188,7 @@ Week 10 successfully implemented the Chronology Studio and Deadline Board & Cale
 - Generated entries are PROPOSALS until explicitly accepted
 - Users maintain control over timeline accuracy
 - Reversible actions allow correction of mistakes
-- Matches Vaadhan reference pattern of "review then finalize"
+- Matches Statutory reference pattern of "review then finalize"
 
 **Implementation**:
 - Default status: "proposed" with `needs_review: true`

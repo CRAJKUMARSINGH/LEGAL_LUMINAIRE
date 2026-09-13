@@ -7,6 +7,20 @@
 ## Accuracy Governance
 - Canonical accuracy rules (v2): `docs/accuracy-governance/ACCURACY_RULES.md`
 
+## Architecture Decision Records (ADRs)
+- ADR-001: Accuracy-first architecture: `docs/adr/ADR-001-accuracy-first-architecture.md`
+- ADR-002: Local-first localStorage fallback: `docs/adr/ADR-002-local-first-fallback.md`
+- ADR-003: Feature flags for all new features: `docs/adr/ADR-003-feature-flags-all-new-features.md`
+- ADR-004: pnpm workspace monorepo: `docs/adr/ADR-004-monorepo-pnpm-workspace.md`
+- ADR-005: Bilingual Hindi + English: `docs/adr/ADR-005-bilingual-hindi-english.md`
+- ADR-006: Synthetic data only: `docs/adr/ADR-006-synthetic-data-only.md`
+
+## Weekly Enrichment Reports
+- Week 13 — Kiro Foundation Lock: `docs/enrichment/WEEK13_KIRO_COMPETITION_LOCK.md`
+
+## Feature Flags
+- Full flag reference + rollback procedures: `docs/FEATURE_FLAGS_REFERENCE.md`
+
 ## Testing
 - Robustness report: `docs/testing/ROBUSTNESS_REPORT.md`
 - Test case matrix (21 cases): `docs/testing/TEST_CASE_MATRIX_21.md`
@@ -27,3 +41,8 @@
 ## Case Packs
 - Hemraj case pack (working folder): `CASE01_HEMRAJ_STATE_2025/`
 - 21 test cases: `test-cases/`
+
+## Deploy
+- Root Netlify config (production-locked): `netlify.toml`
+- Root Vercel config: `vercel.json`
+- Deploy + multi-case guide: `artifacts/legal-luminaire/DEPLOY_AND_MULTI_CASE_GUIDE.md`
