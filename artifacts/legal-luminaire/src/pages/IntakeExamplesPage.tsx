@@ -1,7 +1,7 @@
 ﻿/**
- * IntakeExamplesPage — Week 01 Kiro Drafting Intake Examples (EX-001 to EX-011)
+ * IntakeExamplesPage — Week 01 Kiro & Week 02 Devin Drafting Intake Examples (EX-001 to EX-021)
  * Route: /intake-examples
- * Source: SUPPLEMENT/SUPPLEMENT REPLIT/WEEK_01_KIRO.md
+ * Source: SUPPLEMENT/SUPPLEMENT REPLIT/WEEK_01_KIRO.md & WEEK_02_DEVIN.md
  * ALL DATA SYNTHETIC / DEMO — not legal advice — not filing-ready without supervising-advocate approval.
  */
 import { useState, useMemo } from "react";
@@ -14,7 +14,8 @@ import {
   CheckCircle2, Clock, FileText, Shield, Info, BookOpen,
   User, Gavel, Home, Building2, Users, Car, Briefcase, TreePine,
 } from "lucide-react";
-import { WEEK01_EXAMPLES, type IntakeExample } from "@/data/demo-cases/week01-intake-examples";
+import { WEEK01_EXAMPLES, type IntakeExample as Week01IntakeExample } from "@/data/demo-cases/week01-intake-examples";
+import { WEEK02_EXAMPLES, type IntakeExample as Week02IntakeExample } from "@/data/demo-cases/week02-intake-examples";
 
 // ── Colour config ─────────────────────────────────────────────────────────
 const WORKFLOW_CONFIG: Record<string, { label: string; color: string }> = {
@@ -51,6 +52,16 @@ const DOMAIN_ICON: Record<string, React.ComponentType<{className?: string}>> = {
   "MACT / Compensation":         Car,
   "Service Law / Writ":          Gavel,
   "Public Law / Acquisition":    TreePine,
+  "Criminal / Anticipatory Bail": Shield,
+  "Criminal / Bail":             Shield,
+  "Negotiable Instrument / Notice": FileText,
+  "Criminal / Complaint":        Gavel,
+  "Criminal / Inherent Jurisdiction": Gavel,
+  "Family / Maintenance":        Users,
+  "Criminal Procedure / Revision": Gavel,
+  "Criminal / Appeal":           Gavel,
+  "Supreme Court / SLP":         Gavel,
+  "Constitutional / Habeas Corpus": Shield,
 };
 const DRAFT_TYPE_COLOR: Record<string, string> = {
   "notice":         "bg-blue-50 text-blue-700 border-blue-200",
@@ -63,10 +74,20 @@ const DRAFT_TYPE_COLOR: Record<string, string> = {
   "memo":           "bg-orange-50 text-orange-700 border-orange-200",
   "chronology":     "bg-indigo-50 text-indigo-700 border-indigo-200",
   "index":          "bg-pink-50 text-pink-700 border-pink-200",
+  "undertaking":    "bg-cyan-50 text-cyan-700 border-cyan-200",
+  "letter":         "bg-lime-50 text-lime-700 border-lime-200",
+  "table":          "bg-slate-50 text-slate-700 border-slate-200",
+  "instruction":    "bg-purple-50 text-purple-700 border-purple-200",
 };
 
+// ── Combined examples ───────────────────────────────────────────────────────
+const ALL_EXAMPLES: (Week01IntakeExample | Week02IntakeExample)[] = [
+  ...WEEK01_EXAMPLES,
+  ...WEEK02_EXAMPLES,
+];
+
 // ── Single card ───────────────────────────────────────────────────────────
-function ExampleCard({ ex }: { ex: IntakeExample }) {
+function ExampleCard({ ex }: { ex: Week01IntakeExample | Week02IntakeExample }) {
   const [open, setOpen] = useState(false);
   const Icon = DOMAIN_ICON[ex.domain] ?? Scale;
   const wf = WORKFLOW_CONFIG[ex.workflowState] ?? WORKFLOW_CONFIG["intake-only"];
@@ -242,9 +263,9 @@ export default function IntakeExamplesPage() {
   const [filterDomain, setFilterDomain] = useState("all");
   const [filterComplexity, setFilterComplexity] = useState("all");
 
-  const domains = useMemo(() => Array.from(new Set(WEEK01_EXAMPLES.map(e => e.domain))), []);
+  const domains = useMemo(() => Array.from(new Set(ALL_EXAMPLES.map(e => e.domain))), []);
 
-  const filtered = useMemo(() => WEEK01_EXAMPLES.filter(e => {
+  const filtered = useMemo(() => ALL_EXAMPLES.filter(e => {
     const q = search.toLowerCase();
     const matchSearch = !q || e.title.toLowerCase().includes(q) || e.domain.toLowerCase().includes(q) || e.background.toLowerCase().includes(q);
     const matchDomain = filterDomain === "all" || e.domain === filterDomain;
@@ -261,17 +282,17 @@ export default function IntakeExamplesPage() {
             <Scale className="h-6 w-6 text-primary" />
           </div>
           <div className="flex-1">
-            <h1 className="text-xl font-bold">Drafting Intake Examples — Week 01</h1>
+            <h1 className="text-xl font-bold">Drafting Intake Examples — Week 01 & Week 02</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              EX-001 to EX-011 · Civil, Family, Property, Consumer, Service &amp; Public Law<br />
-              <span className="text-[10px]">Source: DU Faculty of Law — Drafting, Pleadings &amp; Conveyancing (educational adaptation) · Week 01 Owner: Kiro</span>
+              EX-001 to EX-021 · Civil, Family, Property, Consumer, Service, Public Law, Criminal, Constitutional<br />
+              <span className="text-[10px]">Source: DU Faculty of Law — Drafting, Pleadings &amp; Conveyancing (educational adaptation) · Week 01 Owner: Kiro · Week 02 Owner: Devin</span>
             </p>
             <div className="flex flex-wrap gap-2 mt-3">
               <Badge className="bg-amber-500 text-white text-[9px] font-black">SYNTHETIC / DEMO</Badge>
               <Badge variant="outline" className="text-[9px]">Not Legal Advice</Badge>
               <Badge variant="outline" className="text-[9px]">Not Filing-Ready</Badge>
               <Badge variant="outline" className="text-[9px]">Supervising Advocate Approval Required</Badge>
-              <Badge variant="outline" className="text-[9px]">{WEEK01_EXAMPLES.length} examples</Badge>
+              <Badge variant="outline" className="text-[9px]">{ALL_EXAMPLES.length} examples</Badge>
             </div>
           </div>
         </div>
@@ -292,17 +313,18 @@ export default function IntakeExamplesPage() {
           <option value="Basic">Basic</option>
           <option value="Intermediate">Intermediate</option>
           <option value="Advanced">Advanced</option>
+          <option value="Expert">Expert</option>
         </select>
-        <span className="text-xs text-muted-foreground">{filtered.length}/{WEEK01_EXAMPLES.length} shown</span>
+        <span className="text-xs text-muted-foreground">{filtered.length}/{ALL_EXAMPLES.length} shown</span>
       </div>
 
       {/* Stat row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Total Examples", value: WEEK01_EXAMPLES.length, color: "text-primary" },
-          { label: "Blocked Drafts", value: WEEK01_EXAMPLES.flatMap(e=>e.drafts).filter(d=>d.status==="blocked").length, color: "text-red-600" },
-          { label: "Unresolved Facts", value: WEEK01_EXAMPLES.reduce((n,e)=>n+e.unresolvedFacts.length,0), color: "text-amber-600" },
-          { label: "Supervisor Approval Needed", value: WEEK01_EXAMPLES.flatMap(e=>e.drafts).filter(d=>d.approvalRequired).length, color: "text-orange-600" },
+          { label: "Total Examples", value: ALL_EXAMPLES.length, color: "text-primary" },
+          { label: "Blocked Drafts", value: ALL_EXAMPLES.flatMap(e=>e.drafts).filter(d=>d.status==="blocked").length, color: "text-red-600" },
+          { label: "Unresolved Facts", value: ALL_EXAMPLES.reduce((n,e)=>n+e.unresolvedFacts.length,0), color: "text-amber-600" },
+          { label: "Supervisor Approval Needed", value: ALL_EXAMPLES.flatMap(e=>e.drafts).filter(d=>d.approvalRequired).length, color: "text-orange-600" },
         ].map(s => (
           <div key={s.label} className="rounded-lg border bg-card p-3 text-center">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
