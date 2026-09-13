@@ -1,9 +1,53 @@
+# About Legal Luminaire
+
 Legal Luminaire is an accuracy-first AI legal workbench built for Indian advocates and legal professionals. It helps organize case documents, research relevant authorities, verify citations, prepare bilingual drafts and complete pre-filing reviews in one structured workflow.
 
-Its key differentiator is the Fact-Fit Gate and Citation Gate. Instead of treating every AI-generated authority as reliable, Legal Luminaire evaluates precedents against the facts, evidence and procedure of the matter. Citations are classified into verification tiers such as Court-Safe, Verified, Secondary, Pending and Fatal Error. Draft export is blocked when unresolved citation risks remain.
+## Key Differentiator
 
-The workbench includes a case intake flow, demo case browser, AI legal research, grounded Copilot, chronology tools, deadline tracking, Indian and engineering standards exploration, bilingual drafting, court and matter tracking, filing checklists and an Accuracy Academy. It currently includes 26 synthetic demo matters covering criminal law, civil litigation, NDPS, negotiable instruments, arbitration and infrastructure disputes.
+The **Fact-Fit Gate and Citation Gate** are the core innovations. Instead of treating every AI-generated authority as reliable, Legal Luminaire evaluates precedents against the facts, evidence and procedure of the matter. Citations are classified into verification tiers:
 
-Legal Luminaire was created by Rajkumar Singh Chauhan, a Senior Counsel and Civil Engineer with more than 30 years of experience in Indian Infrastructural contract disputes, consultation, Civil engineering project execution and dispute resolution thereof . The project is designed as a working prototype and demonstration of how domain expertise, structured verification and AI-assisted drafting can work together without allowing convenience to replace legal judgment.
+- **Court-Safe** — Directly applicable and verified
+- **Verified** — Relevant and confirmed
+- **Secondary** — Supporting authority
+- **Pending** — Requires verification
+- **Fatal Error** — Incorrect or inapplicable
 
-All included matters and documents are synthetic demonstration data. Legal Luminaire is not a substitute for professional legal review.
+Draft export is **physically blocked** when unresolved citation risks remain. No override. No workaround.
+
+## Comprehensive Workbench Features
+
+The platform includes:
+- **Case Intake Flow** — Structured document upload and organization
+- **Demo Case Browser** — 26 synthetic matters for exploration
+- **AI Legal Research** — Structured precedent and statute search
+- **Grounded Copilot** — Matter-specific research assistance
+- **Chronology Studio** — Timeline and event tracking
+- **Deadline Engine** — Limitation period and court vacation tracking
+- **Standards Explorer** — Indian and engineering standards reference
+- **Bilingual Drafting** — Hindi and English document preparation
+- **Court & Matter Tracking** — Case status and hearing management
+- **Filing Checklists** — Pre-submission review workflows
+- **Accuracy Academy** — AI trade-off education and simulation
+
+## Demo Cases
+
+Currently includes **26 synthetic demo matters** covering:
+- Criminal law
+- Civil litigation
+- NDPS (Narcotic Drugs and Psychotropic Substances)
+- Negotiable instruments
+- Arbitration
+- Infrastructure disputes
+
+## Creator
+
+**Rajkumar Singh Chauhan** — Senior Counsel and Civil Engineer with 30+ years of experience in:
+- Indian infrastructure contract disputes
+- Civil engineering project execution
+- Dispute resolution and consultation
+
+The project demonstrates how domain expertise, structured verification and AI-assisted drafting can work together without allowing convenience to replace legal judgment.
+
+## Important Notice
+
+All included matters and documents are **synthetic demonstration data**. Legal Luminaire is not a substitute for professional legal review.
