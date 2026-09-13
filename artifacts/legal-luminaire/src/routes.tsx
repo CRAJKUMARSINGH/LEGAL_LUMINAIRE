@@ -1,4 +1,4 @@
-﻿import React, { Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
+import React, { Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useCaseContext } from "@/context/CaseContext";
 import { featureFlags } from "@/config/featureFlags";
@@ -9,6 +9,15 @@ import { isLpsRoute, LPS_ROUTE_MAP } from "@/types";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 
 // Lazy load components for code splitting
+const Example33Page = lazy(() => import("@/pages/Example33Page"));
+const Example34Page = lazy(() => import("@/pages/Example34Page"));
+const Example35Page = lazy(() => import("@/pages/Example35Page"));
+const Example36Page = lazy(() => import("@/pages/Example36Page"));
+const Example37Page = lazy(() => import("@/pages/Example37Page"));
+const Example38Page = lazy(() => import("@/pages/Example38Page"));
+const Example39Page = lazy(() => import("@/pages/Example39Page"));
+const Example40Page = lazy(() => import("@/pages/Example40Page"));
+const Example41Page = lazy(() => import("@/pages/Example41Page"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 // Week 1 — hidden /system/flags dev route (bilingual flag inspector)
 // Works under Netlify SPA redirects (/* → /index.html 200).
@@ -166,6 +175,7 @@ export function Router() {
           <Route path="/citation-search" component={() => Wrap(<CitationSearchPage />, "CitationSearchPage")} />
           <Route path="/authority/:id" component={() => Wrap(<CitationAuthorityPage />, "CitationAuthorityPage")} />
           <Route path="/copilot" component={() => Wrap(<CopilotPage />, "CopilotPage")} />
+          <Route path="/standards" component={() => <div className="p-0">{Wrap(<StandardsView />, "StandardsView")}</div>} />
 
           {/* Defense Master Routes */}
           <Route path="/cross-check-report" component={() => Wrap(<CrossCheckReport />, "CrossCheckReport")} />
@@ -202,6 +212,7 @@ export function Router() {
 
           {/* Case-scoped routes */}
           <Route path="/case/:id/copilot"               component={() => Wrap(<CopilotPage />, "CopilotPage")} />
+          <Route path="/case/:id/citation-search"       component={() => Wrap(<CitationSearchPage />, "CitationSearchPage")} />
           <Route path="/case/:id/dashboard"             component={() => <div className="p-6">{Wrap(<DynamicDashboardView />, "DynamicDashboardView")}</div>} />
           <Route path="/case/:id/chat"                  component={() => <div className="flex flex-col h-full">{Wrap(<ChatView />, "ChatView")}</div>} />
           <Route path="/case/:id/case-law"              component={() => <div className="p-0">{Wrap(<CaseLawView />, "CaseLawView")}</div>} />
@@ -209,6 +220,7 @@ export function Router() {
           <Route path="/case/:id/cross-reference"       component={() => Wrap(<CrossReferenceMatrix />, "CrossReferenceMatrix")} />
           <Route path="/case/:id/ai-research"           component={() => Wrap(<AIResearchEngine />, "AIResearchEngine")} />
           <Route path="/case/:id/ai-draft-engine"       component={() => Wrap(<AIDraftEngine />, "AIDraftEngine")} />
+          <Route path="/standards"                 component={() => <div className="p-0">{Wrap(<StandardsView />, "StandardsView")}</div>} />
           <Route path="/case/:id/standards"             component={() => <div className="p-0">{Wrap(<StandardsView />, "StandardsView")}</div>} />
           <Route path="/case/:id/timeline"              component={() => <div className="p-0">{Wrap(<TimelineView />, "TimelineView")}</div>} />
           <Route path="/case/:id/documents"             component={() => <div className="p-0">{Wrap(<DocumentsView />, "DocumentsView")}</div>} />
@@ -261,7 +273,16 @@ export function Router() {
           {(featureFlags.enableJudgeAnalytics || featureFlags.enableCourtAnalytics) && (
             <Route path="/case/:id/judge-analytics"   component={() => Wrap(<JudgeAnalyticsPage />, "JudgeAnalyticsPage")} />
           )}
-          <Route component={() => Wrap(<NotFound />, "NotFound")} />
+          <Route path="/example33" component={() => Wrap(<Example33Page />, "Example33Page")} />
+        <Route path="/example34" component={() => Wrap(<Example34Page />, "Example34Page")} />
+        <Route path="/example35" component={() => Wrap(<Example35Page />, "Example35Page")} />
+        <Route path="/example36" component={() => Wrap(<Example36Page />, "Example36Page")} />
+        <Route path="/example37" component={() => Wrap(<Example37Page />, "Example37Page")} />
+        <Route path="/example38" component={() => Wrap(<Example38Page />, "Example38Page")} />
+        <Route path="/example39" component={() => Wrap(<Example39Page />, "Example39Page")} />
+        <Route path="/example40" component={() => Wrap(<Example40Page />, "Example40Page")} />
+        <Route path="/example41" component={() => Wrap(<Example41Page />, "Example41Page")} />
+        <Route component={() => Wrap(<NotFound />, "NotFound")} />
         </Switch>
       </Layout>
     </AppErrorBoundary>
