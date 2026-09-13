@@ -39,6 +39,27 @@ Currently includes **26 synthetic demo matters** covering:
 - Arbitration
 - Infrastructure disputes
 
+## Sample Drafting Library
+
+Legal Luminaire includes a comprehensive **50+ sample drafting library**:
+
+### Case Templates
+- 7 pre-built case templates (Murder Trial, Corruption, Cybercrime, Domestic Violence, Property Dispute, Contract Breach, M&A, Environmental Law)
+- Structured case data with timeline, case law, standards, and strategy
+- Validation and generation functions for quick case setup
+
+### Document Templates
+- 13+ legal document templates (Briefs, Compliance Notes, Evidence Checklists, Hearing Notes, etc.)
+- Court-ready formats for various legal proceedings
+- Bilingual support (Hindi and English)
+
+### Test Cases & Scenarios
+- 21 functional test cases (TC-01 to TC-21)
+- 7 edge cases for quality gate testing
+- 5 stress test cases for performance validation
+- 4 showcase cases for marketing demonstrations
+- Marketing success stories and accuracy benchmarks
+
 ## Creator
 
 **Rajkumar Singh Chauhan** — Senior Counsel and Civil Engineer with 30+ years of experience in:

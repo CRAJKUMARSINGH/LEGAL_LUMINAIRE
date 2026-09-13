@@ -35,6 +35,7 @@ Built for Indian trial advocates who face five broken workflows daily: AI halluc
 - **🔬 Forensic Standards Explorer** — 50+ IS/ASTM/NABL standards in bilingual plain-language. Know exactly which IS clause the prosecution violated — without a technical expert in the room.
 - **🎓 Accuracy Academy** — Interactive simulation with live trade-off meters (Verification Depth / Drafting Velocity / Client Safety). Teaches *when* to trust AI output. Every choice has a cost.
 - **📁 26 Synthetic Demo Cases** — Complete trial dossiers across criminal defense, S.65B BSA electronic evidence, commercial arbitration, and ballistics. 100% synthetic. Zero real PII.
+- **📚 50+ Sample Drafting Library** — Pre-built case templates, legal document templates, and test scenarios for quick case setup.
 - **🌐 Full EN/HI Bilingual UI** — Every label, error state, and workflow available in English and Hindi.
 
 ---

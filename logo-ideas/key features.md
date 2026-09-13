@@ -31,3 +31,4 @@
 - **Standards Explorer** — Helps distinguish and apply relevant Indian, IS, ASTM and forensic standards
 - **Accuracy Academy** — Demonstrates the risks and trade-offs of AI-assisted legal work
 - **26 Synthetic Demo Cases** — Covers criminal, civil, NDPS, negotiable instruments, arbitration and infrastructure matters
+- **50+ Sample Drafting Library** — Pre-built case templates, legal document templates, and test scenarios for quick case setup
